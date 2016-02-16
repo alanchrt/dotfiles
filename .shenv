@@ -1,0 +1,35 @@
+# .shenv - Alan Christopher Thomas
+# http://alanct.com/
+
+# Keep 1000 lines in history
+HISTSIZE=1000
+HISTFILESIZE=1000
+
+# Remove default Ctrl-S behavior
+if [ -t 0 ]; then
+    stty -ixon -ixoff
+fi
+
+# Use full color
+export TERM=xterm-256color
+
+# Use vim as default editor
+export EDITOR=emacs
+export VISUAL=emacs
+
+# Use local binaries
+export PATH=~/.local/bin:$PATH
+
+# Store Go code in home directory
+export GOPATH=$HOME/.gocode
+
+# Set up virtualenv
+if [ -f "$HOME/.venvburrito/startup.sh" ]; then
+    . "$HOME/.venvburrito/startup.sh"
+fi
+
+# Virtualenv settings
+export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+export PIP_VIRTUALENV_BASE=$WORKON_HOME
+export PIP_RESPECT_VIRTUALENV=true
