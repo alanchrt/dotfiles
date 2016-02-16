@@ -87,7 +87,7 @@ configure_git() {
 
 configure_emacs() {
     echo "Configuring emacs..."
-    link_file .emacs .emacs
+    link_file prelude-modules.el .emacs.d/prelude-modules.el
 }
 
 configure_tmux() {
@@ -104,7 +104,7 @@ delete_backups() {
     rm -rf $HOME/.gitignore.dotbackup
     rm -rf $HOME/.shenv.dotbackup
 #    rm -rf $HOME/.tmux.conf.dotbackup
-    rm -rf $HOME/.emacs.dotbackup
+    rm -rf $HOME/.emacs.d/prelude-modules.el
     rm -rf $HOME/.oh-my-zsh.dotbackup
     rm -rf $HOME/.zshrc.dotbackup
 }
