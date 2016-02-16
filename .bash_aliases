@@ -16,6 +16,9 @@ alias gdt='git difftool'
 alias gco='git checkout'
 alias glo='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %C(cyan)(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
 
+# Use byobu for tmux
+alias tmux='byobu'
+
 # Emacs
 alias e='emacs'
 

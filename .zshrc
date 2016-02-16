@@ -1,10 +1,8 @@
-# Init oh-my-zsh
-export ZSH=/home/vagrant/.oh-my-zsh
+# Configure oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME='robbyrussell'
-source $ZSH/oh-my-zsh.sh
-
-# Run oh-my-zsh plugins
 plugins=(git tmux vagrant ssh-agent brew debian python pip virtualenv virtualenvwrapper django fabric celery nvm npm go heroku postgres redis-cli colored-man-pages colorize)
+source $ZSH/oh-my-zsh.sh
 
 # Enable completion
 autoload -U compinit

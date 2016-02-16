@@ -35,11 +35,6 @@ clone_or_pull_repo() {
     fi
 }
 
-install_virtualenvwrapper() {
-    echo "Installing virtualenvwrapper..."
-    curl -s https://raw.githubusercontent.com/brainsik/virtualenv-burrito/master/virtualenv-burrito.sh | exclude_profile=1 $SHELL || true
-}
-
 install_oh_my_zsh() {
     echo "Installing oh-my-zsh..."
     if pushd $HOME/.oh-my-zsh; then git pull origin master; popd; else git clone git://github.com/robbyrussell/oh-my-zsh.git $HOME/.oh-my-zsh; fi
@@ -70,6 +65,7 @@ configure_bash() {
 configure_zsh() {
     echo "Configuring zsh..."
     link_file .zshrc .zshrc
+    rm -f $HOME/.zcompdump
 }
 
 configure_git() {
@@ -128,7 +124,6 @@ if [ "$DELETE_BACKUPS" == 1 ]; then
     exit 0
 fi
 
-install_virtualenvwrapper
 install_oh_my_zsh
 install_prelude
 configure_shell
