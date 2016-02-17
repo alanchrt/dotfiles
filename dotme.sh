@@ -40,9 +40,9 @@ install_oh_my_zsh() {
     if pushd $HOME/.oh-my-zsh; then git pull origin master; popd; else git clone git://github.com/robbyrussell/oh-my-zsh.git $HOME/.oh-my-zsh; fi
 }
 
-install_prelude() {
-    echo "Installing prelude..."
-    if pushd $HOME/.emacs.d; then git pull origin master; popd; else git clone git://github.com/bbatsov/prelude.git $HOME/.emacs.d; fi
+install_spacemacs() {
+    echo "Installing spacemacs..."
+    if pushd $HOME/.emacs.d; then git fetch origin master && git reset --hard master; popd; else git clone https://github.com/syl20bnr/spacemacs $HOME/.emacs.d; fi
 }
 
 configure_shell() {
@@ -71,20 +71,13 @@ configure_zsh() {
 configure_git() {
     echo "Configuring git..."
     backup_file .gitconfig
-    if [ -z "$GIT_NAME" ]; then
-        read -p "Git user.name: " GIT_NAME
-    fi
-    if [ -z "$GIT_EMAIL" ]; then
-        read -p "Git user.email: " GIT_EMAIL
-    fi
     sed -e 's/\[\[GIT_NAME\]\]/'"$GIT_NAME"'/g' -e 's/\[\[GIT_EMAIL\]\]/'"$GIT_EMAIL"'/g' `pwd`/.gitconfig-global > $HOME/.gitconfig
     copy_file .gitignore-global .gitignore
 }
 
 configure_emacs() {
     echo "Configuring emacs..."
-    link_file .emacs.d/prelude-modules.el .emacs.d/prelude-modules.el
-    link_file .emacs.d/personal/preload/keys.el .emacs.d/personal/preload/keys.el
+    link_file .spacemacs .spacemacs
 }
 
 configure_tmux() {
@@ -101,8 +94,6 @@ delete_backups() {
     rm -rf $HOME/.gitignore.dotbackup
     rm -rf $HOME/.shenv.dotbackup
 #    rm -rf $HOME/.tmux.conf.dotbackup
-    rm -rf $HOME/.emacs.d/prelude-modules.el.dotbackup
-    rm -rf $HOME/.oh-my-zsh.dotbackup
     rm -rf $HOME/.zshrc.dotbackup
 }
 
@@ -125,8 +116,15 @@ if [ "$DELETE_BACKUPS" == 1 ]; then
     exit 0
 fi
 
+if [ -z "$GIT_NAME" ]; then
+    read -p "Git user.name: " GIT_NAME
+fi
+if [ -z "$GIT_EMAIL" ]; then
+    read -p "Git user.email: " GIT_EMAIL
+fi
+
 install_oh_my_zsh
-install_prelude
+install_spacemacs
 configure_shell
 configure_bash
 configure_zsh
