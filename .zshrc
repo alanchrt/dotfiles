@@ -1,3 +1,6 @@
+# Enable SSH forwarding
+zstyle :omz:plugins:ssh-agent agent-forwarding on
+
 # Configure oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME='robbyrussell'
