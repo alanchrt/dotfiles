@@ -83,7 +83,8 @@ configure_git() {
 
 configure_emacs() {
     echo "Configuring emacs..."
-    link_file prelude-modules.el .emacs.d/prelude-modules.el
+    link_file .emacs.d/prelude-modules.el .emacs.d/prelude-modules.el
+    link_file .emacs.d/personal/preload/keys.el .emacs.d/personal/preload/keys.el
 }
 
 configure_tmux() {
