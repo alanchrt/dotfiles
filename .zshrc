@@ -4,7 +4,7 @@ zstyle :omz:plugins:ssh-agent agent-forwarding on
 # Configure oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME='robbyrussell'
-plugins=(git tmux vagrant ssh-agent brew debian python pip virtualenv virtualenvwrapper django fabric celery node nvm npm go heroku postgres redis-cli colored-man-pages colorize)
+plugins=(git tmux vagrant ssh-agent brew debian python pip virtualenv virtualenvwrapper django fabric celery node nvm npm go heroku postgres redis-cli colored-man-pages colorize history-substring-search)
 source $ZSH/oh-my-zsh.sh
 
 # Redefine tmux wrapper to use byobu-tmux
@@ -46,6 +46,10 @@ HISTFILE=$HOME/.zhistory
 
 # Emacs bindings
 bindkey -e
+
+# Bind history substring search
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
 
 # Properly set shell
 export SHELL=$(which zsh)
