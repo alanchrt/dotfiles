@@ -23,11 +23,6 @@ export PATH=~/.local/bin:$PATH
 # Store Go code in home directory
 export GOPATH=$HOME/.gocode
 
-# Set up virtualenv
-if [ -f "$HOME/.venvburrito/startup.sh" ]; then
-    . "$HOME/.venvburrito/startup.sh"
-fi
-
 # Virtualenv settings
 export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
 export VIRTUAL_ENV_DISABLE_PROMPT=1
