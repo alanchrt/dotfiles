@@ -12,17 +12,17 @@ backup_directory() {
 
 link_file() {
     backup_file $2
-    ln -s `pwd`/$1 $HOME/$2
+    ln -s `pwd`/confs/$1 $HOME/$2
 }
 
 link_directory() {
     backup_directory $2
-    ln -s `pwd`/$1 $HOME/$2
+    ln -s `pwd`/confs/$1 $HOME/$2
 }
 
 copy_file() {
     backup_file $2
-    cp `pwd`/$1 $HOME/$2
+    cp `pwd`/confs/$1 $HOME/$2
 }
 
 clone_or_pull_repo() {
@@ -72,7 +72,7 @@ configure_zsh() {
 configure_git() {
     echo "Configuring git..."
     backup_file .gitconfig
-    sed -e 's/\[\[GIT_NAME\]\]/'"$GIT_NAME"'/g' -e 's/\[\[GIT_EMAIL\]\]/'"$GIT_EMAIL"'/g' `pwd`/.gitconfig-global > $HOME/.gitconfig
+    sed -e 's/\[\[GIT_NAME\]\]/'"$GIT_NAME"'/g' -e 's/\[\[GIT_EMAIL\]\]/'"$GIT_EMAIL"'/g' `pwd`/confs/.gitconfig-global > $HOME/.gitconfig
     copy_file .gitignore-global .gitignore
 }
 
