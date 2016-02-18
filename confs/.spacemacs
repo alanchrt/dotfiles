@@ -25,9 +25,11 @@ values."
      ;; ----------------------------------------------------------------
      auto-completion
      ;; better-defaults
+     git
      emacs-lisp
      python
-     git
+     javascript
+     react
      markdown
      ;; org
      ;; (shell :variables
