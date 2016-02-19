@@ -43,7 +43,7 @@ install_oh_my_zsh() {
 install_spacemacs() {
     echo "Installing spacemacs..."
     test -e $HOME/.emacs.d/init.el || backup_directory .emacs.d
-    if pushd $HOME/.emacs.d; then git fetch origin master && git reset --hard master; popd; else git clone https://github.com/syl20bnr/spacemacs $HOME/.emacs.d; fi
+    if pushd $HOME/.emacs.d; then git pull origin master; popd; else git clone https://github.com/syl20bnr/spacemacs $HOME/.emacs.d; fi
 }
 
 configure_shell() {
