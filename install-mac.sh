@@ -6,5 +6,5 @@ git clone https://github.com/creationix/nvm.git $HOME/.nvm && cd $HOME/.nvm && g
 source $HOME/.nvm/nvm.sh
 npm install -g tern
 sudo easy_install pip
-sudo pip install virtualenvwrapper flake8 ipython
+sudo pip install virtualenvwrapper flake8 ipython autoflake yapf
 sudo chpass -s /bin/zsh $USER 
