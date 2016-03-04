@@ -24,10 +24,12 @@ export PATH=~/.local/bin:$PATH
 export GOPATH=$HOME/.gocode
 
 # Virtualenv settings
+export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_VIRTUALENV_ARGS='--no-site-packages'
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
 export PIP_RESPECT_VIRTUALENV=true
+source /usr/local/bin/virtualenvwrapper.sh
 
 # Source nvm
 export NVM_DIR="$HOME/.nvm"
