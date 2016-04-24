@@ -1,31 +1,3 @@
-# Enable SSH forwarding
-zstyle :omz:plugins:ssh-agent agent-forwarding on
-
-# Configure oh-my-zsh
-export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME='robbyrussell'
-plugins=(git tmux vagrant ssh-agent brew debian python pip virtualenv virtualenvwrapper django fabric celery node nvm npm go heroku postgres redis-cli colored-man-pages colorize history-substring-search)
-source $ZSH/oh-my-zsh.sh
-
-# Redefine tmux wrapper to use byobu-tmux
-function _zsh_tmux_plugin_run()
-{
-    # We have other arguments, just run them
-    if [[ -n "$@" ]]
-    then
-        \byobu-tmux $@
-        # Try to connect to an existing session.
-    elif [[ "$ZSH_TMUX_AUTOCONNECT" == "true" ]]
-    then
-        \byobu-tmux `[[ "$ZSH_TMUX_ITERM2" == "true" ]] && echo '-CC '` attach || \byobu-tmux `[[ "$ZSH_TMUX_ITERM2" == "true" ]] && echo '-CC '` `[[ "$ZSH_TMUX_FIXTERM" == "true" ]] && echo '-f '$_ZSH_TMUX_FIXED_CONFIG` new-session
-        [[ "$ZSH_TMUX_AUTOQUIT" == "true" ]] && exit
-        # Just run tmux, fixing the TERM variable if requested.
-    else
-        \byobu-tmux `[[ "$ZSH_TMUX_ITERM2" == "true" ]] && echo '-CC '` `[[ "$ZSH_TMUX_FIXTERM" == "true" ]] && echo '-f '$_ZSH_TMUX_FIXED_CONFIG`
-        [[ "$ZSH_TMUX_AUTOQUIT" == "true" ]] && exit
-    fi
-}
-
 # Enable completion
 autoload -U compinit
 compinit -i
@@ -58,6 +30,34 @@ export SHELL=$(which zsh)
 if [ -f ~/.shenv ]; then
     . ~/.shenv
 fi
+
+# Enable SSH forwarding
+zstyle :omz:plugins:ssh-agent agent-forwarding on
+
+# Configure oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
+ZSH_THEME='robbyrussell'
+plugins=(git tmux vagrant ssh-agent brew debian python pip virtualenv virtualenvwrapper django fabric celery node nvm npm go heroku postgres redis-cli colored-man-pages colorize history-substring-search)
+source $ZSH/oh-my-zsh.sh
+
+# Redefine tmux wrapper to use byobu-tmux
+function _zsh_tmux_plugin_run()
+{
+    # We have other arguments, just run them
+    if [[ -n "$@" ]]
+    then
+        \byobu-tmux $@
+        # Try to connect to an existing session.
+    elif [[ "$ZSH_TMUX_AUTOCONNECT" == "true" ]]
+    then
+        \byobu-tmux `[[ "$ZSH_TMUX_ITERM2" == "true" ]] && echo '-CC '` attach || \byobu-tmux `[[ "$ZSH_TMUX_ITERM2" == "true" ]] && echo '-CC '` `[[ "$ZSH_TMUX_FIXTERM" == "true" ]] && echo '-f '$_ZSH_TMUX_FIXED_CONFIG` new-session
+        [[ "$ZSH_TMUX_AUTOQUIT" == "true" ]] && exit
+        # Just run tmux, fixing the TERM variable if requested.
+    else
+        \byobu-tmux `[[ "$ZSH_TMUX_ITERM2" == "true" ]] && echo '-CC '` `[[ "$ZSH_TMUX_FIXTERM" == "true" ]] && echo '-f '$_ZSH_TMUX_FIXED_CONFIG`
+        [[ "$ZSH_TMUX_AUTOQUIT" == "true" ]] && exit
+    fi
+}
 
 # Include alias definitions
 if [ -f ~/.bash_aliases ]; then
