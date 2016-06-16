@@ -96,6 +96,7 @@ delete_backups() {
     rm -rf $HOME/.shenv.dotbackup
 #    rm -rf $HOME/.tmux.conf.dotbackup
     rm -rf $HOME/.zshrc.dotbackup
+    rm -rf $HOME/.emacs.d.dotbackup
 }
 
 set -e

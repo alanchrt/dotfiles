@@ -13,9 +13,10 @@ fi
 # Use full color
 export TERM=xterm-256color
 
-# Use vim as default editor
-export EDITOR=emacs
-export VISUAL=emacs
+# Use emacs as default editor
+export ALTERNATE_EDITOR=''
+export EDITOR='emacsclient -t'
+export VISUAL='emacsclient -t'
 
 # Use local binaries
 export PATH=~/.local/bin:$PATH
