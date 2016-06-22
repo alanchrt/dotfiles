@@ -1,18 +1,18 @@
+require 'yaml'
+
 VAGRANTFILE_API_VERSION = "2"
 VM_NAME = "dev"
 VM_IP = "192.168.100.200"
-VARS_FILE = ".vars"
+VARS_FILE = "roles/dotfiles/vars/main.yml"
 
 begin
-  ANSIBLE_VARS = Hash[*File.read(VARS_FILE).split(/=|\n/)]
+  ANSIBLE_VARS = YAML.load_file(VARS_FILE)
 rescue Errno::ENOENT
   ANSIBLE_VARS = {}
   ANSIBLE_VARS["git_name"] = [(print 'Git user.name: '), STDIN.gets.chomp][1]
   ANSIBLE_VARS["git_email"] = [(print 'Git user.email: '), STDIN.gets.chomp][1]
   f = File.new(VARS_FILE, 'w')
-  ANSIBLE_VARS.each do |key, val|
-    f.puts "#{key}=#{val}\n"
-  end
+  YAML.dump(ANSIBLE_VARS, f)
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
@@ -37,6 +37,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
   config.vm.provision "ansible" do |ansible|
     ansible.playbook = "#{File.dirname(__FILE__)}/playbook.yml"
-    ansible.extra_vars = ANSIBLE_VARS
   end
 end
