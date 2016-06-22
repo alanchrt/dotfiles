@@ -5,9 +5,10 @@
        dest=/home/vagrant/.nvm
 
 - name: Install Node.js
-  shell: source ~/.nvm/nvm.sh && nvm install v4.2.4
+  shell: source /home/vagrant/.nvm/nvm.sh && nvm install v4.2.4
   args:
     executable: /bin/bash
+    creates: /home/vagrant/.nvm/versions/node/v4.2.4/bin/node
 
 - name: Install tern
   npm: name=tern
