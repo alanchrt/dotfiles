@@ -1,0 +1,7 @@
+---
+- name: Install vim
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - vim-nox

@@ -1,0 +1,12 @@
+---
+- name: Install zsh
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - zsh
+
+- name: Configure default shell
+  become: yes
+  user: name=vagrant
+        shell=/usr/bin/zsh

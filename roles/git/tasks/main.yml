@@ -1,0 +1,12 @@
+---
+- name: Add git PPA
+  become: yes
+  apt_repository: repo="ppa:git-core/ppa"
+
+- name: Install git and related tools
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - git
+    - gist

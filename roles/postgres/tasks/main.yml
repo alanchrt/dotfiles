@@ -1,0 +1,7 @@
+---
+- name: Install postgresql client
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - postgresql-client

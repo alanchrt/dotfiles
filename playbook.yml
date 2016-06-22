@@ -1,149 +1,27 @@
 ---
 - name: Provision dev system
   hosts: all
-
-  tasks:
-    - name: Install system basics
-      become: yes
-      apt: name={{item}}
-           state=installed
-           update_cache=true
-      with_items:
-        - build-essential
-
-    - name: Add git PPA
-      become: yes
-      apt_repository: repo="ppa:git-core/ppa"
-
-    - name: Add Heroku release key
-      become: yes
-      apt_key: url=https://toolbelt.heroku.com/apt/release.key
-               state=present
-
-    - name: Add Heroku apt repository
-      become: yes
-      apt_repository: repo="deb http://toolbelt.heroku.com/ubuntu ./"
-                      state=present
-
-    - name: Install development tools
-      become: yes
-      apt: name={{item}}
-           state=installed
-           update_cache=true
-      with_items:
-        - zsh
-        - git
-        - byobu
-        - heroku-toolbelt
-        - ranger
-        - vim-nox
-        - tree
-        - htop
-        - gist
-        - unzip
-        - postgresql-client
-        - mysql-client
-
-    - name: Install python base
-      become: yes
-      apt: name={{item}}
-           state=installed
-           update_cache=true
-      with_items:
-        - python
-        - python-dev
-        - python-pip
-
-    - name: Install python tooling
-      become: yes
-      pip: name={{item}}
-      with_items:
-        - virtualenvwrapper
-        - flake8
-        - ipython
-        - autoflake
-        - yapf
-
-    - name: Sync nvm
-      git: repo=https://github.com/creationix/nvm.git
-           accept_hostkey=true
-           dest=/home/vagrant/.nvm
-
-    - name: Install Node.js
-      shell: source ~/.nvm/nvm.sh && nvm install v4.2.4
-      args:
-        executable: /bin/bash
-
-    - name: Install tern
-      npm: name=tern
-           global=yes
-           executable=/home/vagrant/.nvm/versions/node/v4.2.4/bin/npm
-
-    - name: Download emacs
-      become: yes
-      get_url: url=http://mirror.team-cymru.org/gnu/emacs/emacs-24.4.tar.gz
-               dest=/usr/local/src/emacs-24.4.tar.gz
-
-    - name: Unarchive emacs
-      become: yes
-      unarchive: src=/usr/local/src/emacs-24.4.tar.gz
-                 dest=/usr/local/src
-                 copy=no
-
-    - name: Install emacs dependencies
-      become: yes
-      apt: name=emacs24
-           state=build-dep
-
-    - name: Build and install emacs
-      become: yes
-      shell: ./configure && make && make install
-      args:
-        chdir: /usr/local/src/emacs-24.4
-        creates: /usr/local/bin/emacs
-
-    - name: Download ngrok
-      become: yes
-      get_url: url=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-               dest=/usr/local/src/ngrok-stable-linux-amd64.zip
-
-    - name: Install ngrok
-      become: yes
-      unarchive: src=/usr/local/src/ngrok-stable-linux-amd64.zip
-                 dest=/usr/local/bin
-                 copy=no
-                 creates=/usr/local/bin/ngrok
-
-    - name: Configure shell
-      become: yes
-      user: name=vagrant
-            shell=/usr/bin/zsh
+  roles:
+    - base
+    - git
+    - zsh
+    - byobu
+    - emacs
+    - vim
+    - python
+    - node
+    - postgres
+    - mysql
+    - heroku
+    - ngrok
 
 - name: Configure dev environment
   hosts: all
+  roles:
+    - dotfiles
 
   vars_prompt:
     - name: "git_name"
       prompt: "Git user.name:"
     - name: "git_email"
       prompt: "Git user.email:"
-
-  tasks:
-    - name: Sync oh-my-zsh
-      git: repo=https://github.com/robbyrussell/oh-my-zsh.git
-           accept_hostkey=true
-           dest=/home/vagrant/.oh-my-zsh
-
-    - name: Sync spacemacs
-      git: repo=https://github.com/syl20bnr/spacemacs
-           accept_hostkey=true
-           dest=/home/vagrant/.emacs.d
-
-    - name: Link all dotfiles
-      expect:
-        chdir: /vagrant
-        command: ./dotme.sh
-        creates: /home/vagrant/.shenv
-        responses:
-          Git user.name: "{{git_name}}"
-          Git user.email: "{{git_email}}"

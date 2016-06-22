@@ -1,0 +1,8 @@
+---
+- name: Install byobu
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - tmux
+    - byobu

@@ -1,0 +1,19 @@
+---
+- name: Install python base
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - python
+    - python-dev
+    - python-pip
+
+- name: Install python tooling
+  become: yes
+  pip: name={{item}}
+  with_items:
+    - virtualenvwrapper
+    - flake8
+    - ipython
+    - autoflake
+    - yapf

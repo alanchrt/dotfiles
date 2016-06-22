@@ -1,0 +1,7 @@
+---
+- name: Install mysql client
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - mysql-client

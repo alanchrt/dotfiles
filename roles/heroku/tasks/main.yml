@@ -1,0 +1,17 @@
+---
+- name: Add Heroku release key
+  become: yes
+  apt_key: url=https://toolbelt.heroku.com/apt/release.key
+           state=present
+
+- name: Add Heroku apt repository
+  become: yes
+  apt_repository: repo="deb http://toolbelt.heroku.com/ubuntu ./"
+                  state=present
+
+- name: Install heroku toolbelt
+  become: yes
+  apt: name={{item}}
+        state=installed
+  with_items:
+    - heroku-toolbelt

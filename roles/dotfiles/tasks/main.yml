@@ -1,0 +1,19 @@
+---
+- name: Sync oh-my-zsh
+  git: repo=https://github.com/robbyrussell/oh-my-zsh.git
+       accept_hostkey=true
+       dest=/home/vagrant/.oh-my-zsh
+
+- name: Sync spacemacs
+  git: repo=https://github.com/syl20bnr/spacemacs
+       accept_hostkey=true
+       dest=/home/vagrant/.emacs.d
+
+- name: Link all dotfiles
+  expect:
+    chdir: /vagrant
+    command: ./dotme.sh
+    creates: /home/vagrant/.shenv
+    responses:
+      Git user.name: "{{git_name}}"
+      Git user.email: "{{git_email}}"

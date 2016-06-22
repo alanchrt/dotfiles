@@ -1,0 +1,12 @@
+---
+- name: Download ngrok
+  become: yes
+  get_url: url=https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+           dest=/usr/local/src/ngrok-stable-linux-amd64.zip
+
+- name: Install ngrok
+  become: yes
+  unarchive: src=/usr/local/src/ngrok-stable-linux-amd64.zip
+             dest=/usr/local/bin
+             copy=no
+             creates=/usr/local/bin/ngrok
