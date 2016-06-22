@@ -34,6 +34,7 @@ values."
      python
      react
      ruby
+     rust
      vagrant
      yaml
      git
