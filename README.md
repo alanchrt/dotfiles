@@ -29,6 +29,8 @@ $ brew install ansible
 $ vagrant up
 ```
 
+For Vagrant-provisioned dev environments, your host machine home directory will be available inside the VM at `~/host`.
+
 ### Running against localhost
 
 It's also possible to provision your local machine with the Ansible playbook:
