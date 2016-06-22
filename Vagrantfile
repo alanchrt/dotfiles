@@ -26,7 +26,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.insert_key = false
   config.ssh.forward_agent = true
 
-  config.vm.synced_folder Dir.home, "/home/vagrant/host"
+  config.vm.synced_folder ENV.fetch("DEV_VM_SYNCED_FOLDER", Dir.home), "/host"
 
   config.vm.provider :virtualbox do |v|
     v.name = VM_NAME

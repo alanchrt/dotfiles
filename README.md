@@ -29,7 +29,7 @@ $ brew install ansible
 $ vagrant up
 ```
 
-For Vagrant-provisioned dev environments, your host machine home directory will be available inside the VM at `~/host`.
+For Vagrant-provisioned dev environments, your host machine home directory will be available inside the VM at `/host`. You can confugre which directory will be synced to `/host` by setting `DEV_VM_SYNCED_FOLDER` on your host machine before running `vagrant up`.
 
 ### Running against localhost
 
