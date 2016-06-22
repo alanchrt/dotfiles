@@ -135,5 +135,5 @@
         command: ./dotme.sh
         creates: /home/vagrant/.shenv
         responses:
-          Git user.name: git_name
-          Git user.email: git_email
+          Git user.name: "{{git_name}}"
+          Git user.email: "{{git_email}}"
