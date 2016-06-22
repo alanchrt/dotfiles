@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
 link_file() {
+    rm $HOME/$2
     ln -s `pwd`/home/$1 $HOME/$2
 }
 
 link_directory() {
+    rm -r $HOME/$2
     ln -s `pwd`/home/$1 $HOME/$2
 }
 
