@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
 link_file() {
-    rm $HOME/$2
+    if [ ! -z "$HOME" ] && [ ! -z "$2" ]; then
+        rm -f $HOME/$2
+    fi
     ln -s `pwd`/home/$1 $HOME/$2
 }
 
 link_directory() {
-    rm -r $HOME/$2
+    if [ ! -z "$HOME" ] && [ ! -z "$2" ]; then
+        rm -rf $HOME/$2
+    fi
     ln -s `pwd`/home/$1 $HOME/$2
 }
 
@@ -31,7 +35,7 @@ install_oh_my_zsh() {
 
 install_spacemacs() {
     echo "Installing spacemacs..."
-    clone_or_pull_repo syl20nbr/spacemacs .emacs.d
+    clone_or_pull_repo syl20bnr/spacemacs .emacs.d
 }
 
 configure_shell() {
