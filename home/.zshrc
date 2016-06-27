@@ -59,6 +59,9 @@ function _zsh_tmux_plugin_run()
     fi
 }
 
+# Remove silver searcher conflicg
+unalias ag
+
 # Include alias definitions
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases

@@ -1,7 +1,8 @@
 ---
-- name: Install postgresql client
+- name: Install postgresql headers and client
   become: yes
   apt: name={{item}}
        state=installed
   with_items:
+    - libpq-dev
     - postgresql-client
