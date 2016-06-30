@@ -12,3 +12,4 @@
     - unzip
     - silversearcher-ag
     - jq
+    - httpie
