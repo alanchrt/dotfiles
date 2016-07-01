@@ -72,6 +72,12 @@ configure_emacs() {
     link_file .spacemacs .spacemacs
 }
 
+configure_python() {
+    echo "Configuring python..."
+    mkdir -p $HOME/.config
+    link_file .config/flake8 .config/flake8
+}
+
 set -e
 
 if [ -z "$GIT_NAME" ]; then
@@ -89,5 +95,6 @@ configure_bash
 configure_zsh
 configure_git
 configure_emacs
+configure_python
 
 echo "Done."
