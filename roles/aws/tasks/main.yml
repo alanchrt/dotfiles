@@ -1,0 +1,13 @@
+---
+- name: Install pip
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - python-pip
+
+- name: Install AWS CLI
+  become: yes
+  pip: name={{item}}
+  with_items:
+    - awscli

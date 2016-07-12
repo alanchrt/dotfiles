@@ -13,6 +13,7 @@
     - postgres
     - mysql
     - heroku
+    - aws
     - ngrok
 
 - name: Configure dev environment
