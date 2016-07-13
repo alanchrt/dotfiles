@@ -6,6 +6,7 @@
        update_cache=true
   with_items:
     - build-essential
+    - ntp
     - ranger
     - tree
     - htop
@@ -14,3 +15,8 @@
     - jq
     - httpie
     - whois
+
+- name: Start ntp
+  become: yes
+  service: name=ntp
+           state=started
