@@ -21,6 +21,7 @@ alias gp="gist-paste -p"
 
 # Emacs
 alias e='emacsclient -t'
+alias ec='emacsclient -t .'
 
 # Use proper terminal for weechat
 alias wee='TERM=screen-256color weechat'
