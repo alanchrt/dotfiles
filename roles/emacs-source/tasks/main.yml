@@ -1,0 +1,23 @@
+---
+- name: Download emacs source
+  become: yes
+  get_url: url=http://mirror.team-cymru.org/gnu/emacs/emacs-24.4.tar.gz
+           dest=/usr/local/src/emacs-24.4.tar.gz
+
+- name: Unarchive emacs
+  become: yes
+  unarchive: src=/usr/local/src/emacs-24.4.tar.gz
+             dest=/usr/local/src
+             copy=no
+
+- name: Install emacs dependencies
+  become: yes
+  apt: name=emacs24
+       state=build-dep
+
+- name: Build and install emacs
+  become: yes
+  shell: ./configure && make && make install
+  args:
+    chdir: /usr/local/src/emacs-24.4
+    creates: /usr/local/bin/emacs

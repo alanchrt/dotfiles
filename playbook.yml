@@ -1,12 +1,13 @@
 ---
 - name: Provision dev system
   hosts: all
+  tasks:
+    - group_by: key=ubuntu_release_{{ ansible_distribution_release }}
   roles:
     - base
     - git
     - zsh
     - byobu
-    - emacs
     - vim
     - python
     - node
@@ -15,6 +16,14 @@
     - heroku
     - aws
     - ngrok
+
+- hosts: ubuntu_release_trusty
+  roles:
+    - emacs-source
+
+- hosts: ubuntu_release_wily
+  roles:
+    - emacs
 
 - name: Configure dev environment
   hosts: all

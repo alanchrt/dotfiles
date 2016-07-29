@@ -16,7 +16,7 @@ rescue Errno::ENOENT
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "ubuntu/wily64"
 
   config.vm.hostname = VM_NAME
   config.vm.network :private_network, ip: VM_IP
