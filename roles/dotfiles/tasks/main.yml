@@ -2,18 +2,41 @@
 - name: Sync oh-my-zsh
   git: repo=https://github.com/robbyrussell/oh-my-zsh.git
        accept_hostkey=true
-       dest=/home/vagrant/.oh-my-zsh
+       dest="{{ansible_env.HOME}}/.oh-my-zsh"
 
 - name: Sync spacemacs
-  git: repo=https://github.com/syl20bnr/spacemacs
+  git: repo=https://github.com/syl20bnr/spacemacs.git
        accept_hostkey=true
-       dest=/home/vagrant/.emacs.d
+       dest="{{ansible_env.HOME}}/.emacs.d"
+
+- stat: path=/vagrant
+  register: vagrant_dir
+
+- name: Clone dotfiles repo over SSH
+  git: repo=git@github.com:alanctkc/dotfiles.git
+       accept_hostkey=true
+       dest="{{ansible_env.HOME}}/.dotfiles"
+  when: not vagrant_dir.stat.exists
+  register: ssh_clone
+  ignore_errors: True
+
+- name: Clone dotfiles repo over HTTPS
+  git: repo=https://github.com/alanctkc/dotfiles.git
+       accept_hostkey=true
+       dest="{{ansible_env.HOME}}/.dotfiles"
+  when: ssh_clone|failed and not vagrant_dir.stat.exists
+
+- name: Symlink dotfiles repo
+  file: src=/vagrant
+        dest="{{ansible_env.HOME}}/.dotfiles"
+        state=link
+  when: vagrant_dir.stat.isdir is defined and vagrant_dir.stat.isdir
 
 - name: Link all dotfiles
   expect:
-    chdir: /vagrant
+    chdir: "{{ansible_env.HOME}}/.dotfiles"
     command: ./dotme.sh
-    creates: /home/vagrant/.shenv
+    creates: "{{ansible_env.HOME}}/.shenv"
     responses:
       Git user.name: "{{git_name}}"
       Git user.email: "{{git_email}}"

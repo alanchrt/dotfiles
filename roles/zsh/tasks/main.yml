@@ -8,5 +8,5 @@
 
 - name: Configure default shell
   become: yes
-  user: name=vagrant
+  user: name="{{ansible_env.USER}}"
         shell=/usr/bin/zsh
