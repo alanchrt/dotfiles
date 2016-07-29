@@ -1,5 +1,45 @@
 **IMPORTANT:** This is my new, "batteries-included" dotfiles repo, using spacemacs, byobu, and oh-my-zsh. If you're looking for the Vim+tmux+git dotfiles repo that previously lived at this address or has been mentioned in talks, you can now find it [here](https://github.com/alanctkc/dotfiles-old).
 
+## Try it out
+
+This repo includes a Vagrant configuration that automatically provisions the entire setup. Make sure you have [Vagrant, VirtualBox, and Ansible installed](#install-dependencies) first.
+
+Then, clone the repo and create the Vagrant. This will take a while.
+
+```bash
+$ git clone https://github.com/alanctkc/dotfiles.git
+$ cd dotfiles
+$ vagrant up
+```
+
+SSH into the Vagrant. You'll find the home directory of your host machine at `/host`:
+
+```bash
+$ vagrant ssh
+$ ls /host
+```
+
+Switch to the directory of a project in your home directory and open a tmux session:
+
+```bash
+$ cd /host/path/to/projectname
+$ to
+```
+
+Inside the tmux session, open a file with Spacemacs (the first load will take a while):
+
+```bash
+$ e path/to/file.ext
+```
+
+Check out some basic Spacemacs keybindings in the [Spacemacs documentation](http://spacemacs.org/doc/DOCUMENTATION.html#orgheadline180).
+
+Detach from your tmux session with `Ctrl+a d`. Reattach using the project directory's name:
+
+```bash
+$ ta projectname
+```
+
 ## Link dotfiles
 
 The repo contains a simple bootstrap script to link up dotfiles into your home directory (requires git):
