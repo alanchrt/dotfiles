@@ -4,7 +4,7 @@
 
 This repo includes a Vagrant configuration that automatically provisions the entire setup. Make sure you have [Vagrant, VirtualBox, and Ansible installed](#install-dependencies) first.
 
-Then, clone the repo and create the Vagrant. This will take a while.
+Then, clone the repo and create the Vagrant. You'll be prompted for a display name and email address for your git config the first time. This part will take a while.
 
 ```bash
 $ git clone https://github.com/alanctkc/dotfiles.git
