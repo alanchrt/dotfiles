@@ -2,7 +2,7 @@
 - name: Provision dev system
   hosts: all
   tasks:
-    - group_by: key=ubuntu_release_{{ ansible_distribution_release }}
+    - group_by: key=ubuntu_release_{{ansible_distribution_release}}
   roles:
     - base
     - git
