@@ -38,3 +38,31 @@ It's also possible to provision your local machine with the Ansible playbook:
 ```bash
 $ ansible-playbook -i 'localhost,' -c local playbook.yml
 ```
+
+#### Credentials
+
+There are a few logins that might be worth setting up right off the bat.
+
+##### AWS
+
+```bash
+$ aws configure
+````
+
+##### Heroku
+
+```bash
+$ heroku login
+```
+
+##### Gist
+
+```bash
+$ gist-paste --login
+```
+
+##### Ngrok
+
+```bash
+$ ngrok authtoken <token>
+```
