@@ -10,6 +10,7 @@
     - ranger
     - tree
     - htop
+    - zip
     - unzip
     - silversearcher-ag
     - jq

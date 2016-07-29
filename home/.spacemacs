@@ -255,6 +255,7 @@ This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
   (setq web-mode-code-indent-offset 2)
   (setq neo-theme 'nerd)
+  (setq neo-show-hidden-files nil)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
