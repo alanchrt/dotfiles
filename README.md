@@ -39,7 +39,7 @@ It's also possible to provision your local machine with the Ansible playbook:
 $ ansible-playbook -i 'localhost,' -c local playbook.yml
 ```
 
-#### Credentials
+### Credentials
 
 There are a few logins that might be worth setting up right off the bat.
 
