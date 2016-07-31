@@ -76,7 +76,7 @@ For Vagrant-provisioned dev environments, your host machine home directory will 
 It's also possible to provision your local machine with the Ansible playbook:
 
 ```bash
-$ ansible-playbook -i 'localhost,' -c local playbook.yml
+$ ansible-playbook --ask-sudo-pass -i 'localhost,' -c local playbook.yml
 ```
 
 ### Credentials
