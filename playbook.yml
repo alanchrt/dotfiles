@@ -25,6 +25,10 @@
   roles:
     - emacs
 
+- hosts: ubuntu_release_xenial
+  roles:
+    - emacs
+
 - name: Configure dev environment
   hosts: all
   roles:
@@ -32,6 +36,6 @@
 
   vars_prompt:
     - name: "git_name"
-      prompt: "Git user.name:"
+      prompt: "Git user.name"
     - name: "git_email"
-      prompt: "Git user.email:"
+      prompt: "Git user.email"
