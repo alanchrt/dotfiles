@@ -1,0 +1,13 @@
+---
+- name: Install i3 and compton
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - i3
+    - compton
+
+- name: Set i3 as window manager in LightDM
+  become: yes
+  lineinfile: dest=/etc/lightdm/lightdm.conf
+              line="user-session=i3"

@@ -78,6 +78,12 @@ configure_python() {
     link_file .config/flake8 .config/flake8
 }
 
+configure_i3() {
+    echo "Configuring i3..."
+    mkdir -p $HOME/.config/i3
+    link_file .config/i3/config .config/i3/config
+}
+
 set -e
 
 if [ -z "$GIT_NAME" ]; then
@@ -96,5 +102,6 @@ configure_zsh
 configure_git
 configure_emacs
 configure_python
+configure_i3
 
 echo "Done."

@@ -1,0 +1,8 @@
+---
+- name: Install vagrant and virtualbox
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - vagrant
+    - virtualbox

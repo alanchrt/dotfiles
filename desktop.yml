@@ -1,0 +1,15 @@
+---
+- name: Provision desktop system
+  hosts: all
+  roles:
+    - i3
+    - vagrant
+    - dotfiles
+
+  vars_prompt:
+    - name: "git_name"
+      prompt: "Git user.name"
+      private: no
+    - name: "git_email"
+      prompt: "Git user.email"
+      private: no
