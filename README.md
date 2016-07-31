@@ -57,6 +57,8 @@ You can run this playbook against your own hosts or, alternatively, run the deve
 #### Ubuntu
 
 ```bash
+$ sudo apt-add-repository ppa:ansible/ansible
+$ sudo apt-get update
 $ sudo apt-get install vagrant virtualbox ansible
 $ vagrant up
 ```
