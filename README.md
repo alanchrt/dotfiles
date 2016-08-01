@@ -50,7 +50,7 @@ $ ./dotme.sh
 
 ## Install dependencies
 
-Examine [this Ansible playbook](playbook.yml) to see the software I typically provision on new development machines.
+Examine [this Ansible playbook](playbooks/headless.yml) to see the software I typically provision on new development machines.
 
 You can run this playbook against your own hosts or, alternatively, run the development environment in an Ubuntu VM on your own system using Vagrant.
 
@@ -79,7 +79,7 @@ It's also possible to provision your local machine with the Ansible playbook:
 
 ```bash
 $ git clone https://github.com/alanctkc/dotfiles.git ~/.dotfiles
-$ ansible-playbook --ask-sudo-pass -i 'localhost,' -c local playbook.yml
+$ ansible-playbook --ask-sudo-pass -i 'localhost,' -c local playbooks/headless.yml
 ```
 
 ### Credentials

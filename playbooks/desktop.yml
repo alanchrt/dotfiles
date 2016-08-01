@@ -2,8 +2,9 @@
 - name: Provision desktop system
   hosts: all
   roles:
-    - i3
     - touchpad
+    - audio
+    - i3
     - vagrant
     - spotify
     - dotfiles

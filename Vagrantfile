@@ -36,6 +36,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
   config.vm.provision "ansible" do |ansible|
-    ansible.playbook = "#{File.dirname(__FILE__)}/playbook.yml"
+    ansible.playbook = "#{File.dirname(__FILE__)}/playbooks/headless.yml"
   end
 end
