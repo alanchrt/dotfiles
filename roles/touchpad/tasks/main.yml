@@ -1,0 +1,20 @@
+---
+- name: Create Xorg config directory
+  become: yes
+  file: path=/etc/X11/xorg.conf.d
+        state=directory
+
+- name: Install synaptics Xorg config
+  become: yes
+  copy: src=/usr/share/X11/xorg.conf.d/50-synaptics.conf
+        dest=/etc/X11/xorg.conf.d/50-synaptics.conf
+        
+- name: Configure natural scrolling
+  become: yes
+  lineinfile: dest=/etc/X11/xorg.conf.d/50-synaptics.conf
+              line={{item}}
+              state=present
+              insertafter="Identifier \"touchpad catchall\""
+  with_items:
+    - "        Option \"VertScrollDelta\" \"-111\""
+    - "        Option \"HorizScrollDelta\" \"-111\""

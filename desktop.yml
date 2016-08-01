@@ -3,6 +3,7 @@
   hosts: all
   roles:
     - i3
+    - touchpad
     - vagrant
     - dotfiles
 
