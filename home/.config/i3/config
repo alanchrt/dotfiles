@@ -95,8 +95,8 @@ bar {
     status_command i3status
 }
 
-# Startup scripts (in custom .i3_local)
-exec --no-startup-id /usr/bin/xsetroot -solid '#0c0c0c'
+# Startup scripts
 exec --no-startup-id compton --config ~/.config/compton.conf
+exec --no-startup-id syndaemon -i 0.5 -K -d  # disable touchpad while typing
 exec --no-startup-id nm-applet
 exec --no-startup-id ~/.i3_local

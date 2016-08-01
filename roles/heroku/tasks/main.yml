@@ -11,7 +11,4 @@
 
 - name: Install heroku toolbelt
   become: yes
-  apt: name={{item}}
-        state=installed
-  with_items:
-    - heroku-toolbelt
+  apt: name=heroku-toolbelt
