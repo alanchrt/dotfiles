@@ -98,4 +98,6 @@ bar {
 
 # Startup scripts (in custom .i3_local)
 exec --no-startup-id /usr/bin/xsetroot -solid '#0c0c0c'
+exec --no-startup-id compton --config ~/.config/compton.conf
+exec --no-startup-id nm-applet
 exec --no-startup-id ~/.i3_local
