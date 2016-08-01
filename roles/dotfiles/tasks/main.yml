@@ -25,6 +25,7 @@
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.dotfiles"
   when: ssh_clone|failed and not vagrant_dir.stat.exists
+  ignore_errors: True
 
 - name: Symlink dotfiles repo
   file: src=/vagrant
