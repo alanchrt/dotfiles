@@ -1,0 +1,5 @@
+---
+- name: Provision MacBook Pro
+  hosts: all
+  roles:
+    - macbook-facetimehd
