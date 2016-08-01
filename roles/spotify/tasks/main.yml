@@ -1,0 +1,15 @@
+---
+- name: Add Spotify signing key
+  become: yes
+  apt_key: keyserver=hkp://keyserver.ubuntu.com:80
+           id=BBEBDCB318AD50EC6865090613B00F1FD2C19886
+
+- name: Add Spotify apt repository
+  become: yes
+  apt_repository: repo="deb http://repository.spotify.com stable non-free"
+                  state=present
+
+- name: Install Spotify
+  become: yes
+  apt: name=spotify-client
+       state=installed

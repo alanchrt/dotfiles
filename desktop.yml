@@ -5,6 +5,7 @@
     - i3
     - touchpad
     - vagrant
+    - spotify
     - dotfiles
 
   vars_prompt:
