@@ -1,0 +1,27 @@
+---
+- name: Install checkinstall
+  become: yes
+  apt: name=heroku-toolbelt
+
+- name: Clone Facetime HD camera firmware source
+  git: repo=https://github.com/patjak/bcwc_pcie.git
+       accept_hostkey=true
+       dest=/usr/local/src/bcwc_pcie
+
+- name: Extract Facetime HD camera firmware
+  chdir: /usr/local/src/bcwc_pcie/firmware
+  command: make
+  creates: /usr/local/src/bcwc_pcie/firmware/AppleCameraInterface
+
+- name: Install Facetime HD camera
+  chdir: /usr/local/src/bcwc_pcie/firmware
+  command: checkinstall
+  creates: /lib/firmware/facetimehd/firmware.bin
+
+- name: Add Facetime HD kernel module PPA
+  become: yes
+  apt_repository: repo="ppa:psanford/facetimehd"
+
+- name: Install Facetime HD kernel module
+  become: yes
+  apt: name=facetimehd-dkms
