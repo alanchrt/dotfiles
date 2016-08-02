@@ -99,6 +99,10 @@ bindsym XF86AudioStop exec --no-startup-id dbus-send --print-reply --dest=org.mp
 bindsym XF86AudioPrev exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous
 bindsym XF86AudioNext exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next
 
+# Brigtness, WARNING raw values might be macbook-specific
+bindsym XF86MonBrightnessUp exec --no-startup-id light -r -A 50
+bindsym XF86MonBrightnessDown exec --no-startup-id light -r -U 50
+
 # Workspace bar
 bar {
     status_command i3status
@@ -106,6 +110,6 @@ bar {
 
 # Startup scripts
 exec --no-startup-id compton --config ~/.config/compton.conf
-exec --no-startup-id syndaemon -i 0.2 -K -d  # disable touchpad while typing
+exec --no-startup-id setpci -v -H1 -s 00:01.00 BRIDGE_CONTROL=0  # enable backlight, WARNING macbook-specific
 exec --no-startup-id nm-applet
 exec --no-startup-id ~/.i3_local
