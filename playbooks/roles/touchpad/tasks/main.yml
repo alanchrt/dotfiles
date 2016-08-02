@@ -18,3 +18,4 @@
   with_items:
     - "        Option \"VertScrollDelta\" \"-111\""
     - "        Option \"HorizScrollDelta\" \"-111\""
+    - "        Option \"VertEdgeScroll\" \"off\""
