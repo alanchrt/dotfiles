@@ -6,12 +6,6 @@
     - i3
     - vagrant
     - spotify
-    - dotfiles
+    - gimp
 
-  vars_prompt:
-    - name: "git_name"
-      prompt: "Git user.name"
-      private: no
-    - name: "git_email"
-      prompt: "Git user.email"
-      private: no
+- include: headless.yml

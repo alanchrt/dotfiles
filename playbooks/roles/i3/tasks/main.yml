@@ -6,6 +6,8 @@
   with_items:
     - i3
     - compton
+    - rofi
+    - gnome-settings-daemon
 
 - name: Set i3 as window manager in LightDM
   become: yes

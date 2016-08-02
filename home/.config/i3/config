@@ -12,7 +12,7 @@ new_float normal
 font pango:DejaVu Sans Mono 10
 
 # Software
-bindsym $mod+space exec --no-startup-id dmenu_run
+bindsym $mod+space exec --no-startup-id rofi -show run -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
 bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 
 # State
@@ -111,5 +111,6 @@ bar {
 # Startup scripts
 exec --no-startup-id compton --config ~/.config/compton.conf
 exec --no-startup-id setpci -v -H1 -s 00:01.00 BRIDGE_CONTROL=0  # enable backlight, WARNING macbook-specific
+exec --no-startup-id gnome-settings-daemon
 exec --no-startup-id nm-applet
 exec --no-startup-id ~/.i3_local

@@ -1,0 +1,5 @@
+---
+- name: Install GIMP
+  become: yes
+  apt: name=gimp
+       state=installed
