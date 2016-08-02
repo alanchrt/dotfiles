@@ -13,6 +13,8 @@ font pango:DejaVu Sans Mono 10
 
 # Software
 bindsym $mod+space exec --no-startup-id rofi -show run -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
+bindsym $mod+o exec --no-startup-id rofi -show window -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
+bindsym $mod+i exec --no-startup-id rofi -show ssh -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
 bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 
 # State
