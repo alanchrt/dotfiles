@@ -17,3 +17,12 @@
   become: yes
   lineinfile: dest=/etc/lightdm/lightdm.conf
               line="user-session=i3"
+
+- name: Grant no-password sudo privileges to necessary commands
+  become: yes
+  lineinfile: dest=/etc/sudoers
+              line={{item}}
+  with_items:
+    - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/reboot"
+    - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/poweroff"
+    - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /usr/bin/setpci"
