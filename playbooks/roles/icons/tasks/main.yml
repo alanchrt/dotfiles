@@ -1,0 +1,12 @@
+---
+- name: Add Moka icon theme PPA
+  become: yes
+  apt_repository: repo="ppa:moka/daily"
+
+- name: Install Moka icon theme
+  become: yes
+  apt: name=moka-icon-theme
+       state=installed
+
+- name: Set icon theme to Moka
+  command: gsettings set org.gnome.desktop.interface icon-theme "Moka"
