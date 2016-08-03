@@ -5,6 +5,7 @@
        state=installed
   with_items:
     - i3
+    - i3blocks
     - compton
     - thunar
     - arandr
