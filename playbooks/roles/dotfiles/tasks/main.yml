@@ -15,7 +15,7 @@
 - name: Clone dotfiles repo over SSH
   git: repo=git@github.com:alanctkc/dotfiles.git
        accept_hostkey=true
-       dest="{{ansible_env.HOME}}/.dotfiles"
+       dest="{{ansible_env.HOME}}/.config/dotfiles"
   when: not vagrant_dir.stat.exists
   register: ssh_clone
   ignore_errors: True
@@ -23,19 +23,19 @@
 - name: Clone dotfiles repo over HTTPS
   git: repo=https://github.com/alanctkc/dotfiles.git
        accept_hostkey=true
-       dest="{{ansible_env.HOME}}/.dotfiles"
+       dest="{{ansible_env.HOME}}/.config/dotfiles"
   when: ssh_clone|failed and not vagrant_dir.stat.exists
   ignore_errors: True
 
 - name: Symlink dotfiles repo
   file: src=/vagrant
-        dest="{{ansible_env.HOME}}/.dotfiles"
+        dest="{{ansible_env.HOME}}/.config/dotfiles"
         state=link
   when: vagrant_dir.stat.isdir is defined and vagrant_dir.stat.isdir
 
 - name: Link all dotfiles
   expect:
-    chdir: "{{ansible_env.HOME}}/.dotfiles"
+    chdir: "{{ansible_env.HOME}}/.config/dotfiles"
     command: ./dotme.sh
     creates: "{{ansible_env.HOME}}/.shenv"
     responses:

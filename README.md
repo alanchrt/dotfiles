@@ -78,7 +78,7 @@ For Vagrant-provisioned dev environments, your host machine home directory will 
 It's also possible to provision your local machine with the Ansible playbook:
 
 ```bash
-$ git clone https://github.com/alanctkc/dotfiles.git ~/.dotfiles
+$ git clone https://github.com/alanctkc/dotfiles.git ~/.config/dotfiles
 $ ansible-playbook --ask-sudo-pass -i 'localhost,' -c local playbooks/headless.yml
 ```
 
