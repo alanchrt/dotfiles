@@ -1,0 +1,23 @@
+---
+- name: Add Infinality font patches PPA
+  become: yes
+  apt_repository: repo="ppa:no1wantdthisname/ppa"
+
+- name: Install Infinality font patches
+  become: yes
+  apt: name={{item}}
+       state=installed
+  with_items:
+    - fontconfig-infinality
+
+- name: Set OS X style in Infinality
+  become: yes
+  file: src=/etc/fonts/infinality/styles.conf.avail/osx
+        dest=/etc/fonts/infinality/conf.d
+        state=link
+
+- name: Set OS X style in settings script
+  become: yes
+  lineinfile: dest=/etc/profile.d/infinality-settings.sh
+              regexp="^USE_STYLE="
+              line="USE_STYLE=\"OSX\""
