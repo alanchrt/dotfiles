@@ -16,6 +16,7 @@
     - jq
     - httpie
     - whois
+    - oathtool
 
 - name: Start ntp
   become: yes

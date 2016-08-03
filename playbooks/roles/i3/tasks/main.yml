@@ -14,6 +14,7 @@
     - rofi
     - gnome-settings-daemon
     - feh
+    - xclip
 
 - name: Set i3 as window manager in LightDM
   become: yes
@@ -28,3 +29,9 @@
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/reboot"
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/poweroff"
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /usr/bin/setpci"
+
+- name: Install MFA tool
+  become: yes
+  copy: src=mfa
+        dest=/usr/local/bin/mfa
+        mode=0755
