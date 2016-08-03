@@ -5,6 +5,7 @@
     - i3
     - touchpad
     - backlight
+    - gtk
     - icons
     - vagrant
     - spotify
