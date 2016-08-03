@@ -7,7 +7,9 @@
     - i3
     - i3blocks
     - compton
-    - thunar
+    - pasystray
+    - fdpowermon
+    - pcmanfm
     - arandr
     - rofi
     - gnome-settings-daemon

@@ -9,7 +9,7 @@ new_window 1pixel
 new_float normal
 
 # Font
-font pango:Ubuntu 11
+font pango:Ubuntu 12
 
 # Software
 bindsym $mod+space exec --no-startup-id rofi -show run -lines 3 -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
@@ -93,8 +93,8 @@ bindsym $mod+Control+Down exec --no-startup-id "i3-nagbar -t warning -m 'You pre
 bindsym $mod+Control+Right exec --no-startup-id "i3-nagbar -t warning -m 'You pressed the reboot shortcut. Do you really want to reboot your computer?' -b '   Reboot   ' 'sudo reboot'"
 
 # Multimedia
-bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -D pulse sset Master 5%+
-bindsym XF86AudioLowerVolume exec --no-startup-id amixer -D pulse sset Master 5%-
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -D pulse sset Master 5%+ && killall -SIGUSR1 i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id amixer -D pulse sset Master 5%- && killall -SIGUSR1 i3status
 bindsym XF86AudioMute exec --no-startup-id amixer -D pulse set Master 1+ toggle
 bindsym XF86AudioPlay exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
 bindsym XF86AudioStop exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop
@@ -108,7 +108,6 @@ bindsym XF86MonBrightnessDown exec --no-startup-id light -r -U 50
 # Workspace bar
 bar {
     status_command i3blocks -c ~/.config/i3blocks.conf
-    tray_output primary
 
     colors {
         background #222222
@@ -120,7 +119,9 @@ exec --no-startup-id compton --config ~/.config/compton.conf
 # TODO: setpci needs to be root
 exec --no-startup-id sudo setpci -v -H1 -s 00:01.00 BRIDGE_CONTROL=0  # enable backlight, WARNING macbook-specific
 exec --no-startup-id gnome-settings-daemon
+exec --no-startup-id pcmanfm -d
 exec --no-startup-id nm-applet
+exec --no-startup-id pasystray
 exec_always --no-startup-id feh --bg-scale /usr/share/backgrounds/Xerus_Wallpaper_Grey_4096x2304.png
 exec --no-startup-id ~/.i3_local
 
