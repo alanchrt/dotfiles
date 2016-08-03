@@ -9,12 +9,12 @@ new_window 1pixel
 new_float normal
 
 # Font
-font pango:DejaVu Sans Mono 10
+font pango:Ubuntu 11
 
 # Software
-bindsym $mod+space exec --no-startup-id rofi -show run -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
-bindsym $mod+o exec --no-startup-id rofi -show window -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
-bindsym $mod+i exec --no-startup-id rofi -show ssh -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
+bindsym $mod+space exec --no-startup-id rofi -show run -lines 3 -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
+bindsym $mod+o exec --no-startup-id rofi -show window -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
+bindsym $mod+i exec --no-startup-id rofi -show ssh -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
 bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 
 # State
@@ -88,7 +88,7 @@ bindsym $mod+Shift+period move container to workspace next, workspace next, focu
 
 # i3 control
 bindsym $mod+Control+i restart
-bindsym $mod+Control+Up exec --no-startup-id i3lock -c 000000
+bindsym $mod+Control+Up exec --no-startup-id i3lock -c 222222
 bindsym $mod+Control+Down exec --no-startup-id "i3-nagbar -t warning -m 'You pressed the shutdown shortcut. Do you really want to shut down your computer?' -b '  Shut Down  ' 'sudo poweroff'"
 bindsym $mod+Control+Right exec --no-startup-id "i3-nagbar -t warning -m 'You pressed the reboot shortcut. Do you really want to reboot your computer?' -b '   Reboot   ' 'sudo reboot'"
 
@@ -108,6 +108,7 @@ bindsym XF86MonBrightnessDown exec --no-startup-id light -r -U 50
 # Workspace bar
 bar {
     status_command i3status
+    tray_output primary
 }
 
 # Startup scripts

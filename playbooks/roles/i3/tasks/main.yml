@@ -1,11 +1,13 @@
 ---
-- name: Install i3 and compton
+- name: Install i3 and related software
   become: yes
   apt: name={{item}}
        state=installed
   with_items:
     - i3
     - compton
+    - thunar
+    - arandr
     - rofi
     - gnome-settings-daemon
     - feh
@@ -14,28 +16,3 @@
   become: yes
   lineinfile: dest=/etc/lightdm/lightdm.conf
               line="user-session=i3"
-
-- name: Clone backlight utility
-  become: yes
-  git: repo=https://github.com/haikarainen/light.git
-       accept_hostkey=true
-       dest=/usr/local/src/light
-
-- name: Install backlight utility dependencies
-  become: yes
-  apt: name=help2man
-       state=installed
-
-- name: Build backlight utility
-  become: yes
-  command: make
-  args:
-    chdir: /usr/local/src/light
-    creates: /usr/local/src/light/light
-
-- name: Install backlight utility
-  become: yes
-  command: checkinstall
-  args:
-    chdir: /usr/local/src/light
-    creates: /usr/bin/light
