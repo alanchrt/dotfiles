@@ -16,7 +16,8 @@ bindsym $mod+space exec --no-startup-id rofi -show run -lines 3 -opacity 90 -fg 
 bindsym $mod+o exec --no-startup-id rofi -show window -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
 bindsym $mod+i exec --no-startup-id rofi -show ssh -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
 bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
-bindsym $mod+f exec --no-startup-id pcmanfm
+bindsym $mod+Shift+f exec --no-startup-id pcmanfm
+bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
 
 # State
 bindsym $mod+Shift+q kill
