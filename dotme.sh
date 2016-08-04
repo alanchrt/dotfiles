@@ -80,9 +80,7 @@ configure_python() {
 
 configure_i3() {
     echo "Configuring i3..."
-    mkdir -p $HOME/.config/i3
-    link_file .config/i3/config .config/i3/config
-    link_file .config/i3blocks.conf .config/i3blocks.conf
+    link_directory .config/i3 .config/i3
     link_file .config/compton.conf .config/compton.conf
 }
 
