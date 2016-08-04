@@ -9,7 +9,7 @@
   apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc
            state=present
 
-- name: Install postgresql headers and client
+- name: Install PostgreSQL server and client
   become: yes
   apt: name={{item}}
        state=installed

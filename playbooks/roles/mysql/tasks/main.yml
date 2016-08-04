@@ -1,5 +1,15 @@
 ---
-- name: Install mysql client
+- name: Specify root MySQL password for development
+  become: yes
+  debconf: name=mysql-server
+           question={{item}}
+           vtype="password"
+           value="dev"
+  with_items:
+    - mysql-server/root_password
+    - mysql-server/root_password_again
+
+- name: Install MySQL server and client
   become: yes
   apt: name={{item}}
        state=installed
