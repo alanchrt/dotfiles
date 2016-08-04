@@ -18,6 +18,7 @@ bindsym $mod+i exec --no-startup-id rofi -show ssh -opacity 90 -fg "#f1f1f1" -bg
 bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
+bindsym $mod+Shift+p exec --no-startup-id gnome-system-monitor
 
 # State
 bindsym $mod+Shift+q kill
