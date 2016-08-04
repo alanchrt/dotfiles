@@ -5,7 +5,7 @@
 set $mod Mod4
 
 # Borders
-new_window 1pixel
+new_window pixel 3
 new_float normal
 
 # Font
