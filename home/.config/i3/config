@@ -125,6 +125,7 @@ exec --no-startup-id pcmanfm -d
 exec --no-startup-id nm-applet
 exec --no-startup-id pasystray
 exec --no-startup-id fdpowermon
+exec --no-startup-id fluxgui
 exec_always --no-startup-id feh --bg-scale /usr/share/backgrounds/Xerus_Wallpaper_Grey_4096x2304.png
 exec --no-startup-id ~/.i3_local
 

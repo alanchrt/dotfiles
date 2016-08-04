@@ -1,0 +1,9 @@
+---
+- name: Add f.lux GUI PPA
+  become: yes
+  apt_repository: repo="ppa:nathan-renniewaldock/flux"
+
+- name: Install f.lux GUI
+  become: yes
+  apt: name=fluxgui
+       state=installed

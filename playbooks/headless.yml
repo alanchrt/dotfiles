@@ -16,6 +16,7 @@
     - heroku
     - aws
     - ngrok
+    - mfa
 
 - name: Configure dev environment
   hosts: all

@@ -5,9 +5,11 @@
     - i3
     - touchpad
     - backlight
+    - clipboard
     - gtk
     - icons
     - fonts
+    - flux
     - vagrant
     - spotify
     - gimp
