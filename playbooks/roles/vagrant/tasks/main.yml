@@ -1,8 +1,15 @@
 ---
-- name: Install vagrant and virtualbox
+- name: Check for Vagrant installation
+  command: dpkg-query -W vagrant
+  register: vagrant_check_deb
+  ignore_errors: True
+
+- name: Install Vagrant
   become: yes
-  apt: name={{item}}
+  apt: deb=https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb
+  when: vagrant_check_deb.failed
+
+- name: Install virtualbox
+  become: yes
+  apt: name=virtualbox
        state=installed
-  with_items:
-    - vagrant
-    - virtualbox
