@@ -13,6 +13,7 @@
     - node
     - postgres
     - mysql
+    - nfs
     - heroku
     - aws
     - ngrok
