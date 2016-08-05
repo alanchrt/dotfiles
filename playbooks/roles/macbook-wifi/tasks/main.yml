@@ -1,0 +1,5 @@
+---
+- name: Install Macbook WiFi driver
+  become: yes
+  apt: name=bcmwl-kernel-source
+       state=installed

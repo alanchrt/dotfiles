@@ -131,4 +131,4 @@ exec_always --no-startup-id feh --bg-scale /usr/share/backgrounds/Xerus_Wallpape
 exec --no-startup-id ~/.i3_local
 
 # Desktop applications
-exec --no-startup-id firefox
+exec --no-startup-id sleep 3 && firefox
