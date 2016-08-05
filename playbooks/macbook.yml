@@ -4,3 +4,5 @@
   roles:
     - macbook-facetimehd
     - hfs
+
+- include: desktop.yml

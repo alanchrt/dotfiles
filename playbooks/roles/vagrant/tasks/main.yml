@@ -7,7 +7,7 @@
 - name: Install Vagrant
   become: yes
   apt: deb=https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb
-  when: vagrant_check_deb.failed
+  when: vagrant_check_deb.rc == 1
 
 - name: Install virtualbox
   become: yes

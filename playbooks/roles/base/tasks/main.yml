@@ -13,6 +13,7 @@
     - zip
     - unzip
     - silversearcher-ag
+    - ncdu
     - jq
     - httpie
     - whois
