@@ -7,6 +7,7 @@
     - i3
     - i3blocks
     - compton
+    - xautolock
     - pasystray
     - fdpowermon
     - pcmanfm
