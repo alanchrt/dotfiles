@@ -63,7 +63,7 @@ configure_zsh() {
 
 configure_git() {
     echo "Configuring git..."
-    sed -e 's/\[\[GIT_NAME\]\]/'"$GIT_NAME"'/g' -e 's/\[\[GIT_EMAIL\]\]/'"$GIT_EMAIL"'/g' `pwd`/home/.gitconfig-global > $HOME/.gitconfig
+    link_file .gitconfig-global .gitconfig
     copy_file .gitignore-global .gitignore
 }
 
@@ -85,14 +85,6 @@ configure_i3() {
 }
 
 set -e
-
-if [ -z "$GIT_NAME" ]; then
-    read -p "Git user.name: " GIT_NAME
-fi
-
-if [ -z "$GIT_EMAIL" ]; then
-    read -p "Git user.email: " GIT_EMAIL
-fi
 
 install_oh_my_zsh
 install_spacemacs

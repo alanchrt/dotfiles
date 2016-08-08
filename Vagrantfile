@@ -3,17 +3,6 @@ require 'yaml'
 VAGRANTFILE_API_VERSION = "2"
 VM_NAME = "dev"
 VM_IP = "192.168.100.200"
-VARS_FILE = "roles/dotfiles/vars/main.yml"
-
-begin
-  ANSIBLE_VARS = YAML.load_file(VARS_FILE)
-rescue Errno::ENOENT
-  ANSIBLE_VARS = {}
-  ANSIBLE_VARS["git_name"] = [(print 'Git user.name: '), STDIN.gets.chomp][1]
-  ANSIBLE_VARS["git_email"] = [(print 'Git user.email: '), STDIN.gets.chomp][1]
-  f = File.new(VARS_FILE, 'w')
-  YAML.dump(ANSIBLE_VARS, f)
-end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = "ubuntu/wily64"
