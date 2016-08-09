@@ -2,4 +2,4 @@
 - name: Install xclip
   become: yes
   apt: name=xclip
-       state=installed
+       state=present

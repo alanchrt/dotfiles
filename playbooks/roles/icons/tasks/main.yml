@@ -6,7 +6,7 @@
 - name: Install Moka icon theme
   become: yes
   apt: name=moka-icon-theme
-       state=installed
+       state=present
 
 - name: Clone Arc icon theme
   become: yes

@@ -12,7 +12,7 @@
 - name: Install PostgreSQL server and client
   become: yes
   apt: name={{item}}
-       state=installed
+       state=present
   with_items:
     - libpq-dev
     - postgresql-9.4

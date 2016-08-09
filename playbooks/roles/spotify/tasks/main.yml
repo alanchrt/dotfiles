@@ -12,4 +12,4 @@
 - name: Install Spotify
   become: yes
   apt: name=spotify-client
-       state=installed
+       state=present

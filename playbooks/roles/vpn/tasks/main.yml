@@ -2,7 +2,7 @@
 - name: Install OpenVPN plugin for Network Manager
   become: yes
   apt: name={{item}}
-       state=installed
+       state=present
   with_items:
     - network-manager-openvpn
     - network-manager-openvpn-gnome

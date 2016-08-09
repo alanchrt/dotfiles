@@ -2,4 +2,4 @@
 - name: Install HFS+ tooling
   become: yes
   apt: name=hfsprogs
-       state=installed
+       state=present

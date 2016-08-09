@@ -30,7 +30,7 @@
 - name: Install Facetime HD kernel module
   become: yes
   apt: name=facetimehd-dkms
-       state=installed
+       state=present
 
 - name: Load Facetime HD module on startup
   become: yes

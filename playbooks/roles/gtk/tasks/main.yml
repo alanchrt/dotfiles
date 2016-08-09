@@ -7,7 +7,7 @@
 - name: Install Arc GTK theme
   become: yes
   apt: name=arc-theme
-       state=installed
+       state=present
        allow_unauthenticated=yes
 
 - name: Set GTK theme to Arc-Darker

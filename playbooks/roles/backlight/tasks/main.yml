@@ -8,7 +8,7 @@
 - name: Install backlight utility dependencies
   become: yes
   apt: name=help2man
-       state=installed
+       state=present
 
 - name: Build backlight utility
   become: yes

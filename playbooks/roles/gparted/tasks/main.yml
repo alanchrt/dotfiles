@@ -2,4 +2,4 @@
 - name: Install GParted
   become: yes
   apt: name=gparted
-       state=installed
+       state=present

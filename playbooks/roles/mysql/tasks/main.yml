@@ -12,7 +12,7 @@
 - name: Install MySQL server and client
   become: yes
   apt: name={{item}}
-       state=installed
+       state=present
   with_items:
     - mysql-server
     - mysql-client

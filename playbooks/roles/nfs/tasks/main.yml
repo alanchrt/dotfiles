@@ -2,4 +2,4 @@
 - name: Install NFS server
   become: yes
   apt: name=nfs-kernel-server
-       state=installed
+       state=present

@@ -2,7 +2,7 @@
 - name: Install python base
   become: yes
   apt: name={{item}}
-       state=installed
+       state=present
   with_items:
     - python
     - python-dev

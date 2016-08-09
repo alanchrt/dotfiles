@@ -2,7 +2,7 @@
 - name: Install system basics
   become: yes
   apt: name={{item}}
-       state=installed
+       state=present
   with_items:
     - build-essential
     - ntp

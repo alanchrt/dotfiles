@@ -9,9 +9,10 @@
     - gtk
     - icons
     - fonts
-    - flux
+    - urxvt
     - gparted
     - vpn
+    - flux
     - vagrant
     - spotify
     - gimp
