@@ -34,10 +34,7 @@
   when: vagrant_dir.stat.isdir is defined and vagrant_dir.stat.isdir
 
 - name: Link all dotfiles
-  expect:
+  command: ./dotme.sh
+  args:
     chdir: "{{ansible_env.HOME}}/.config/dotfiles"
-    command: ./dotme.sh
     creates: "{{ansible_env.HOME}}/.shenv"
-    responses:
-      Git user.name: "{{git_name}}"
-      Git user.email: "{{git_email}}"
