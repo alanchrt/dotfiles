@@ -122,6 +122,7 @@ exec --no-startup-id compton --config ~/.config/compton.conf
 # TODO: setpci needs to be root
 exec --no-startup-id sudo setpci -v -H1 -s 00:01.00 BRIDGE_CONTROL=0 && light -r -S 1000  # enable backlight, WARNING macbook-specific
 exec --no-startup-id gnome-settings-daemon
+exec --no-startup-id urxvtd -q -o -f
 exec --no-startup-id emacs --daemon
 exec --no-startup-id xautolock -time 3 -locker "i3lock -u -c 222222"
 exec --no-startup-id pcmanfm -d

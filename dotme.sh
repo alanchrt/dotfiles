@@ -61,6 +61,11 @@ configure_zsh() {
     rm -f $HOME/.zcompdump
 }
 
+configure_urxvt() {
+    echo "Configuring urxvt..."
+    link_file .Xdefaults .Xdefaults
+}
+
 configure_git() {
     echo "Configuring git..."
     link_file .gitconfig-global .gitconfig
@@ -91,6 +96,7 @@ install_spacemacs
 configure_shell
 configure_bash
 configure_zsh
+configure_urxvt
 configure_git
 configure_emacs
 configure_python
