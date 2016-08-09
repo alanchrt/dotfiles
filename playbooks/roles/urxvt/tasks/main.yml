@@ -11,5 +11,3 @@
   become: yes
   alternatives: name=x-terminal-emulator
                 path=/usr/bin/urxvtc
-
-# TODO: install source code pro?
