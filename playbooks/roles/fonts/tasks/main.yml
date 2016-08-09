@@ -21,23 +21,3 @@
   lineinfile: dest=/etc/profile.d/infinality-settings.sh
               regexp="^USE_STYLE="
               line="USE_STYLE=\"OSX\""
-
-- name: Download Source Code Pro
-  become: yes
-  get_url: url=https://github.com/adobe-fonts/source-code-pro/archive/2.030R-ro/1.050R-it.tar.gz
-           dest=/usr/local/src/source-code-pro.tar.gz
-
-- name: Extract Source Code Pro
-  become: yes
-  unarchive: src=/usr/local/src/source-code-pro.tar.gz
-             dest=/usr/local/src
-
-- name: Install Source Code Pro
-  become: yes
-  command: cp -r /usr/local/src/source-code-pro-2.030R-ro-1.050R-it/TTF /usr/share/fonts/truetype/source-code-pro
-  args:
-    creates: /usr/share/fonts/truetype/source-code-pro
-
-- name: Re-build font cache
-  become: yes
-  command: fc-cache
