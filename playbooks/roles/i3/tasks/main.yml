@@ -10,7 +10,6 @@
     - xautolock
     - pasystray
     - fdpowermon
-    - pcmanfm
     - arandr
     - rofi
     - gnome-settings-daemon
@@ -29,10 +28,3 @@
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/reboot"
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/poweroff"
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /usr/bin/setpci"
-
-- name: Uninstall Nautilus
-  become: yes
-  apt: name=nautilus
-       state=absent
-  # TODO: set pcmanfm as default: http://askubuntu.com/a/335911
-  # https://ask.fedoraproject.org/en/question/37536/how-can-i-set-pcmanfm-file-manager-as-default/?answer=37538#post-id-37538
