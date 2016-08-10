@@ -37,6 +37,7 @@ zstyle :omz:plugins:ssh-agent agent-forwarding on
 # Configure oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME='bira'
+DISABLE_VENV_CD=1
 plugins=(tmux vagrant ssh-agent python pip virtualenv virtualenvwrapper django fabric celery nvm npm heroku redis-cli colored-man-pages colorize history-substring-search safe-paste)
 source $ZSH/oh-my-zsh.sh
 

@@ -1,4 +1,4 @@
-*font: xft:Ubuntu Mono,size=14
+*font: xft:Ubuntu Mono:size=12
 
 URxvt.scrollBar: false
 URxvt.scrollTtyOutput: false
