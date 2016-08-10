@@ -1,13 +1,10 @@
 ---
 - name: Install Urxvt
   become: yes
-  apt: name={{item}}
+  apt: name=rxvt-unicode-256color
        state=present
-  with_items:
-    - rxvt-unicode
-    - rxvt-unicode-256color
 
 - name: Set Urxvt as default terminal
   become: yes
   alternatives: name=x-terminal-emulator
-                path=/usr/bin/urxvtc
+                path=/usr/bin/urxvtcd
