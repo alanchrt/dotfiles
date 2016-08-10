@@ -1,4 +1,5 @@
-*font: xft:Ubuntu Mono:size=12
+URxvt.font: xft:Ubuntu Mono:pixelsize=17
+URxvt.letterSpace: -1
 
 URxvt.scrollBar: false
 URxvt.scrollTtyOutput: false
@@ -6,21 +7,21 @@ URxvt.scrollWithBuffer: true
 URxvt.scrollTtyKeypress: true
 
 /* Tango */
-*foreground: #c8c8c8
-*background: #1a1a1a
-*color0: #2e3436
-*color1: #cc0000
-*color2: #4e9a06
-*color3: #c4a000
-*color4: #3465a4
-*color5: #75507b
-*color6: #06989a
-*color7: #d3d7cf
-*color8: #555753
-*color9: #ef2929
-*color10: #8ae234
-*color11: #fce94f
-*color12: #729fcf
-*color13: #ad7fa8
-*color14: #34e2e2
-*color15: #eeeeec
+URxvt.foreground: #c8c8c8
+URxvt.background: #1a1a1a
+URxvt.color0: #2e3436
+URxvt.color1: #cc0000
+URxvt.color2: #4e9a06
+URxvt.color3: #c4a000
+URxvt.color4: #3465a4
+URxvt.color5: #75507b
+URxvt.color6: #06989a
+URxvt.color7: #d3d7cf
+URxvt.color8: #555753
+URxvt.color9: #ef2929
+URxvt.color10: #8ae234
+URxvt.color11: #fce94f
+URxvt.color12: #729fcf
+URxvt.color13: #ad7fa8
+URxvt.color14: #34e2e2
+URxvt.color15: #eeeeec
