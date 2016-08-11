@@ -256,23 +256,11 @@ layers configuration. You are free to put any user code."
   (setq web-mode-code-indent-offset 2)
   (setq neo-theme 'nerd)
   (setq neo-show-hidden-files nil)
-  (custom-set-faces
-   '(neo-dir-link-face ((t (:foreground "blue"))))
-   '(neo-file-link-face ((t (:foreground "white")))))
-  )
 
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(paradox-github-token t))
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+ '(neo-dir-link-face ((t (:foreground "blue"))))
+ '(neo-file-link-face ((t (:foreground "white")))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
