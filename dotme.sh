@@ -67,6 +67,11 @@ configure_termite() {
     link_file .config/termite/config .config/termite/config
 }
 
+configure_tmux() {
+    echo "Configuring tmux..."
+    link_file .tmux.conf .tmux.conf
+}
+
 configure_git() {
     echo "Configuring git..."
     link_file .gitconfig-global .gitconfig
@@ -86,6 +91,7 @@ configure_python() {
 
 configure_i3() {
     echo "Configuring i3..."
+    mkdir -p $HOME/.config
     link_directory .config/i3 .config/i3
     link_file .config/compton.conf .config/compton.conf
 }
@@ -98,6 +104,7 @@ configure_shell
 configure_bash
 configure_zsh
 configure_termite
+configure_tmux
 configure_git
 configure_emacs
 configure_python
