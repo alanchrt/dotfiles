@@ -124,6 +124,7 @@ exec --no-startup-id sudo setpci -v -H1 -s 00:01.00 BRIDGE_CONTROL=0 && light -r
 exec --no-startup-id gnome-settings-daemon
 exec --no-startup-id emacs --daemon
 exec --no-startup-id xautolock -time 3 -locker "i3lock -u -c 222222"
+exec --no-startup-id unclutter
 exec --no-startup-id pcmanfm -d
 exec --no-startup-id nm-applet
 exec --no-startup-id pasystray

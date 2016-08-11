@@ -8,6 +8,7 @@
     - i3blocks
     - compton
     - xautolock
+    - unclutter
     - pasystray
     - fdpowermon
     - arandr
