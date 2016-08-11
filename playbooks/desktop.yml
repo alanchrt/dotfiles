@@ -10,7 +10,7 @@
     - gtk
     - icons
     - fonts
-    - urxvt
+    - termite
     - gparted
     - vpn
     - flux

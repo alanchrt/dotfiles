@@ -79,7 +79,19 @@ It's also possible to provision your local machine with the Ansible playbook:
 
 ```bash
 $ git clone https://github.com/alanctkc/dotfiles.git ~/.config/dotfiles
-$ ansible-playbook --ask-sudo-pass -i 'localhost,' -c local playbooks/headless.yml
+$ ./provision-local.sh headless
+```
+
+For the full desktop setup:
+
+```bash
+$ ./provision-local.sh desktop
+```
+
+Or on a Macbook (running Ubuntu):
+
+```bash
+$ ./provision-local.sh macbook
 ```
 
 ### Credentials

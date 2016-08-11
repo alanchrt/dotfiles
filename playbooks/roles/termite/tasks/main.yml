@@ -1,0 +1,68 @@
+---
+- name: Clone vte-ng
+  become: yes
+  git: repo=https://github.com/thestinger/vte-ng.git
+       accept_hostkey=true
+       dest=/usr/local/src/vte-ng
+
+- name: Install vte-ng dependencies
+  become: yes
+  apt: name={{item}}
+       state=present
+  with_items:
+    - autoconf
+    - libgtk-3-dev
+    - libpango1.0-dev
+    - libgnutls-dev
+    - libglib2.0-dev
+    - libgirepository1.0-dev
+    - valac
+    - libxml2-utils
+    - gtk-doc-tools
+    - gperf
+
+- name: Configure vte-ng
+  become: yes
+  command: ./autogen.sh
+  args:
+    chdir: /usr/local/src/vte-ng
+    creates: /usr/local/src/vte-ng/Makefile
+
+- name: Build vte-ng
+  become: yes
+  command: make
+  args:
+    chdir: /usr/local/src/vte-ng
+    creates: /usr/local/src/vte-ng/src/vte-2.91
+
+- name: Install vte-ng
+  become: yes
+  command: checkinstall --pkgname vte-ng --pkgversion 2.91
+  args:
+    chdir: /usr/local/src/vte-ng
+    creates: /usr/local/bin/vte-2.91
+
+- name: Clone termite
+  become: yes
+  git: repo=https://github.com/thestinger/termite.git
+       accept_hostkey=true
+       dest=/usr/local/src/termite
+
+- name: Build termite
+  become: yes
+  command: make
+  args:
+    chdir: /usr/local/src/termite
+    creates: /usr/local/src/termite/termite
+
+- name: Intall termite
+  become: yes
+  command: checkinstall
+  args:
+    chdir: /usr/local/src/termite
+    creates: /usr/local/bin/termite
+
+- name: Set termite as default terminal
+  become: yes
+  alternatives: name=x-terminal-emulator
+                path=/usr/local/bin/termite
