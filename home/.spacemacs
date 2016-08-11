@@ -260,6 +260,7 @@ layers configuration. You are free to put any user code."
 (custom-set-variables
  '(paradox-github-token t))
 (custom-set-faces
+ '(web-mode-html-tag-bracket-face ((t (:inherit web-mode-html-tag-face :foreground nil))))
  '(neo-dir-link-face ((t (:foreground "blue"))))
  '(neo-file-link-face ((t (:foreground "white")))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
