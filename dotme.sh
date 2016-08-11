@@ -96,6 +96,11 @@ configure_i3() {
     link_file .config/compton.conf .config/compton.conf
 }
 
+configure_vimperator() {
+    echo "Configuring Vimperator..."
+    link_file .vimperatorrc .vimperatorrc
+}
+
 set -e
 
 install_oh_my_zsh
@@ -109,5 +114,6 @@ configure_git
 configure_emacs
 configure_python
 configure_i3
+configure_vimperator
 
 echo "Done."

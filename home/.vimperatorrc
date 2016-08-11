@@ -1,0 +1,2 @@
+set hintchars=hjklasdfgyuiopqwertnmzxcvb
+source! .vimperatorrc.local
