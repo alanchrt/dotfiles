@@ -1,6 +1,18 @@
+" Hints
 set hintchars=hjklasdfgyuiopqwertnmzxcvb
 highlight Hint -append color:#ffffff;background-color:#222222;
 
+" Keybindings
 noremap ~ <NOP>
 
+" Browser settings
+set! browser.startup.homepage=https://calendar.google.com/calendar/render
+set! browser.download.dir=~/downloads
+set! browser.formfill.enable=false
+set! browser.search.suggest.enabled=false
+set! signon.rememberSignons=false
+set! browser.link.open_newwindow.restriction=0
+set! general.warnOnAboutConfig=false
+
+" Local settings
 source! .vimperatorrc.local
