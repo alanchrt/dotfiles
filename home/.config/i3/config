@@ -92,8 +92,8 @@ bindsym $mod+Shift+period move container to workspace next, workspace next, focu
 # i3 control
 bindsym $mod+Control+i restart
 bindsym $mod+Control+Up exec --no-startup-id slock
-bindsym $mod+Control+Down exec --no-startup-id "i3-nagbar -t warning -m 'You pressed the shutdown shortcut. Do you really want to shut down your computer?' -b '  Shut Down  ' 'sudo poweroff'"
-bindsym $mod+Control+Right exec --no-startup-id "i3-nagbar -t warning -m 'You pressed the reboot shortcut. Do you really want to reboot your computer?' -b '   Reboot   ' 'sudo reboot'"
+bindsym $mod+Control+Down exec --no-startup-id "zenity --question --title='System shut down' --text='Do you really want to shut down your machine?' && sudo poweroff"
+bindsym $mod+Control+Right exec --no-startup-id "zenity --question --title='System reboot' --text='Do you really want to reboot your machine?' && sudo reboot"
 
 # Multimedia
 bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -D pulse sset Master 5%+ && killall -SIGUSR1 i3status
