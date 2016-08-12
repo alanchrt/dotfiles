@@ -37,4 +37,4 @@
   command: ./dotme.sh
   args:
     chdir: "{{ansible_env.HOME}}/.config/dotfiles"
-    creates: "{{ansible_env.HOME}}/.shenv"
+    creates: "{{ansible_env.HOME}}/.dotted"

@@ -92,8 +92,10 @@ configure_python() {
 configure_i3() {
     echo "Configuring i3..."
     mkdir -p $HOME/.config
+    mkdir -p $HOME/.config/dunst
     link_directory .config/i3 .config/i3
     link_file .config/compton.conf .config/compton.conf
+    link_file .config/dunst/dunstrc .config/dunst/dunstrc
 }
 
 configure_vimperator() {
@@ -116,4 +118,5 @@ configure_python
 configure_i3
 configure_vimperator
 
+touch $HOME/.dotted
 echo "Done."
