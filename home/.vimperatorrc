@@ -1,5 +1,5 @@
 set hintchars=hjklasdfgyuiopqwertnmzxcvb
-highlight Hint color:#ffffff;background-color:#222222;padding:2px;
+highlight Hint -append color:#ffffff;background-color:#222222;
 
 noremap ~ <NOP>
 
