@@ -58,6 +58,7 @@ configure_bash() {
 configure_zsh() {
     echo "Configuring zsh..."
     link_file .zshrc .zshrc
+    link_directory .zsh-custom .zsh-custom
     rm -f $HOME/.zcompdump
 }
 
