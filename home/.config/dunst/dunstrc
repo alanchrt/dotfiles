@@ -1,5 +1,5 @@
 [global]
-    font = Ubuntu 12
+    font = Ubuntu 11
     allow_markup = yes
     plain_text = no
     format = "<b>%s</b>\n%b"
