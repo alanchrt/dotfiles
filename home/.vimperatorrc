@@ -1,2 +1,3 @@
 set hintchars=hjklasdfgyuiopqwertnmzxcvb
+noremap ~ <NOP>
 source! .vimperatorrc.local
