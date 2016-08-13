@@ -68,9 +68,10 @@ configure_termite() {
     link_file .config/termite/config .config/termite/config
 }
 
-configure_tmux() {
-    echo "Configuring tmux..."
-    link_file .tmux.conf .tmux.conf
+configure_byobu() {
+    echo "Configuring byobu..."
+    mkdir -p $HOME/.byobu
+    link_file .byobu/.tmux.conf .byobu/.tmux.conf
 }
 
 configure_git() {
@@ -117,7 +118,7 @@ configure_shell
 configure_bash
 configure_zsh
 configure_termite
-configure_tmux
+configure_byobu
 configure_git
 configure_emacs
 configure_python
