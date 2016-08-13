@@ -29,3 +29,8 @@
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/reboot"
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/poweroff"
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /usr/bin/setpci"
+
+- name: Install i3 python library
+  become: yes
+  pip: name=i3-py
+       state=present

@@ -58,8 +58,8 @@ bindsym $mod+s layout stacking
 bindsym $mod+d layout default
 
 # Workspaces
-bindsym $mod+comma workspace prev
-bindsym $mod+period workspace next
+bindsym $mod+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput.py workspace prev
+bindsym $mod+period exec --no-startup-id python ~/.config/i3/workspaceonoutput.py workspace next
 bindsym $mod+Control+comma move workspace to output left
 bindsym $mod+Control+period move workspace to output right
 bindsym $mod+1 workspace 1
@@ -86,8 +86,8 @@ bindsym $mod+Shift+7 move container to workspace 7
 bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
-bindsym $mod+Shift+comma move container to workspace prev, workspace prev, focus
-bindsym $mod+Shift+period move container to workspace next, workspace next, focus
+bindsym $mod+Shift+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput.py move prev
+bindsym $mod+Shift+period exec --no-startup-id python ~/.config/i3/workspaceonoutput.py move next
 
 # i3 control
 bindsym $mod+Control+i restart

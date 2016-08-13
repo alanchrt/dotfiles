@@ -11,6 +11,7 @@
 - name: Install python tooling
   become: yes
   pip: name={{item}}
+       state=present
   with_items:
     - virtualenvwrapper
     - flake8
