@@ -20,7 +20,7 @@ export VISUAL='emacsclient -t'
 
 # Use gnome keyring
 if [ "$DESKTOP_SESSION" = "i3" ]; then
-    export $(gnome-keyring-daemon -s)
+    export $(gnome-keyring-daemon -s 2> /dev/null)
 fi
 
 # Use local binaries
