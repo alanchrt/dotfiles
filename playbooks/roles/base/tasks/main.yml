@@ -5,6 +5,7 @@
        state=present
   with_items:
     - build-essential
+    - checkinstall
     - ntp
     - ranger
     - tree

@@ -1,4 +1,6 @@
 ---
+- include: headless.yml
+
 - name: Provision desktop system
   hosts: all
   roles:
@@ -17,5 +19,3 @@
     - vagrant
     - spotify
     - gimp
-
-- include: headless.yml

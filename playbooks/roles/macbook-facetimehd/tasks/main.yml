@@ -1,8 +1,4 @@
 ---
-- name: Install checkinstall
-  become: yes
-  apt: name=heroku-toolbelt
-
 - name: Clone Facetime HD camera firmware source
   become: yes
   git: repo=https://github.com/patjak/bcwc_pcie.git
