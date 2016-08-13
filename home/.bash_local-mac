@@ -1,6 +1,0 @@
-# Add homebrew binaries to path
-homebrew=/usr/local/share/python:/usr/local/bin:/usr/local/sbin
-export PATH=$homebrew:$PATH
-
-# Load virtualenvwrapper
-source /usr/local/bin/virtualenvwrapper.sh

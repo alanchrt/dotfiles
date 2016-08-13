@@ -14,10 +14,6 @@ link_directory() {
     ln -s `pwd`/home/$1 $HOME/$2
 }
 
-copy_file() {
-    cp `pwd`/home/$1 $HOME/$2
-}
-
 clone_or_pull_repo() {
     if [ ! -f $HOME/$2/README.md ]; then
         git clone https://github.com/$1.git $HOME/$2
@@ -42,11 +38,6 @@ configure_shell() {
     echo "Configuring common shell environment..."
     link_file .bash_aliases .bash_aliases
     link_file .shenv .shenv
-    if [ "$OSTYPE" == "darwin"* ]; then
-        copy_file .bash_local-mac .bash_local
-    else
-        copy_file .bash_local-linux .bash_local
-    fi
 }
 
 configure_bash() {
@@ -77,7 +68,7 @@ configure_byobu() {
 configure_git() {
     echo "Configuring git..."
     link_file .gitconfig-global .gitconfig
-    copy_file .gitignore-global .gitignore
+    link_file .gitignore-global .gitignore
 }
 
 configure_emacs() {
