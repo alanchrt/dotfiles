@@ -8,6 +8,7 @@
   become: yes
   copy: src=/usr/share/X11/xorg.conf.d/50-synaptics.conf
         dest=/etc/X11/xorg.conf.d/50-synaptics.conf
+        force=no
         
 - name: Configure natural scrolling
   become: yes
