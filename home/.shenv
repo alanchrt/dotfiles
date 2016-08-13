@@ -18,6 +18,11 @@ export ALTERNATE_EDITOR=''
 export EDITOR='emacsclient -t'
 export VISUAL='emacsclient -t'
 
+# Use gnome keyring
+if [ "$DESKTOP_SESSION" = "i3" ]; then
+    export $(gnome-keyring-daemon -s)
+fi
+
 # Use local binaries
 export PATH=~/.local/bin:$PATH
 
