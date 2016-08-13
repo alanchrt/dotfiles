@@ -18,9 +18,9 @@ for workspace in i3.get_workspaces():
 target_output = outputs[current_workspace['output']]
 workspace_count = len(target_output)
 if direction == 'prev':
-    target_workspace = target_output[index_on_output - 1 % workspace_count]
+    target_workspace = target_output[(index_on_output - 1) % workspace_count]
 elif direction == 'next':
-    target_workspace = target_output[index_on_output + 1 % workspace_count]
+    target_workspace = target_output[(index_on_output + 1) % workspace_count]
 
 if command == 'workspace':
     i3.command('workspace', target_workspace['name'])
