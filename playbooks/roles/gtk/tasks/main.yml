@@ -1,4 +1,13 @@
 ---
+- name: Install GTK custom facts
+  become: yes
+  copy: src=gtk.fact
+        dest=/etc/ansible/facts.d/gtk.fact
+        mode=0755
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
+
 - name: Add Arc GTK theme apt repository
   become: yes
   apt_repository: repo="deb http://download.opensuse.org/repositories/home:/Horst3180/xUbuntu_16.04/ /"
@@ -12,3 +21,4 @@
 
 - name: Set GTK theme to Arc-Darker
   command: gsettings set org.gnome.desktop.interface gtk-theme "Arc-Darker"
+  when: ansible_local.gtk.gtk_theme != "Arc-Darker"

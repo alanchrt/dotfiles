@@ -1,4 +1,13 @@
 ---
+- name: Install icon custom facts
+  become: yes
+  copy: src=icons.fact
+        dest=/etc/ansible/facts.d/icons.fact
+        mode=0755
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
+
 - name: Add Moka icon theme PPA
   become: yes
   apt_repository: repo="ppa:moka/daily"
@@ -22,3 +31,4 @@
 
 - name: Set icon theme to Arc
   command: gsettings set org.gnome.desktop.interface icon-theme "Arc"
+  when: ansible_local.icons.icon_theme != "Arc"

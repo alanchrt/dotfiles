@@ -1,4 +1,9 @@
 ---
+- name: Ensure custom facts directory exists
+  become: yes
+  file: path=/etc/ansible/facts.d
+        state=directory
+
 - name: Install system basics
   become: yes
   apt: name={{item}}
