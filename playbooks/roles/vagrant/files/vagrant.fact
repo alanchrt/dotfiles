@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+vagrant_installed=$(dpkg-query -W vagrant &> /dev/null && echo "true" || echo "false")
+
+echo "{\"vagrant_installed\": ${vagrant_installed}}"

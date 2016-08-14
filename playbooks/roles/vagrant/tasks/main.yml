@@ -1,13 +1,17 @@
 ---
-- name: Check for Vagrant installation
-  command: dpkg-query -W vagrant
-  register: vagrant_check_deb
-  ignore_errors: True
+- name: Install vagrant custom facts
+  become: yes
+  copy: src=vagrant.fact
+        dest=/etc/ansible/facts.d/vagrant.fact
+        mode=0755
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
 
 - name: Install Vagrant
   become: yes
   apt: deb=https://releases.hashicorp.com/vagrant/1.8.5/vagrant_1.8.5_x86_64.deb
-  when: vagrant_check_deb.rc == 1
+  when: not ansible_local.vagrant.vagrant_installed
 
 - name: Install virtualbox
   become: yes
