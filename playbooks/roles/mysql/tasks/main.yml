@@ -1,4 +1,13 @@
 ---
+- name: Install mysql custom facts
+  become: yes
+  copy: src=mysql.fact
+        dest=/etc/ansible/facts.d/mysql.fact
+        mode=0755
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
+
 - name: Specify root MySQL password for development
   become: yes
   debconf: name=mysql-server
@@ -8,6 +17,7 @@
   with_items:
     - mysql-server/root_password
     - mysql-server/root_password_again
+  when: not ansible_local.mysql.mysql_root_password_set
 
 - name: Install MySQL server and client
   become: yes
