@@ -20,6 +20,7 @@
 - name: Clone Arc icon theme
   become: yes
   git: repo=https://github.com/horst3180/arc-icon-theme
+       update=no
        depth=1
        accept_hostkey=true
        dest=/usr/local/src/arc-icon-theme

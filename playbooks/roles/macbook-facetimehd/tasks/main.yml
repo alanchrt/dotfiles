@@ -2,6 +2,7 @@
 - name: Clone Facetime HD camera firmware source
   become: yes
   git: repo=https://github.com/patjak/bcwc_pcie.git
+       update=no
        accept_hostkey=true
        dest=/usr/local/src/bcwc_pcie
 

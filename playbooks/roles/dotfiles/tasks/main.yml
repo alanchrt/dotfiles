@@ -18,7 +18,7 @@
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.emacs.d"
 
-- name: Clone dotfiles repo over SSH
+- name: Sync dotfiles repo over SSH
   git: repo=git@github.com:alanctkc/dotfiles.git
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.config/dotfiles"
@@ -26,7 +26,7 @@
   register: ssh_clone
   ignore_errors: True  # will fail with local changes
 
-- name: Clone dotfiles repo over HTTPS
+- name: Sync dotfiles repo over HTTPS
   git: repo=https://github.com/alanctkc/dotfiles.git
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.config/dotfiles"

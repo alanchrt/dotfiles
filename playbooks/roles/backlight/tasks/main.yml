@@ -2,6 +2,7 @@
 - name: Clone backlight utility
   become: yes
   git: repo=https://github.com/haikarainen/light.git
+       update=no
        accept_hostkey=true
        dest=/usr/local/src/light
 

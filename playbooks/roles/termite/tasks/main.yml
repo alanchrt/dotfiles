@@ -2,6 +2,7 @@
 - name: Clone vte-ng
   become: yes
   git: repo=https://github.com/thestinger/vte-ng.git
+       update=no
        accept_hostkey=true
        dest=/usr/local/src/vte-ng
 
@@ -45,6 +46,7 @@
 - name: Clone termite
   become: yes
   git: repo=https://github.com/thestinger/termite.git
+       update=no
        accept_hostkey=true
        dest=/usr/local/src/termite
 
