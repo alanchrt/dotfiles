@@ -1,0 +1,22 @@
+---
+- name: Remove default Ubuntu directories
+  become: yes
+  file: path="{{ansible_env.HOME}}/{{item}}"
+        state=absent
+  with_items:
+    - Desktop
+    - Documents
+    - Downloads
+    - examples.desktop
+    - Music
+    - Pictures
+    - Public
+    - Templates
+    - Videos
+
+- name: Create home subdirectories
+  file: path="{{ansible_env.HOME}}/{{item}}"
+        state=directory
+  with_items:
+    - downloads
+    - workspaces

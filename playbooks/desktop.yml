@@ -5,6 +5,7 @@
   hosts: all
   roles:
     - i3
+    - home
     - touchpad
     - backlight
     - clipboard
