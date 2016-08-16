@@ -12,6 +12,7 @@
 - name: Install PostgreSQL server and client
   become: yes
   apt: name={{item}}
+       allow_unauthenticated=yes
        state=present
   with_items:
     - libpq-dev

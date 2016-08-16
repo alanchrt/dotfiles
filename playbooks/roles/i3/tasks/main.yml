@@ -16,6 +16,12 @@
     - gnome-settings-daemon
     - feh
 
+- name: Ensure LightDM config exists
+  become: yes
+  copy: src=lightdm.conf
+        dest=/etc/lightdm/lightdm.conf
+        force=no
+
 - name: Set i3 as window manager in LightDM
   become: yes
   lineinfile: dest=/etc/lightdm/lightdm.conf
