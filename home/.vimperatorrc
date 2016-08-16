@@ -4,6 +4,8 @@ highlight Hint -append color:#ffffff;background-color:#222222;
 
 " Keybindings
 noremap ~ <NOP>
+nmap <C-n> :tabnext<CR><Esc>
+nmap <C-p> :tabprevious<CR><Esc>
 
 " Browser settings
 set! beacon.enabled=false
