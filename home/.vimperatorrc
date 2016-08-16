@@ -6,13 +6,45 @@ highlight Hint -append color:#ffffff;background-color:#222222;
 noremap ~ <NOP>
 
 " Browser settings
-set! browser.startup.homepage=https://calendar.google.com/calendar/render
+set! beacon.enabled=false
+set! browser.disableResetPrompt=true
 set! browser.download.dir=~/downloads
 set! browser.formfill.enable=false
-set! browser.search.suggest.enabled=false
-set! signon.rememberSignons=false
 set! browser.link.open_newwindow.restriction=0
+set! browser.newtab.preload=false
+set! browser.newtabpage.enabled=false
+set! browser.newtabpage.enhanced=false
+set! browser.newtabpage.introShown=false
+set! browser.pocket.enabled=false
+set! signon.rememberSignons=false
+set! browser.safebrowsing.appRepURL=
+set! browser.safebrowsing.enabled=false
+set! browser.safebrowsing.malware.enabled=false
+set! browser.search.suggest.enabled=false
+set! browser.selfsupport.url=
+set! browser.send_pings=false
+set! browser.shell.checkDefaultBrowser=false
+set! browser.startup.homepage=https://calendar.google.com/calendar/render
+set! browser.startup.homepage_override.mstone=9001.0.0
+set! datareporting.healthreport.service.enabled=false
+set! datareporting.healthreport.uploadEnabled=false
+set! datareporting.policy.dataSubmissionEnabled=false
+set! dom.battery.enabled=false
+set! extensions.autoDisableScopes=14
+set! extensions.getAddons.cache.enabled=false
 set! general.warnOnAboutConfig=false
+set! general.useragent.override=
+set! general.warnOnAboutConfig=false
+set! loop.enabled=false
+set! network.cookie.cookieBehavior=1
+set! network.dns.disablePrefetch=true
+set! network.http.referer.spoofSource=true
+set! network.prefetch-next=false
+set! privacy.donottrackheader.enabled=true
+set! privacy.donottrackheader.value=1
+set! privacy.trackingprotection.enabled=true
+set! privacy.trackingprotection.pbmode.enabled=true
+set! toolkit.telemetry.enabled=false
 
 " Local settings
 source! .vimperatorrc.local
