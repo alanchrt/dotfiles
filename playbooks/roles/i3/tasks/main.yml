@@ -16,16 +16,10 @@
     - gnome-settings-daemon
     - feh
 
-- name: Ensure LightDM config exists
+- name: Set i3 as autologin window manager in LightDM
   become: yes
-  copy: src=lightdm.conf
-        dest=/etc/lightdm/lightdm.conf
-        force=no
-
-- name: Set i3 as window manager in LightDM
-  become: yes
-  lineinfile: dest=/etc/lightdm/lightdm.conf
-              line="user-session=i3"
+  template: src=roles/i3/files/12-autologin.conf
+            dest=/etc/lightdm/lightdm.conf.d/12-autologin.conf
 
 - name: Grant no-password sudo privileges to necessary commands
   become: yes
