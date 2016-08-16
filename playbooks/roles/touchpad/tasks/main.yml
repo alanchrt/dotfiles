@@ -10,13 +10,9 @@
         dest=/etc/X11/xorg.conf.d/50-synaptics.conf
         force=no
         
-- name: Configure natural scrolling
+- name: Configure scroll edge
   become: yes
   lineinfile: dest=/etc/X11/xorg.conf.d/50-synaptics.conf
-              line={{item}}
+              line="        Option \"VertEdgeScroll\" \"off\""
               state=present
               insertafter="Identifier \"touchpad catchall\""
-  with_items:
-    - "        Option \"VertScrollDelta\" \"-111\""
-    - "        Option \"HorizScrollDelta\" \"-111\""
-    - "        Option \"VertEdgeScroll\" \"off\""
