@@ -30,6 +30,12 @@
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/poweroff"
     - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /usr/bin/setpci"
 
+- name: Use dunst for notifications
+  become: yes
+  lineinfile: dest=/usr/share/dbus-1/services/org.freedesktop.Notifications.service
+              regexp="^Exec="
+              line="Exec=/usr/bin/dunst"
+
 - name: Install i3 python library
   become: yes
   pip: name=i3-py
