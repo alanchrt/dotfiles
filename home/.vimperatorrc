@@ -4,6 +4,8 @@ highlight Hint -append color:#ffffff;background-color:#222222;
 
 " Keybindings
 noremap ~ <NOP>
+noremap <C-j> <NOP>
+noremap <C-k> <NOP>
 nmap <C-n> :tabnext<CR><Esc>
 nmap <C-p> :tabprevious<CR><Esc>
 
