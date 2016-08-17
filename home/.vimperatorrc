@@ -1,3 +1,6 @@
+" UI
+set gui=nonavigation
+
 " Hints
 set hintchars=hjklasdfgyuiopqwertnmzxcvb
 highlight Hint -append color:#ffffff;background-color:#222222;
