@@ -11,6 +11,8 @@ noremap <C-j> <NOP>
 noremap <C-k> <NOP>
 nmap <C-n> :tabnext<CR><Esc>
 nmap <C-p> :tabprevious<CR><Esc>
+imap <C-n> <Esc>:tabnext<CR><Esc>
+imap <C-p> <Esc>:tabprevious<CR><Esc>
 
 " Browser settings
 set! beacon.enabled=false
