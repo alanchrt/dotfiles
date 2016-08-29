@@ -105,8 +105,8 @@ bindsym XF86AudioPrev exec --no-startup-id dbus-send --print-reply --dest=org.mp
 bindsym XF86AudioNext exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next
 
 # Brigtness, WARNING raw values might be macbook-specific
-bindsym XF86MonBrightnessUp exec --no-startup-id light -r -A 50
-bindsym XF86MonBrightnessDown exec --no-startup-id light -r -U 50
+bindsym XF86MonBrightnessUp exec --no-startup-id light -r -A 20
+bindsym XF86MonBrightnessDown exec --no-startup-id light -r -U 20
 
 # Workspace bar
 bar {
