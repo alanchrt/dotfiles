@@ -4,9 +4,9 @@
 # http://alanct.com/
 
 # ls aliases
-alias ls='ls -G'
-alias ll='ls -al'
-alias la='ls -A'
+alias ls='ls -G --color=auto'
+alias ll='ls -al --color=auto'
+alias la='ls -A --color=auto'
 
 # Git aliases
 alias gst='git status'
