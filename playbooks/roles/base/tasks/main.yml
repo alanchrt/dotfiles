@@ -20,8 +20,10 @@
     - silversearcher-ag
     - ncdu
     - powertop
+    - wavemon
     - jq
     - httpie
+    - nmap
     - whois
     - oathtool
 
