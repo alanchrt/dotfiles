@@ -13,6 +13,10 @@ nmap <C-n> :tabnext<CR><Esc>
 nmap <C-p> :tabprevious<CR><Esc>
 imap <C-n> <Esc>:tabnext<CR><Esc>
 imap <C-p> <Esc>:tabprevious<CR><Esc>
+imap <C-o> <Esc>:back<CR><Esc>
+imap <C-i> <Esc>:forward<CR><Esc>
+imap <C-d> <Esc><C-d>
+imap <C-u> <Esc><C-u>
 
 " Browser settings
 set! beacon.enabled=false
