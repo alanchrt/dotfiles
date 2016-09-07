@@ -10,7 +10,10 @@
     executable: /bin/bash
     creates: "{{ansible_env.HOME}}/.nvm/versions/node/v4.2.4/bin/node"
 
-- name: Install tern
-  npm: name=tern
+- name: Install common node tools
+  npm: name={{item}}
        global=yes
        executable="{{ansible_env.HOME}}/.nvm/versions/node/v4.2.4/bin/npm"
+  with_items:
+    - tern
+    - gulp
