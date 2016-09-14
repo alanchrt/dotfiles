@@ -13,6 +13,7 @@
     - gtk
     - icons
     - fonts
+    - cloudprint
     - termite
     - insomnia
     - gparted
