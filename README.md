@@ -121,3 +121,11 @@ $ gist-paste --login
 ```bash
 $ ngrok authtoken <token>
 ```
+
+#### Desktop-specific
+
+##### Google Cloud Print
+
+```bash
+$ sudo /usr/local/share/cloudprint-cups/setupcloudprint.py
+```
