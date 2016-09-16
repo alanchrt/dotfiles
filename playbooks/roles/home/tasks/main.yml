@@ -20,3 +20,4 @@
   with_items:
     - downloads
     - workspaces
+    - notes
