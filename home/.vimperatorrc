@@ -1,5 +1,6 @@
 " UI
 set gui=nonavigation
+set focuscontent
 
 " Hints
 set hintchars=hjklasdfgyuiopqwertnmzxcvb
