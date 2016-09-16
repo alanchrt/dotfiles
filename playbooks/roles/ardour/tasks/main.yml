@@ -1,0 +1,5 @@
+---
+- name: Install ardour
+  become: yes
+  apt: name=ardour
+       state=present
