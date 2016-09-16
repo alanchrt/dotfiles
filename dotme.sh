@@ -91,11 +91,6 @@ configure_i3() {
     link_file .config/dunst/dunstrc .config/dunst/dunstrc
 }
 
-configure_desktop() {
-    echo "Configuring Desktop settings..."
-    link_file .config/user-dirs.dirs .config/user-dirs.dirs
-}
-
 configure_vimperator() {
     echo "Configuring Vimperator..."
     link_file .vimperatorrc .vimperatorrc
@@ -114,7 +109,6 @@ configure_git
 configure_emacs
 configure_python
 configure_i3
-configure_desktop
 configure_vimperator
 
 touch $HOME/.dotted
