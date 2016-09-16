@@ -10,6 +10,7 @@
     - {role: emacs, when: ansible_distribution_release != "trusty"}
     - vim
     - python
+    - latex
     - node
     - postgres
     - mysql

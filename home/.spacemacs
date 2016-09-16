@@ -35,6 +35,7 @@ values."
      react
      ruby
      rust
+     latex
      vagrant
      yaml
      git
