@@ -13,19 +13,6 @@
     - Templates
     - Videos
 
-- name: Set user directories to use HOME instead
-  lineinfile: dest="{{ansible_env.HOME}}/.config/user-dirs.dirs"
-              regexp="^{{item}}"
-              line="{{item}}=\"$HOME\""
-  with_items:
-    - XDG_DESKTOP_DIR
-    - XDG_TEMPLATES_DIR
-    - XDG_PUBLICSHARE_DIR
-    - XDG_DOCUMENTS_DIR
-    - XDG_MUSIC_DIR
-    - XDG_PICTURES_DIR
-    - XDG_VIDEOS_DIR
-
 - name: Create home subdirectories
   file: path="{{ansible_env.HOME}}/{{item}}"
         state=directory
