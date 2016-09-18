@@ -123,7 +123,7 @@ exec --no-startup-id compton --config ~/.config/compton.conf
 exec --no-startup-id sudo setpci -v -H1 -s 00:01.00 BRIDGE_CONTROL=0 && light -r -S 1000  # enable backlight, WARNING macbook-specific
 exec --no-startup-id gnome-settings-daemon
 exec --no-startup-id emacs --daemon
-exec --no-startup-id xautolock -time 3 -corners -000 -locker -slock
+exec --no-startup-id xautolock -time 3 -corners -000 -locker slock
 exec --no-startup-id unclutter
 exec --no-startup-id pcmanfm -d
 exec --no-startup-id nm-applet
