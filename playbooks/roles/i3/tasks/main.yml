@@ -8,6 +8,7 @@
     - i3blocks
     - compton
     - xautolock
+    - xss-lock
     - unclutter
     - pasystray
     - fdpowermon
