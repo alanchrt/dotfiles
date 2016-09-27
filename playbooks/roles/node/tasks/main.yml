@@ -5,15 +5,29 @@
        dest="{{ansible_env.HOME}}/.nvm"
 
 - name: Install Node.js
-  shell: "source {{ansible_env.HOME}}/.nvm/nvm.sh && nvm install v4.2.4"
+  shell: "source {{ansible_env.HOME}}/.nvm/nvm.sh && nvm install v4.5.0"
   args:
     executable: /bin/bash
-    creates: "{{ansible_env.HOME}}/.nvm/versions/node/v4.2.4/bin/node"
+    creates: "{{ansible_env.HOME}}/.nvm/versions/node/v4.5.0/bin/node"
+
+- name: Install Node 6
+  shell: "source {{ansible_env.HOME}}/.nvm/nvm.sh && nvm install v6.6.0"
+  args:
+    executable: /bin/bash
+    creates: "{{ansible_env.HOME}}/.nvm/versions/node/v6.6.0/bin/node"
 
 - name: Install common node tools
   npm: name={{item}}
        global=yes
-       executable="{{ansible_env.HOME}}/.nvm/versions/node/v4.2.4/bin/npm"
+       executable="{{ansible_env.HOME}}/.nvm/versions/node/v4.5.0/bin/npm"
+  with_items:
+    - tern
+    - gulp
+
+- name: Install common node tools
+  npm: name={{item}}
+       global=yes
+       executable="{{ansible_env.HOME}}/.nvm/versions/node/v6.6.0/bin/npm"
   with_items:
     - tern
     - gulp
