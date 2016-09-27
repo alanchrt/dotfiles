@@ -13,6 +13,9 @@ fi
 # Use full color
 export TERM=xterm-256color
 
+# Syntax highlight in less
+export LESSOPEN="| pygmentize -g %s"
+
 # Use emacs as default editor
 export ALTERNATE_EDITOR=''
 export EDITOR='emacsclient -t'
@@ -41,4 +44,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 # Source virtualenvwrapper
-source /usr/local/bin/virtualenvwrapper.sh
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+  . /usr/local/bin/virtualenvwrapper.sh
+fi

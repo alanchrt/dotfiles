@@ -13,6 +13,7 @@
     - checkinstall
     - ntp
     - ranger
+    - python-pygments
     - tree
     - htop
     - zip
