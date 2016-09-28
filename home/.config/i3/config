@@ -96,7 +96,7 @@ bindsym $mod+Control+Down exec --no-startup-id "zenity --question --title='Syste
 bindsym $mod+Control+Right exec --no-startup-id "zenity --question --title='System reboot' --text='Do you really want to reboot your machine?' && sudo reboot"
 
 # Multimedia
-bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -D pulse sset Master 5%+ && killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -D pulse set Master 1+ unmute && amixer -D pulse sset Master 5%+ && killall -SIGUSR1 i3status
 bindsym XF86AudioLowerVolume exec --no-startup-id amixer -D pulse sset Master 5%- && killall -SIGUSR1 i3status
 bindsym XF86AudioMute exec --no-startup-id amixer -D pulse set Master 1+ toggle
 bindsym XF86AudioPlay exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
