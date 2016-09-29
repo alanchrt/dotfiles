@@ -18,6 +18,7 @@
   with_items:
     - tern
     - gulp
+    - create-react-app
 
 - name: Install Node.js (v6.6.0)
   shell: "source {{ansible_env.HOME}}/.nvm/nvm.sh && nvm install v6.6.0"
@@ -33,3 +34,4 @@
   with_items:
     - tern
     - gulp
+    - create-react-app
