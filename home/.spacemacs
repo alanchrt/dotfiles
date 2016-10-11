@@ -324,6 +324,7 @@ you should place your code here."
   (setq neo-theme 'nerd)
   (setq neo-show-hidden-files nil)
   (setq initial-buffer-choice "./")
+  (setq org-startup-indented t)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
