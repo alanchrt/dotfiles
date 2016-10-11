@@ -21,7 +21,6 @@ alias gp="gist-paste -p"
 
 # Emacs
 alias e='emacsclient -t'
-alias ep='emacsclient -t .'
 alias se='sudoedit'
 
 # Use proper terminal for weechat
