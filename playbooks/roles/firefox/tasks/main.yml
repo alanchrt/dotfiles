@@ -21,4 +21,5 @@
 - name: Install Firefox
   become: yes
   apt: name=firefox
+       update_cache=yes
        state=present
