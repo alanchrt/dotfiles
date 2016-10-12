@@ -318,13 +318,14 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  (setq js2-basic-offset 2)
-  (setq js-indent-level 2)
-  (setq web-mode-code-indent-offset 2)
-  (setq neo-theme 'nerd)
-  (setq neo-show-hidden-files nil)
+  (setq powerline-default-separator nil)
   (setq initial-buffer-choice "./")
   (setq org-startup-indented t)
+  (setq neo-theme 'nerd)
+  (setq neo-show-hidden-files nil)
+  (setq-default js2-basic-offset 2)
+  (setq-default js-indent-level 2)
+  (setq-default web-mode-code-indent-offset 2)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
