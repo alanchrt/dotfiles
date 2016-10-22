@@ -21,6 +21,7 @@
     - yo
     - create-react-app
     - pushstate-server
+    - js-beautify
 
 - name: Install Node.js (v6.6.0)
   shell: "source {{ansible_env.HOME}}/.nvm/nvm.sh && nvm install v6.6.0"
@@ -39,3 +40,4 @@
     - yo
     - create-react-app
     - pushstate-server
+    - js-beautify

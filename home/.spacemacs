@@ -323,9 +323,15 @@ you should place your code here."
   (setq org-startup-indented t)
   (setq neo-theme 'nerd)
   (setq neo-show-hidden-files nil)
-  (setq-default js2-basic-offset 2)
-  (setq-default js-indent-level 2)
-  (setq-default web-mode-code-indent-offset 2)
+  (setq-default
+   ;; js2-mode
+   js2-basic-offset 2
+   ;; web-mode
+   css-indent-offset 2
+   web-mode-markup-indent-offset 2
+   web-mode-css-indent-offset 2
+   web-mode-code-indent-offset 2
+   web-mode-attr-indent-offset 2)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will

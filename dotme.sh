@@ -82,6 +82,11 @@ configure_python() {
     link_file .config/flake8 .config/flake8
 }
 
+configure_node() {
+    echo "Configuring node.js..."
+    link_file .jsbeautifyrc .jsbeautifyrc
+}
+
 configure_i3() {
     echo "Configuring i3..."
     mkdir -p $HOME/.config
@@ -108,6 +113,7 @@ configure_byobu
 configure_git
 configure_emacs
 configure_python
+configure_node
 configure_i3
 configure_vimperator
 
