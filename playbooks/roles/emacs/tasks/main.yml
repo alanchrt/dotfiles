@@ -1,7 +1,7 @@
 ---
-- name: Install emacs apt package
+- name: Install emacs
   become: yes
-  apt: name={{item}}
-       state=present
+  pacman: name={{item}}
+          state=present
   with_items:
-    - emacs24
+    - emacs

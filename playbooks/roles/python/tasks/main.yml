@@ -1,11 +1,9 @@
 ---
 - name: Install python base
   become: yes
-  apt: name={{item}}
-       state=present
+  pacman: name={{item}}
+          state=present
   with_items:
-    - python
-    - python-dev
     - python-pip
 
 - name: Install python tooling

@@ -1,5 +1,5 @@
 ---
-- name: Install NFS server
+- name: Install NFS utils
   become: yes
-  apt: name=nfs-kernel-server
-       state=present
+  pacman: name=nfs-utils
+          state=present

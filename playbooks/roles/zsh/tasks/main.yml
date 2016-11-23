@@ -1,8 +1,8 @@
 ---
 - name: Install zsh
   become: yes
-  apt: name=zsh
-       state=present
+  pacman: name=zsh
+          state=present
 
 - name: Configure default shell
   become: yes

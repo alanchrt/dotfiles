@@ -1,5 +1,0 @@
----
-- name: Install sqlite
-  become: yes
-  apt: name=sqlite3
-       state=present

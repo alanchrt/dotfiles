@@ -1,6 +1,0 @@
----
-- name: Install MFA tool
-  become: yes
-  copy: src=mfa
-        dest=/usr/local/bin/mfa
-        mode=0755

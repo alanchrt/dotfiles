@@ -1,8 +1,13 @@
 ---
-- name: Install byobu
+- name: Install tmux
   become: yes
-  apt: name={{item}}
-       state=present
+  pacman: name={{item}}
+          state=present
   with_items:
     - tmux
+
+- name: Install byobu
+  yaourt: name={{item}}
+          state=present
+  with_items:
     - byobu

@@ -6,20 +6,17 @@
     - git
     - zsh
     - byobu
-    - {role: emacs-source, when: ansible_distribution_release == "trusty"}
-    - {role: emacs, when: ansible_distribution_release != "trusty"}
+    - emacs
     - vim
     - python
     - latex
     - node
     - postgres
-    - mysql
-    - sqlite
+    #- mysql
     - nfs
     - heroku
     - aws
     - ngrok
-    - mfa
 
 - name: Configure dev environment
   hosts: all

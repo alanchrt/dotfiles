@@ -6,29 +6,13 @@
 
 - name: Install system basics
   become: yes
-  apt: name={{item}}
-       state=present
+  pacman: name={{item}}
+          state=present
+          update_cache=yes
   with_items:
-    - build-essential
-    - checkinstall
-    - ntp
-    - ranger
-    - python-pygments
-    - tree
-    - htop
-    - zip
-    - unzip
-    - silversearcher-ag
-    - ncdu
-    - powertop
+    - the_silver_searcher
     - wavemon
     - jq
     - httpie
     - nmap
     - whois
-    - oathtool
-
-- name: Start ntp
-  become: yes
-  service: name=ntp
-           state=started

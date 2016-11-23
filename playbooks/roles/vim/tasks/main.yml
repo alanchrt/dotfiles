@@ -1,10 +1,10 @@
 ---
 - name: Install vim
   become: yes
-  apt: name={{item}}
-       state=present
+  pacman: name={{item}}
+          state=present
   with_items:
-    - vim-nox
+    - vim
 
 - name: Configure basic vimrc
   get_url: url=https://raw.githubusercontent.com/amix/vimrc/master/vimrcs/basic.vim

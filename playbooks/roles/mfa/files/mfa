@@ -1,4 +1,0 @@
-/usr/bin/oathtool --totp -b $(cat $HOME/.mfa/$1.key) | xclip -sel clipboard;
-message="MFA token copied to clipboard for key '$1'.";
-echo $message;
-notify-send "$message";

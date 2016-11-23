@@ -17,7 +17,7 @@ alias gdi='git diff --color'
 alias gdt='git difftool'
 alias gco='git checkout'
 alias glo='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %C(cyan)(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
-alias gp="gist-paste -p"
+alias gp="gist -p"
 
 # Emacs
 alias e='emacsclient -t'
