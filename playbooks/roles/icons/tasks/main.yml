@@ -1,35 +1,11 @@
 ---
-- name: Install icon custom facts
-  become: yes
-  copy: src=icons.fact
-        dest=/etc/ansible/facts.d/icons.fact
-        mode=0755
-
-- name: Reload ansible local facts
-  setup: filter=ansible_local
-
-- name: Add Moka icon theme PPA
-  become: yes
-  apt_repository: repo="ppa:moka/daily"
-
-- name: Install Moka icon theme
-  become: yes
-  apt: name=moka-icon-theme
-       state=present
-
-- name: Clone Arc icon theme
-  become: yes
-  git: repo=https://github.com/horst3180/arc-icon-theme
-       update=no
-       depth=1
-       accept_hostkey=true
-       dest=/usr/local/src/arc-icon-theme
-
 - name: Install Arc icon theme
   become: yes
-  synchronize: src=/usr/local/src/arc-icon-theme/Arc
-        dest=/usr/share/icons
+  pacman: name=arc-icon-theme
+          state=present
 
 - name: Set icon theme to Arc
-  command: gsettings set org.gnome.desktop.interface icon-theme "Arc"
-  when: ansible_local.icons.icon_theme != "Arc"
+  lineinfile: dest="{{ansible_env.HOME}}/.gtkrc-2.0"
+              regexp="^gtk-icon-theme-name="
+              line="gtk-icon-theme-name=\"Arc\""
+              create=yes

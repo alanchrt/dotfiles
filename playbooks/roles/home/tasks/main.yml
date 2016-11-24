@@ -1,12 +1,11 @@
 ---
-- name: Remove default Ubuntu directories
+- name: Remove default user directories
   become: yes
   file: path="{{ansible_env.HOME}}/{{item}}"
         state=absent
   with_items:
     - Desktop
     - Documents
-    - examples.desktop
     - Music
     - Pictures
     - Public

@@ -2,7 +2,7 @@
 - name: Install Dropbox dependencies
   become: yes
   apt: name=python-gpgme
-       state=installed
+       state=present
 
 - name: Download Dropbox daemon
   become: yes

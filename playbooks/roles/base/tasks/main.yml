@@ -11,6 +11,7 @@
           update_cache=yes
   with_items:
     - the_silver_searcher
+    - pygmentize
     - wavemon
     - jq
     - httpie

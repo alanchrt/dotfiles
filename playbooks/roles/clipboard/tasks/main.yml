@@ -1,5 +1,5 @@
 ---
 - name: Install xclip
   become: yes
-  apt: name=xclip
-       state=present
+  pacman: name=xclip
+          state=present

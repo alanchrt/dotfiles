@@ -4,27 +4,26 @@
 - name: Provision desktop system
   hosts: all
   roles:
-    - i3
+    # - i3
     - home
     - touchpad
-    - backlight
+    # - backlight
     - clipboard
-    - pcmanfm
     - gtk
     - icons
-    - fonts
-    - cloudprint
-    - dropbox
-    - firefox
-    - chrome
+    # - fonts
     - termite
-    - insomnia
-    - gparted
-    - vpn
-    - flux
-    - vagrant
-    - android
-    - spotify
-    - ardour
-    - xiphos
-    - gimp
+    # - cloudprint
+    # - dropbox
+    # - firefox
+    # - chrome
+    # - insomnia
+    # - gparted
+    # - vpn
+    # - flux
+    # - vagrant
+    # - android
+    # - spotify
+    # - ardour
+    # - xiphos
+    # - gimp
