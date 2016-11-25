@@ -1,10 +1,41 @@
 ---
+- name: Install GTK custom facts
+  become: yes
+  copy: src=gtk.fact
+        dest=/etc/ansible/facts.d/gtk.fact
+        mode=0755
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
+
 - name: Install Arc GTK theme
   yaourt: name=gtk-theme-arc-git
           state=present
 
-- name: Set GTK theme to Arc-Darker
+- name: Set GTK theme to Arc-Darker for GTK+ 2
   lineinfile: dest="{{ansible_env.HOME}}/.gtkrc-2.0"
               regexp="^gtk-theme-name="
               line="gtk-theme-name=\"Arc-Darker\""
               create=yes
+
+- name: Set GTK theme to Arc-Darker for GTK+ 3
+  lineinfile: dest="{{ansible_env.HOME}}/.config/gtk-3.0/settings.ini"
+              regexp="^gtk-theme-name="
+              line="gtk-theme-name=Arc-Darker"
+              create=yes
+
+- name: Set to not prefer dark theme in  GTK+ 2
+  lineinfile: dest="{{ansible_env.HOME}}/.gtkrc-2.0"
+              regexp="^gtk-application-prefer-dark-theme="
+              line="gtk-application-prefer-dark-theme=false"
+              create=yes
+
+- name: Set to not prefer dark theme in  GTK+ 3
+  lineinfile: dest="{{ansible_env.HOME}}/.config/gtk-3.0/settings.ini"
+              regexp="^gtk-application-prefer-dark-theme="
+              line="gtk-application-prefer-dark-theme=false"
+              create=yes
+
+- name: Set GTK theme to Arc-Darker in Gnome settings
+  command: gsettings set org.gnome.desktop.interface gtk-theme "Arc-Darker"
+  when: ansible_local.gtk.gtk_theme != "Arc-Darker"

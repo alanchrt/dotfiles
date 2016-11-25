@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+gtk_theme=$(gsettings get org.gnome.desktop.interface gtk-theme | awk -F "'" '{print $2}')
+
+echo "{\"gtk_theme\": \"${gtk_theme}\"}"

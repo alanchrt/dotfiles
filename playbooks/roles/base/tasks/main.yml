@@ -4,6 +4,10 @@
   file: path=/etc/ansible/facts.d
         state=directory
 
+- name: Upgrade entire system
+  become: yes
+  command: yaourt -Syua
+
 - name: Install system basics
   become: yes
   pacman: name={{item}}
@@ -17,3 +21,4 @@
     - httpie
     - nmap
     - whois
+    - gnome-screenshot
