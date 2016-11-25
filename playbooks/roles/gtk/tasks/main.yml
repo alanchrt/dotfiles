@@ -24,13 +24,13 @@
               line="gtk-theme-name=Arc-Darker"
               create=yes
 
-- name: Set to not prefer dark theme in  GTK+ 2
+- name: Set to not prefer dark theme in GTK+ 2
   lineinfile: dest="{{ansible_env.HOME}}/.gtkrc-2.0"
               regexp="^gtk-application-prefer-dark-theme="
               line="gtk-application-prefer-dark-theme=false"
               create=yes
 
-- name: Set to not prefer dark theme in  GTK+ 3
+- name: Set to not prefer dark theme in GTK+ 3
   lineinfile: dest="{{ansible_env.HOME}}/.config/gtk-3.0/settings.ini"
               regexp="^gtk-application-prefer-dark-theme="
               line="gtk-application-prefer-dark-theme=false"
