@@ -11,7 +11,7 @@
     - clipboard
     - gtk
     - icons
-    # - fonts
+    - fonts
     - termite
     # - cloudprint
     # - dropbox
