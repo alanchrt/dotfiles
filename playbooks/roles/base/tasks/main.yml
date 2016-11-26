@@ -6,7 +6,7 @@
 
 - name: Upgrade entire system
   become: yes
-  command: yaourt -Syua
+  pacman: upgrade=yes
 
 - name: Install system basics
   become: yes
