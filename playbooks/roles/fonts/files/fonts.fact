@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+bohoomil_key_signed=$(pacman-key -l | grep bohoomil &> /dev/null && echo "true" || echo "false")
+
+echo "{\"bohoomil_key_signed\": ${bohoomil_key_signed}}"

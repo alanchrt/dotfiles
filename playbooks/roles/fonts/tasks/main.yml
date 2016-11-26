@@ -1,31 +1,67 @@
 ---
+- name: Install font custom facts
+  become: yes
+  copy: src=fonts.fact
+        dest=/etc/ansible/facts.d/fonts.fact
+        mode=0755
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
+
+- name: Configure Infinality bundle repositories
+  become: yes
+  blockinfile:
+    dest: /etc/pacman.conf
+    block: |
+      [{{item.repo}}]
+      Server = {{item.server}}
+    marker: "# {mark} INFINALITY CONFIG FOR {{item.mark}}"
+  with_items:
+    - { mark: "BASE", repo: "infinality-bundle", server: "http://bohoomil.com/repo/$arch" }
+    - { mark: "MULTILIB", repo: "infinality-bundle-multilib", server: "http://bohoomil.com/repo/multilib/$arch" }
+    - { mark: "FONTS", repo: "infinality-bundle-fonts", server: "http://bohoomil.com/repo/fonts" }
+
+- name: Import and sign Infinality server key
+  become: yes
+  command: "{{item}}"
+  with_items:
+    - pacman-key -r 962DDE58 
+    - pacman-key --lsign-key 962DDE58
+  when: not ansible_local.fonts.bohoomil_key_signed
+
 - name: Remove non-Infinality versions of dependencies
   become: yes
   pacman: name={{item}}
           state=absent
+          update_cache=yes
           force=yes
   with_items:
     - freetype2
     - fontconfig
     - cairo
+    - ttf-dejavu
+    - ttf-liberation
+    - noto-fonts
+    - tex-gyre-fonts
+    - gsfonts
+    - ttf-droid
+    - ttf-ubuntu-font-family
 
-- name: Install font manager, Infinality patches, and Mac fonts
-  yaourt: name={{item}}
-          state=present
-  with_items:
-    - font-manager
-    - freetype2-infinality
-    - fontconfig-infinality
-    - cairo-infinality
-    - ttf-mac-fonts
-
-- name: Install Ubuntu, and TeX Gyre fonts
+- name: Install Infinality multilib bundle with fonts
   become: yes
   pacman: name={{item}}
           state=present
   with_items:
-    - ttf-ubuntu-font-family
-    - tex-gyre-fonts
+    - infinality-bundle-multilib
+    - ibfonts-meta-extended
+
+- name: Install font manager and MS/Mac fonts
+  yaourt: name={{item}}
+          state=present
+  with_items:
+    - font-manager
+    - ttf-ms-fonts
+    - ttf-mac-fonts
 
 # - name: Disable hinting in Xft settings
 #   become: yes
@@ -79,10 +115,10 @@
 #         dest=/etc/fonts/conf.d/11-lcdfilter-default.conf
 #         state=link
 
-- name: Copy Infinality generic config
-  become: yes
-  copy: src=/usr/share/doc/freetype2-infinality-ultimate/infinality-settings-generic
-        dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
+# - name: Copy Infinality generic config
+#   become: yes
+#   copy: src=/usr/share/doc/freetype2-infinality-ultimate/infinality-settings-generic
+#         dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
 
 # - name: Set OS X style in config
 #   become: yes
