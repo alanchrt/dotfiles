@@ -1,24 +1,28 @@
-# .i3/config - Alan Christopher Thomas
+# .config/i3/config - Alan Christopher Thomas
 # http://alanct.com/
 
 # Modifier (Win)
 set $mod Mod4
+floating_modifier $mod
 
 # Borders
-new_window pixel 3
+new_window pixel 1
 new_float normal
+hide_edge_borders none
+smart_borders on
+
+# Gaps
+gaps inner 10
+gaps outer -4
+smart_gaps on
 
 # Font
-font pango:Ubuntu 12
+font xft:Noto Sans 10
 
 # Software
-bindsym $mod+space exec --no-startup-id rofi -show run -lines 3 -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
-bindsym $mod+o exec --no-startup-id rofi -show window -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
-bindsym $mod+i exec --no-startup-id rofi -show ssh -opacity 90 -fg "#f1f1f1" -bg "#333333" -hlfg "#ffffff" -hlbg "#336699"
 bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Shift+p exec --no-startup-id gnome-system-monitor
 
 # State
 bindsym $mod+Shift+q kill
@@ -55,9 +59,13 @@ mode "RESIZE" {
 
 # Layout
 bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
 bindsym $mod+d layout default
 
 # Workspaces
+workspace_auto_back_and_forth yes
+bindsym $mod+b workspace back_and_forth
+bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_and_forth
 bindsym $mod+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput.py workspace prev
 bindsym $mod+period exec --no-startup-id python ~/.config/i3/workspaceonoutput.py workspace next
 bindsym $mod+Control+comma move workspace to output left
@@ -74,6 +82,7 @@ bindsym $mod+9 workspace 9
 bindsym $mod+0 workspace 10
 bindsym $mod+Escape move scratchpad
 bindsym $mod+Tab scratchpad show
+bindsym $mod+Shift+t sticky toggle
 
 # Move to workspace
 bindsym $mod+Shift+1 move container to workspace 1
@@ -92,48 +101,81 @@ bindsym $mod+Shift+period exec --no-startup-id python ~/.config/i3/workspaceonou
 # i3 control
 bindsym $mod+Control+i restart
 bindsym $mod+Control+Up exec --no-startup-id slock
-bindsym $mod+Control+Down exec --no-startup-id "zenity --question --title='System shut down' --text='Do you really want to shut down your machine?' && sudo poweroff"
-bindsym $mod+Control+Right exec --no-startup-id "zenity --question --title='System reboot' --text='Do you really want to reboot your machine?' && sudo reboot"
+bindsym $mod+Control+Down mode "$mode_shutdown"
+bindsym $mod+Control+Right mode "$mode_reboot"
+
+# Shut down mode
+set $mode_shutdown Shut down system? (Y)es (n)o
+mode "$mode_shutdown" {
+    bindsym Shift+y exec --no-startup-id i3exit shutdown, mode "default"
+    bindsym Shift+n mode "default"
+    bindsym n mode "default"
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+}
+
+# Reboot mode
+set $mode_reboot Reboot system? (Y)es (n)o
+mode "$mode_reboot" {
+    bindsym Shift+y exec --no-startup-id i3exit reboot, mode "default"
+    bindsym Shift+n mode "default"
+    bindsym n mode "default"
+    bindsym Escape mode "default"
+    bindsym Return mode "default"
+}
 
 # Multimedia
-bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -D pulse set Master 1+ unmute && amixer -D pulse sset Master 5%+ && killall -SIGUSR1 i3status
-bindsym XF86AudioLowerVolume exec --no-startup-id amixer -D pulse sset Master 5%- && killall -SIGUSR1 i3status
-bindsym XF86AudioMute exec --no-startup-id amixer -D pulse set Master 1+ toggle
-bindsym XF86AudioPlay exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
-bindsym XF86AudioStop exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop
-bindsym XF86AudioPrev exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous
-bindsym XF86AudioNext exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next
+# bindsym XF86AudioRaiseVolume exec --no-startup-id amixer -D pulse set Master 1+ unmute && amixer -D pulse sset Master 5%+ && killall -SIGUSR1 i3status
+# bindsym XF86AudioLowerVolume exec --no-startup-id amixer -D pulse sset Master 5%- && killall -SIGUSR1 i3status
+# bindsym XF86AudioMute exec --no-startup-id amixer -D pulse set Master 1+ toggle
+# bindsym XF86AudioPlay exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
+# bindsym XF86AudioStop exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop
+# bindsym XF86AudioPrev exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous
+# bindsym XF86AudioNext exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next
+bindsym $mod+Ctrl+m exec i3-sensibleterminal -e 'alsamixer'
 
 # Brigtness, WARNING raw values might be macbook-specific
-bindsym XF86MonBrightnessUp exec --no-startup-id light -r -A 20
-bindsym XF86MonBrightnessDown exec --no-startup-id light -r -U 20
+# bindsym XF86MonBrightnessUp exec --no-startup-id light -r -A 20
+# bindsym XF86MonBrightnessDown exec --no-startup-id light -r -U 20
 
 # Workspace bar
 bar {
-    status_command i3blocks -c ~/.config/i3/i3blocks.conf
+	status_command i3status -c ~/.config/i3/i3status.conf
+	position bottom
 
-    colors {
-        background #222222
-    }
+	bindsym button4 nop
+	bindsym button5 nop
+	font xft:Noto Sans 10.5
+	strip_workspace_numbers yes
+
+	colors {
+		background #2B2C2B
+    statusline #F9FAF9
+		separator  #454947
+
+    #                  border  backgr. text
+		focused_workspace  #F9FAF9 #16A085 #2B2C2B
+		active_workspace   #595B5B #353836 #FDF6E3
+		inactive_workspace #595B5B #353836 #EEE8D5
+		urgent_workspace   #16A085 #FDF6E3 #E5201D
+	}
 }
 
 # Startup scripts
-exec --no-startup-id compton --config ~/.config/compton.conf
-# TODO: setpci needs to be root
-exec --no-startup-id sudo setpci -v -H1 -s 00:01.00 BRIDGE_CONTROL=0 && light -r -S 1000  # enable backlight, WARNING macbook-specific
-exec --no-startup-id gnome-settings-daemon
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id nitrogen --restore; sleep 1; compton -b --config ~/.config/compton.conf
+exec --no-startup-id nm-applet
+exec --no-startup-id xfce4-power-manager
 exec --no-startup-id emacs --daemon
 exec --no-startup-id xautolock -time 3 -corners -000 -locker slock
 exec --no-startup-id xss-lock -- /usr/bin/slock
 exec --no-startup-id unclutter
 exec --no-startup-id pcmanfm -d
-exec --no-startup-id nm-applet
-exec --no-startup-id pasystray
-exec --no-startup-id fdpowermon
-exec --no-startup-id dropboxd
+exec --no-startup-id volumeicon
+# exec --no-startup-id dropboxd
 exec --no-startup-id fluxgui
-exec_always --no-startup-id feh --bg-scale /usr/share/backgrounds/Xerus_Wallpaper_Grey_4096x2304.png
+exec_always --no-startup-id fix_xcursor
 exec --no-startup-id ~/.i3_local
 
 # Desktop applications
-exec --no-startup-id sleep 3 && firefox -P default
+exec --no-startup-id sleep 3 && firefox-beta -P default

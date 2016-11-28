@@ -1,43 +1,51 @@
 ---
-- name: Install i3 and related software
+- name: Install font custom facts
   become: yes
-  apt: name={{item}}
-       state=present
+  copy: src=i3.fact
+        dest=/etc/ansible/facts.d/i3.fact
+        mode=0755
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
+
+- name: Remove system python docutils
+  become: yes
+  pip: name=docutils
+       state=absent
+  when: not ansible_local.i3.docutils_installed
+
+- name: Install i3-related software
+  yaourt: name={{item}}
+          state=present
   with_items:
-    - i3
-    - i3blocks
-    - compton
-    - xautolock
+    - cmake
+    - python-docutils
     - xss-lock
     - unclutter
-    - pasystray
-    - fdpowermon
-    - arandr
     - rofi
-    - gnome-settings-daemon
     - feh
 
 # - name: Set i3 as autologin window manager in LightDM
 #   become: yes
-#   template: src=roles/i3/files/12-autologin.conf
-#             dest=/etc/lightdm/lightdm.conf.d/12-autologin.conf
-
-- name: Grant no-password sudo privileges to necessary commands
-  become: yes
-  lineinfile: dest=/etc/sudoers
-              line={{item}}
-  with_items:
-    - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/reboot"
-    - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /sbin/poweroff"
-    - "{{ansible_env.USER}} ALL=(ALL:ALL) NOPASSWD: /usr/bin/setpci"
-
-- name: Use dunst for notifications
-  become: yes
-  lineinfile: dest=/usr/share/dbus-1/services/org.freedesktop.Notifications.service
-              regexp="^Exec="
-              line="Exec=/usr/bin/dunst"
+#   blockinfile:
+#     dest: /etc/lightdm/lightdm.conf
+#     marker: '# {mark} AUTOLOGIN CONFIG'
+#     block: |
+#       [SeatDefaults]
+#       pam-service=lightdm
+#       pam-autologin-service=lightdm-autologin
+#       autologin-user={{ansible_env.USER}}
+#       autologin-user-timeout=0
+#       session-wrapper=/etc/lightdm/Xsession
 
 - name: Install i3 python library
   become: yes
   pip: name=i3-py
        state=present
+
+- name: Remove system default i3 configs
+  file: path={{item}}
+        state=absent
+  with_items:
+    - "{{ansible_env.HOME}}/.i3"
+    - "{{ansible_env.HOME}}/.i3status.conf"

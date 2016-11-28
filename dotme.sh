@@ -114,7 +114,7 @@ configure_git
 configure_emacs
 configure_python
 configure_node
-#configure_i3
+configure_i3
 configure_vimperator
 
 touch $HOME/.dotted

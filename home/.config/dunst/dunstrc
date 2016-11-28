@@ -1,5 +1,5 @@
 [global]
-    font = Ubuntu 10
+    font = Cantarell 10
     allow_markup = yes
     plain_text = no
     format = "<b>%s</b>\n%b"
@@ -27,7 +27,7 @@
     separator_color = auto
     startup_notification = false
     dmenu = /usr/bin/dmenu -p dunst:
-    browser = /usr/bin/firefox -new-tab
+    browser = /usr/bin/firefox-beta -new-tab
     icon_position = off
     icon_folders = /usr/share/icons/Arc/status/16/:/usr/share/icons/Arc/devices/16/
 
