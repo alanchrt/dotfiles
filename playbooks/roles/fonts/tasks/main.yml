@@ -63,66 +63,13 @@
     - ttf-ms-fonts
     - ttf-mac-fonts
 
-# - name: Disable hinting in Xft settings
-#   become: yes
-#   lineinfile: dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
-#   args:
-#     regexp: "^Xft.hinting:"
-#     line: "Xft.hinting: 0"
+- name: Copy Infinality settings
+  become: yes
+  copy: src=/usr/share/doc/freetype2-infinality-ultimate/infinality-settings.sh
+        dest=/etc/profile.d/infinality-settings.sh
 
-# - name: Disable hinting in font config
-#   become: yes
-#   file: src=/etc/fonts/conf.avail/10-unhinted.conf
-#         dest=/etc/fonts/conf.d/10-unhinted.conf
-#         state=link
-
-# - name: Enable autohint in Xft settings
-#   become: yes
-#   lineinfile: dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
-#   args:
-#     regexp: "^Xft.autohint:"
-#     line: "Xft.autohint: 1"
-
-# - name: Enable autohint in font config
-#   become: yes
-#   file: src=/etc/fonts/conf.avail/10-autohint.conf
-#         dest=/etc/fonts/conf.d/10-autohint.conf
-#         state=link
-
-# - name: Set slight hintstyle in Xft settings
-#   become: yes
-#   lineinfile: dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
-#   args:
-#     regexp: "^Xft.hintstyle:"
-#     line: "Xft.hintstyle: hintslight"
-
-# - name: Set slight hintstyle in font config
-#   become: yes
-#   file: src=/etc/fonts/conf.avail/10-hinting-slight.conf
-#         dest=/etc/fonts/conf.d/10-hinting-slight.conf
-#         state=link
-
-# - name: Set default LCD filter in Xft settings
-#   become: yes
-#   lineinfile: dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
-#   args:
-#     regexp: "^Xft.lcdfilter:"
-#     line: "Xft.lcdfilter: lcddefault"
-
-# - name: Set default LCD filter in font config
-#   become: yes
-#   file: src=/etc/fonts/conf.avail/11-lcdfilter-default.conf
-#         dest=/etc/fonts/conf.d/11-lcdfilter-default.conf
-#         state=link
-
-# - name: Copy Infinality generic config
-#   become: yes
-#   copy: src=/usr/share/doc/freetype2-infinality-ultimate/infinality-settings-generic
-#         dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
-
-# - name: Set OS X style in config
-#   become: yes
-#   lineinfile: dest=/etc/X11/xinit/xinitrc.d/xft-settings.sh
-#               regexp="^USE_STYLE="
-#               line="USE_STYLE=\"OSX\""
-#               create=yes
+- name: Set OS X style in Infinality config
+  become: yes
+  lineinfile: dest=/etc/profile.d/infinality-settings.sh
+              regexp="^export INFINALITY_FT="
+              line="export INFINALITY_FT=\"osx\""
