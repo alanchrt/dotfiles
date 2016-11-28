@@ -1,4 +1,9 @@
 ---
+- name: Remove Pale Moon
+  become: yes
+  pacman: name=palemoon-bin
+          state=absent
+
 - name: Install Firefox Beta and Firefox Developer Edition
   yaourt: name={{item}}
           state=present
