@@ -1,8 +1,9 @@
 ---
-- name: Install ADB and fastboot
-  become: yes
-  apt: name={{item}}
-       state=present
+- name: Install Android SDK
+  yaourt: name={{item}}
+          state=present
   with_items:
-    - android-tools-adb
-    - android-tools-fastboot
+    - android-sdk
+    - android-sdk-platform-tools
+    - android-sdk-build-tools
+    - android-udev

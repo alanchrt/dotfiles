@@ -13,15 +13,15 @@
     - icons
     - fonts
     - termite
-    # - cloudprint
-    # - dropbox
-    # - firefox
-    # - chrome
-    # - insomnia
-    # - vpn
-    # - flux
-    # - vagrant
+    - cloudprint
+    - dropbox
+    - firefox
+    - chrome
+    - insomnia
+    - vpn
+    - flux
+    - vagrant
     # - android
     # - spotify
-    # - ardour
-    # - gimp
+    - ardour
+    - gimp

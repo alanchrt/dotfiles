@@ -1,9 +1,13 @@
 ---
-- name: Remove vte3
+- name: Remove urxvt, xterm, and vte3
   become: yes
-  pacman: name=vte3
+  pacman: name={{item}}
           state=absent
           force=yes
+  with_items:
+    - rxvt-unicode
+    - xterm
+    - vte3
 
 - name: Install vte3-ng
   become: yes

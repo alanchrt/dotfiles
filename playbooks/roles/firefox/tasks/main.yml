@@ -1,25 +1,7 @@
 ---
-- name: Add Firefox Next PPA
-  become: yes
-  apt_repository: repo="ppa:mozillateam/firefox-next"
-
-- name: Install firefox custom facts
-  become: yes
-  copy: src=firefox.fact
-        dest=/etc/ansible/facts.d/firefox.fact
-        mode=0755
-
-- name: Reload ansible local facts
-  setup: filter=ansible_local
-
-- name: Remove outdated Firefox
-  become: yes
-  apt: name=firefox
-       state=absent
-  when: ansible_local.firefox.out_of_date
-
-- name: Install Firefox
-  become: yes
-  apt: name=firefox
-       update_cache=yes
-       state=present
+- name: Install Firefox Beta and Firefox Developer Edition
+  yaourt: name={{item}}
+          state=present
+  with_items:
+    - firefox-beta-bin
+    - firefox-aurora

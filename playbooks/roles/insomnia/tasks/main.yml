@@ -1,4 +1,4 @@
 ---
 - name: Install insomnia
-  become: yes
-  apt: deb=https://builds.insomnia.rest/downloads/ubuntu/latest
+  yaourt: name=insomnia
+          state=present

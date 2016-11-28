@@ -1,25 +1,5 @@
 ---
-- name: Install Dropbox dependencies
+- name: Install Dropbox
   become: yes
-  apt: name=python-gpgme
+  pacman: name=dropbox
        state=present
-
-- name: Download Dropbox daemon
-  become: yes
-  get_url: url=https://www.dropbox.com/download?plat=lnx.x86_64
-           dest=/usr/local/src/dropbox-dist.tar.gz
-
-- name: Unarchive Dropbox daemon
-  become: yes
-  unarchive: src=/usr/local/src/dropbox-dist.tar.gz
-             dest=/usr/local/src
-             copy=no
-
-- name: Symlink Dropbox daemon
-  become: yes
-  file: src=/usr/local/src/.dropbox-dist/dropboxd
-        dest=/usr/local/bin/dropboxd
-        state=link
-
-# possible TODO: download https://www.dropbox.com/download?dl=packages/dropbox.py
-# and symlink to /usr/local/bin/dropbox

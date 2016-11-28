@@ -1,9 +1,0 @@
----
-- include: desktop.yml
-
-- name: Provision MacBook Pro
-  hosts: all
-  roles:
-    - macbook-wifi
-    - macbook-facetimehd
-    - hfs
