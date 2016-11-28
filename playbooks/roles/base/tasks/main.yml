@@ -6,13 +6,13 @@
 
 - name: Upgrade entire system
   become: yes
-  command: yaourt -Syua
+  pacman: upgrade=yes
+          update_cache=yes
 
 - name: Install system basics
   become: yes
   pacman: name={{item}}
           state=present
-          update_cache=yes
   with_items:
     - the_silver_searcher
     - pygmentize

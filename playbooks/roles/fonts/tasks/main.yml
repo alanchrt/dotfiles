@@ -1,23 +1,75 @@
 ---
-- name: Add Infinality font patches PPA
+- name: Install font custom facts
   become: yes
-  apt_repository: repo="ppa:no1wantdthisname/ppa"
+  copy: src=fonts.fact
+        dest=/etc/ansible/facts.d/fonts.fact
+        mode=0755
 
-- name: Install Infinality font patches
+- name: Reload ansible local facts
+  setup: filter=ansible_local
+
+- name: Configure Infinality bundle repositories
   become: yes
-  apt: name={{item}}
-       state=present
+  blockinfile:
+    dest: /etc/pacman.conf
+    block: |
+      [{{item.repo}}]
+      Server = {{item.server}}
+    marker: "# {mark} INFINALITY CONFIG FOR {{item.mark}}"
   with_items:
-    - fontconfig-infinality
+    - { mark: "BASE", repo: "infinality-bundle", server: "http://bohoomil.com/repo/$arch" }
+    - { mark: "MULTILIB", repo: "infinality-bundle-multilib", server: "http://bohoomil.com/repo/multilib/$arch" }
+    - { mark: "FONTS", repo: "infinality-bundle-fonts", server: "http://bohoomil.com/repo/fonts" }
 
-- name: Set OS X style in Infinality
+- name: Import and sign Infinality server key
   become: yes
-  file: src=/etc/fonts/infinality/styles.conf.avail/osx
-        dest=/etc/fonts/infinality/conf.d
-        state=link
+  command: "{{item}}"
+  with_items:
+    - pacman-key -r 962DDE58 
+    - pacman-key --lsign-key 962DDE58
+  when: not ansible_local.fonts.bohoomil_key_signed
 
-- name: Set OS X style in settings script
+- name: Remove non-Infinality versions of dependencies
+  become: yes
+  pacman: name={{item}}
+          state=absent
+          update_cache=yes
+          force=yes
+  with_items:
+    - freetype2
+    - fontconfig
+    - cairo
+    - ttf-dejavu
+    - ttf-liberation
+    - noto-fonts
+    - tex-gyre-fonts
+    - gsfonts
+    - ttf-droid
+    - ttf-ubuntu-font-family
+
+- name: Install Infinality multilib bundle with fonts
+  become: yes
+  pacman: name={{item}}
+          state=present
+  with_items:
+    - infinality-bundle-multilib
+    - ibfonts-meta-extended
+
+- name: Install font manager and MS/Mac fonts
+  yaourt: name={{item}}
+          state=present
+  with_items:
+    - font-manager
+    - ttf-ms-fonts
+    - ttf-mac-fonts
+
+- name: Copy Infinality settings
+  become: yes
+  copy: src=/usr/share/doc/freetype2-infinality-ultimate/infinality-settings.sh
+        dest=/etc/profile.d/infinality-settings.sh
+
+- name: Set OS X style in Infinality config
   become: yes
   lineinfile: dest=/etc/profile.d/infinality-settings.sh
-              regexp="^USE_STYLE="
-              line="USE_STYLE=\"OSX\""
+              regexp="^export INFINALITY_FT="
+              line="export INFINALITY_FT=\"osx\""
