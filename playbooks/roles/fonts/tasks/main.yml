@@ -65,8 +65,9 @@
 
 - name: Copy Infinality settings
   become: yes
-  copy: src=/usr/share/doc/freetype2-infinality-ultimate/infinality-settings.sh
-        dest=/etc/profile.d/infinality-settings.sh
+  command: cp /usr/share/doc/freetype2-infinality-ultimate/infinality-settings.sh /etc/profile.d/infinality-settings.sh
+  args:
+    creates: /etc/profile.d/infinality-settings.sh
 
 - name: Set OS X style in Infinality config
   become: yes
