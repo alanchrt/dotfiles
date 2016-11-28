@@ -21,4 +21,4 @@
 - name: Configure dev environment
   hosts: all
   roles:
-    # - dotfiles
+    - dotfiles

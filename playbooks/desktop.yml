@@ -21,7 +21,7 @@
     - vpn
     - flux
     - vagrant
-    # - android
+    - android
     # - spotify
     - ardour
     - gimp

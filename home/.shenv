@@ -47,3 +47,6 @@ export NVM_DIR="$HOME/.nvm"
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
   . /usr/local/bin/virtualenvwrapper.sh
 fi
+
+# Add android tools to path
+export PATH=/opt/android-sdk/platform-tools:$PATH

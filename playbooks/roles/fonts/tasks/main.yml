@@ -74,3 +74,7 @@
   lineinfile: dest=/etc/profile.d/infinality-settings.sh
               regexp="^export INFINALITY_FT="
               line="export INFINALITY_FT=\"osx\""
+
+- name: Remove user font config
+  file: path="{{ansible_env.HOME}}/.config/fontconfig/fonts.conf"
+        state=absent
