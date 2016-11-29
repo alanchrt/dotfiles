@@ -4,7 +4,7 @@ This is my Arch Linux, Firefox, Byobu, Oh-my-zsh, and Spacemacs setup, tailored 
 
 The system requires [Manjaro Linux](https://manjaro.org/) (specifically [Manjaro i3](https://sourceforge.net/projects/manjaro-i3/files/)) as a base, then uses Ansible to provision additional software and configuration on top.
 
-Take a look at the [Ansible Roles](playbooks/roles) to see what types of software and configuration are installed.
+Take a look at the [Ansible roles](playbooks/roles) to see what types of software and configuration are installed.
 
 ## Installation
 

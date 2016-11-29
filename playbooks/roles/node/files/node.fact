@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+source $HOME/.nvm/nvm.sh
+default_set=$(nvm ls default &> /dev/null && echo "true" || echo "false")
+
+echo "{\"default_set\": ${default_set}}"

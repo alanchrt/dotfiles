@@ -336,7 +336,7 @@ you should place your code here."
    web-mode-attr-indent-offset 2)
 
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "firefox-developer")
+        browse-url-generic-program "firefox-esr")
 
   (unless window-system
     (when (getenv "DISPLAY")
