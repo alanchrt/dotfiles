@@ -4,7 +4,6 @@
   file: path="{{ansible_env.HOME}}/{{item}}"
         state=absent
   with_items:
-    - Desktop
     - Documents
     - Music
     - Pictures

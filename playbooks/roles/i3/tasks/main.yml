@@ -20,6 +20,7 @@
   with_items:
     - cmake
     - python-docutils
+    - slock
     - xss-lock
     - unclutter
     - rofi

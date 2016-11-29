@@ -25,7 +25,7 @@ bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun -opacity 90 
 bindsym $mod+e exec --no-startup-id "rofi -show run -lines 3 -opacity 90 $rofi_colors"
 bindsym $mod+o exec --no-startup-id "rofi -show window -opacity 90 $rofi_colors"
 bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
-bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
+bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
 
@@ -137,7 +137,7 @@ mode "$mode_reboot" {
 # bindsym XF86AudioStop exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop
 # bindsym XF86AudioPrev exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous
 # bindsym XF86AudioNext exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next
-bindsym $mod+Ctrl+m exec i3-sensibleterminal -e 'alsamixer'
+bindsym $mod+Ctrl+m exec termite -e 'alsamixer'
 
 # Brigtness, WARNING raw values might be macbook-specific
 # bindsym XF86MonBrightnessUp exec --no-startup-id light -r -A 20
@@ -158,7 +158,7 @@ bar {
     statusline #F9FAF9
 		separator  #454947
 
-    #                  border  backgr. text
+    #                  border  bg      text
 		focused_workspace  #F9FAF9 #16A085 #2B2C2B
 		active_workspace   #595B5B #353836 #FDF6E3
 		inactive_workspace #595B5B #353836 #EEE8D5
@@ -183,4 +183,4 @@ exec_always --no-startup-id fix_xcursor
 exec --no-startup-id ~/.i3_local
 
 # Desktop applications
-exec --no-startup-id sleep 3 && firefox-beta -P default
+exec --no-startup-id sleep 3 && firefox-esr -P default
