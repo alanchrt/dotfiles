@@ -22,3 +22,7 @@
     - nmap
     - whois
     - gnome-screenshot
+
+- name: Install syntax highlighter
+  yaourt: name=highlight
+          state=present
