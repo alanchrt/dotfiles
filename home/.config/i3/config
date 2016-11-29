@@ -19,18 +19,22 @@ smart_gaps on
 # Font
 font xft:Noto Sans 10
 
-# Software
+# Menus
 set $rofi_colors  -color-window \\"#333333,#333333\\" -color-normal \\"#333333,#f1f1f1,#333333,#336699,#ffffff\\"
 bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun -opacity 90 $rofi_colors"
 bindsym $mod+e exec --no-startup-id "rofi -show run -lines 3 -opacity 90 $rofi_colors"
 bindsym $mod+o exec --no-startup-id "rofi -show window -opacity 90 $rofi_colors"
 bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
+
+# Software
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
+bindsym $mod+Ctrl+n exec termite -e 'emacsclient -t ~/Dropbox/Notes' --title='notes'
 bindsym $mod+Ctrl+m exec termite -e 'alsamixer' --title='alsamixer'
 
 # Floating windows
+for_window [title="notes"] floating enable
 for_window [title="alsamixer"] floating enable
 
 # State
@@ -173,9 +177,9 @@ bar {
 # Startup scripts
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id nitrogen --restore; sleep 1; compton -b --config ~/.config/compton.conf
+exec --no-startup-id emacs --daemon
 exec --no-startup-id nm-applet
 exec --no-startup-id xfce4-power-manager
-exec --no-startup-id emacs --daemon
 exec --no-startup-id xautolock -time 3 -corners -000 -locker slock
 exec --no-startup-id xss-lock -- /usr/bin/slock
 exec --no-startup-id unclutter
@@ -184,7 +188,9 @@ exec --no-startup-id volumeicon
 # exec --no-startup-id dropboxd
 exec --no-startup-id fluxgui
 exec_always --no-startup-id fix_xcursor
+
+# Run local scripts
 exec --no-startup-id ~/.i3_local
 
 # Desktop applications
-exec --no-startup-id sleep 3 && firefox-esr -P default
+exec --no-startup-id firefox-esr
