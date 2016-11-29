@@ -26,18 +26,28 @@
     - rofi
     - feh
 
-# - name: Set i3 as autologin window manager in LightDM
-#   become: yes
-#   blockinfile:
-#     dest: /etc/lightdm/lightdm.conf
-#     marker: '# {mark} AUTOLOGIN CONFIG'
-#     block: |
-#       [SeatDefaults]
-#       pam-service=lightdm
-#       pam-autologin-service=lightdm-autologin
-#       autologin-user={{ansible_env.USER}}
-#       autologin-user-timeout=0
-#       session-wrapper=/etc/lightdm/Xsession
+- name: Create autologin group
+  become: yes
+  group: name=autologin
+         state=present
+
+- name: Add login user to autologin group
+  become: yes
+  user: name="{{ansible_env.USER}}"
+        groups=autologin
+
+- name: Set i3 as autologin window manager in LightDM
+  become: yes
+  blockinfile:
+    dest: /etc/lightdm/lightdm.conf
+    marker: '# {mark} AUTOLOGIN CONFIG'
+    block: |
+      [SeatDefaults]
+      pam-service=lightdm
+      pam-autologin-service=lightdm-autologin
+      autologin-user={{ansible_env.USER}}
+      autologin-user-timeout=0
+      session-wrapper=/etc/lightdm/Xsession
 
 - name: Install i3 python library
   become: yes
