@@ -35,6 +35,7 @@
   become: yes
   user: name="{{ansible_env.USER}}"
         groups=autologin
+        append=yes
 
 - name: Set i3 as autologin window manager in LightDM
   become: yes
