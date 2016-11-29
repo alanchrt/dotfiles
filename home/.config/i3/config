@@ -20,6 +20,11 @@ smart_gaps on
 font xft:Noto Sans 10
 
 # Software
+set $rofi_colors  -color-window \\"#333333,#333333\\" -color-normal \\"#333333,#f1f1f1,#333333,#336699,#ffffff\\"
+bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun -opacity 90 $rofi_colors"
+bindsym $mod+e exec --no-startup-id "rofi -show run -lines 3 -opacity 90 $rofi_colors"
+bindsym $mod+o exec --no-startup-id "rofi -show window -opacity 90 $rofi_colors"
+bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
