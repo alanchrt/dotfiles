@@ -7,7 +7,7 @@ floating_modifier $mod
 
 # Borders
 new_window pixel 1
-new_float normal
+new_float none
 hide_edge_borders none
 smart_borders on
 
@@ -28,6 +28,7 @@ bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
+bindsym $mod+Ctrl+m exec termite -e 'alsamixer'
 
 # State
 bindsym $mod+Shift+q kill
@@ -137,7 +138,6 @@ mode "$mode_reboot" {
 # bindsym XF86AudioStop exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop
 # bindsym XF86AudioPrev exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous
 # bindsym XF86AudioNext exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next
-bindsym $mod+Ctrl+m exec termite -e 'alsamixer'
 
 # Brigtness, WARNING raw values might be macbook-specific
 # bindsym XF86MonBrightnessUp exec --no-startup-id light -r -A 20
