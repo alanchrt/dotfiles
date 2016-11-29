@@ -10,6 +10,3 @@
   with_items:
     - firefox-esr-bin
     - firefox-developer
-    - vimperator
-    - firefox-ublock-origin
-    - firefox-extension-https-everywhere
