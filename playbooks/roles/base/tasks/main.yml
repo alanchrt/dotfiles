@@ -21,7 +21,7 @@
     - httpie
     - nmap
     - whois
-    - gnome-screenshot
+    - markdown
 
 - name: Install syntax highlighter
   yaourt: name=highlight

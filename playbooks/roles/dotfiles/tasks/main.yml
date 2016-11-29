@@ -1,13 +1,4 @@
 ---
-- name: Install dotfiles custom facts
-  become: yes
-  copy: src=dotfiles.fact
-        dest=/etc/ansible/facts.d/dotfiles.fact
-        mode=0755
-
-- name: Reload ansible local facts
-  setup: filter=ansible_local
-
 - name: Sync oh-my-zsh
   git: repo=https://github.com/robbyrussell/oh-my-zsh.git
        accept_hostkey=true
@@ -22,7 +13,6 @@
   git: repo=git@github.com:alanctkc/dotfiles.git
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.config/dotfiles"
-  when: not ansible_local.dotfiles.is_dotfiles_vagrant
   register: ssh_clone
   ignore_errors: True  # will fail with local changes
 
@@ -30,14 +20,8 @@
   git: repo=https://github.com/alanctkc/dotfiles.git
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.config/dotfiles"
-  when: ssh_clone|failed and not ansible_local.dotfiles.is_dotfiles_vagrant
+  when: ssh_clone|failed
   ignore_errors: True  # will fail with local changes
-
-- name: Symlink dotfiles repo
-  file: src=/vagrant
-        dest="{{ansible_env.HOME}}/.config/dotfiles"
-        state=link
-  when: ansible_local.dotfiles.is_dotfiles_vagrant
 
 - name: Link all dotfiles
   command: ./dotme.sh

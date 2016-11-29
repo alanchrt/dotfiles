@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-is_dotfiles_vagrant=$(ls /vagrant/dotme.sh &> /dev/null && echo "true" || echo "false")
-
-echo "{\"is_dotfiles_vagrant\": ${is_dotfiles_vagrant}}"

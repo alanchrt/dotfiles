@@ -25,6 +25,7 @@
     - unclutter
     - rofi
     - feh
+    - gnome-screenshot
 
 - name: Create autologin group
   become: yes

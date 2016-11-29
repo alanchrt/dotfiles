@@ -28,7 +28,10 @@ bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Ctrl+m exec termite -e 'alsamixer'
+bindsym $mod+Ctrl+m exec termite -e 'alsamixer' --title='alsamixer'
+
+# Floating windows
+for_window [title="alsamixer"] floating enable
 
 # State
 bindsym $mod+Shift+q kill
@@ -37,6 +40,7 @@ bindsym $mod+equal border normal
 bindsym $mod+minus border 1pixel
 
 # Focus
+focus_follows_mouse no
 bindsym $mod+h focus left
 bindsym $mod+j focus down
 bindsym $mod+k focus up

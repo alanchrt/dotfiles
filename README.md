@@ -1,131 +1,72 @@
-**IMPORTANT:** This is my new, "batteries-included" dotfiles repo, using spacemacs, byobu, and oh-my-zsh. If you're looking for the Vim+tmux+git dotfiles repo that previously lived at this address or has been mentioned in talks, you can now find it [here](https://github.com/alanctkc/dotfiles-old).
+## Overview
 
-## Try it out
+This is my Arch Linux, Firefox, Byobu, Oh-my-zsh, and Spacemacs setup, tailored toward mnemonic keybindings, tools with smart defaults that "just work," and an integrated desktop and development experience.
 
-This repo includes a Vagrant configuration that automatically provisions the entire setup. Make sure you have [Vagrant, VirtualBox, and Ansible installed](#install-dependencies) first.
+The system requires [Manjaro Linux](https://manjaro.org/) (specifically [Manjaro i3](https://sourceforge.net/projects/manjaro-i3/files/)) as a base, then uses Ansible to provision additional software and configuration on top.
 
-Clone the repo and create the Vagrant. This part will take a while.
+Take a look at the [Ansible Roles](playbooks/roles) to see what types of software and configuration are installed.
 
-```bash
-$ git clone https://github.com/alanctkc/dotfiles.git
-$ cd dotfiles
-$ vagrant up
-```
+## Installation
 
-SSH into the Vagrant. You'll find the home directory of your host machine at `/host`:
+You may prefer to test out this setup in a virtual machine (on [VirtualBox](https://www.virtualbox.org/) or friends) before committing to an install on your host machine.
 
-```bash
-$ vagrant ssh
-$ ls /host
-```
+### Base system setup
 
-Switch to the directory of a project in your home directory and open a tmux session:
+1. Download [the latest Manjaro i3 ISO](https://sourceforge.net/projects/manjaro-i3/files/).
+2. Create bootable media for your machine or attach as bootable storage to a fresh VM.
+3. Boot into the image and use Calamares to complete the Manjaro i3 installation.
 
-```bash
-$ cd /host/path/to/projectname
-$ to
-```
+### Dotfiles installation
 
-Inside the tmux session, open a file with Spacemacs (the first load will take a while):
+1. Install Ansible and Git:
 
-```bash
-$ e path/to/file.ext
-```
+    ```
+    $ sudo pacman -S ansible git
+    ```
 
-Check out some basic Spacemacs keybindings in the [Spacemacs documentation](http://spacemacs.org/doc/DOCUMENTATION.html#orgheadline180).
+2. Clone this repo:
 
-Detach from your tmux session with `Ctrl+a d`. Reattach using the project directory's name:
+    ```
+    $ git clone https://github.com/alanctkc/dotfiles.git ~/.config/dotfiles
+    ```
 
-```bash
-$ ta projectname
-```
+3. Run the Ansible playbook:
 
-## Link dotfiles
-
-The repo contains a simple bootstrap script to link up dotfiles into your home directory (requires git):
-
-```bash
-$ ./dotme.sh
-```
-
-## Install dependencies
-
-Examine [this Ansible playbook](playbooks/headless.yml) to see the software I typically provision on new development machines.
-
-You can run this playbook against your own hosts or, alternatively, run the development environment in an Ubuntu VM on your own system using Vagrant.
-
-#### Ubuntu
-
-```bash
-$ sudo apt-add-repository ppa:ansible/ansible
-$ sudo apt-get update
-$ sudo apt-get install vagrant virtualbox ansible
-$ vagrant up
-```
-
-#### Mac OS X
-
-```bash
-$ brew cask install vagrant virtualbox
-$ brew install ansible
-$ vagrant up
-```
-
-For Vagrant-provisioned dev environments, your host machine home directory will be available inside the VM at `/host`. You can confugre which directory will be synced to `/host` by setting `DEV_VM_SYNCED_FOLDER` on your host machine before running `vagrant up`.
-
-### Running against localhost
-
-It's also possible to provision your local machine with the Ansible playbook:
-
-```bash
-$ git clone https://github.com/alanctkc/dotfiles.git ~/.config/dotfiles
-$ ./provision-local.sh headless
-```
-
-For the full desktop setup:
-
-```bash
-$ ./provision-local.sh desktop
-```
-
-Or on a Macbook (running Ubuntu):
-
-```bash
-$ ./provision-local.sh macbook
-```
+    ```
+    $ cd ~/.config/dotfiles
+    $ ./provision-local.sh desktop
+    ```
 
 ### Credentials
 
-There are a few logins that might be worth setting up right off the bat.
+There are a few logins that might be worth setting up right off the bat if needed.
 
 ##### AWS
 
-```bash
+```
 $ aws configure
-````
+```
 
 ##### Heroku
 
-```bash
+```
 $ heroku login
 ```
 
 ##### Gist
 
-```bash
-$ gist-paste --login
+```
+$ gist --login
 ```
 
 ##### Ngrok
 
-```bash
+```
 $ ngrok authtoken <token>
 ```
 
-#### Desktop-specific
-
 ##### Google Cloud Print
 
-```bash
-$ sudo /usr/local/share/cloudprint-cups/setupcloudprint.py
+```
+$ sudo /usr/share/cloudprint-cups/setupcloudprint.py
 ```
