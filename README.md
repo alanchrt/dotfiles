@@ -2,6 +2,8 @@
 
 This is my Arch Linux, Firefox/Vimperator, Byobu, Oh-my-zsh, and Spacemacs setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
+![dotfiles screenshot](screenshot.png)
+
 The system requires [Manjaro Linux](https://manjaro.org/) (specifically [Manjaro i3](https://sourceforge.net/projects/manjaro-i3/files/)) as a base, then uses Ansible to provision additional software and configuration on top.
 
 Here are some references for getting around the system:
