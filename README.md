@@ -1,10 +1,17 @@
 ## Overview
 
-This is my Arch Linux, Firefox, Byobu, Oh-my-zsh, and Spacemacs setup, tailored toward mnemonic keybindings, tools with smart defaults that "just work," and an integrated desktop and development experience.
+This is my Arch Linux, Firefox/Vimperator, Byobu, Oh-my-zsh, and Spacemacs setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
 The system requires [Manjaro Linux](https://manjaro.org/) (specifically [Manjaro i3](https://sourceforge.net/projects/manjaro-i3/files/)) as a base, then uses Ansible to provision additional software and configuration on top.
 
-Take a look at the [Ansible roles](playbooks/roles) to see what types of software and configuration are installed.
+Here are some references for getting around the system:
+
+- **[Ansible roles](playbooks/roles) -** Software and configuration
+- **[i3 config](home/.config/i3/config) -** Desktop keybindings
+- **[Spacemacs documentation](http://spacemacs.org/doc/DOCUMENTATION.html) -** Development experience
+- **[Byobu man page](http://manpages.ubuntu.com/manpages/zesty/en/man1/byobu.1.html#contenttoc8) -** Tmux keybindings
+- **Vimperator Help -** Discoverable by installing Vimperator Firefox extension and typing `:help<Return>`
+- **[Bash aliases](home/.bash_aliases) -** Terminal aliases for zsh and bash
 
 ## Installation
 
