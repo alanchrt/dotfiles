@@ -1,5 +1,3 @@
-
-
 # .bash_aliases - Alan Christopher Thomas
 # http://alanct.com/
 

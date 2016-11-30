@@ -153,25 +153,25 @@ mode "$mode_reboot" {
 
 # Workspace bar
 bar {
-	status_command i3status -c ~/.config/i3/i3status.conf
-	position bottom
+    status_command i3status -c ~/.config/i3/i3status.conf
+    position bottom
 
-	bindsym button4 nop
-	bindsym button5 nop
-	font xft:Noto Sans 10.5
-	strip_workspace_numbers yes
+    bindsym button4 nop
+    bindsym button5 nop
+    font xft:Noto Sans 10.5
+    strip_workspace_numbers yes
 
-	colors {
-		background #2B2C2B
-    statusline #F9FAF9
-		separator  #454947
+	  colors {
+        background #2B2C2B
+        statusline #F9FAF9
+        separator  #454947
 
-    #                  border  bg      text
-		focused_workspace  #F9FAF9 #16A085 #2B2C2B
-		active_workspace   #595B5B #353836 #FDF6E3
-		inactive_workspace #595B5B #353836 #EEE8D5
-		urgent_workspace   #16A085 #FDF6E3 #E5201D
-	}
+        #                  border  bg      text
+        focused_workspace  #F9FAF9 #16A085 #2B2C2B
+        active_workspace   #595B5B #353836 #FDF6E3
+        inactive_workspace #595B5B #353836 #EEE8D5
+        urgent_workspace   #16A085 #FDF6E3 #E5201D
+    }
 }
 
 # Startup scripts
