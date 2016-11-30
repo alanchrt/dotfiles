@@ -34,7 +34,7 @@ You may prefer to test out this setup in a virtual machine (on [VirtualBox](http
 
     ```
     $ cd ~/.config/dotfiles
-    $ ./provision-local.sh desktop
+    $ ./provision-local.sh
     ```
 
 ### Credentials
