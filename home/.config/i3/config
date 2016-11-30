@@ -76,6 +76,10 @@ bindsym $mod+s layout stacking
 bindsym $mod+w layout tabbed
 bindsym $mod+d layout default
 
+# Colors
+#               border  bg      text
+client.focused  #2AA198 #16A085 #F9FAF9
+
 # Workspaces
 workspace_auto_back_and_forth yes
 bindsym $mod+b workspace back_and_forth
