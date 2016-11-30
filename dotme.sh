@@ -63,6 +63,7 @@ configure_byobu() {
     echo "Configuring byobu..."
     mkdir -p $HOME/.byobu
     link_file .byobu/.tmux.conf .byobu/.tmux.conf
+    link_file .byobu/status .byobu/status
 }
 
 configure_git() {
