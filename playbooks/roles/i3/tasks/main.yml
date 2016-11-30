@@ -1,5 +1,5 @@
 ---
-- name: Install font custom facts
+- name: Install i3 custom facts
   become: yes
   copy: src=i3.fact
         dest=/etc/ansible/facts.d/i3.fact

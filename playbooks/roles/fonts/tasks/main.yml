@@ -75,6 +75,15 @@
               regexp="^export INFINALITY_FT="
               line="export INFINALITY_FT=\"osx\""
 
-- name: Remove user font config
-  file: path="{{ansible_env.HOME}}/.config/fontconfig/fonts.conf"
+- name: Remove user font config and default Infinality repl config
+  become: yes
+  file: path={{item}}
         state=absent
+  with_items:
+    - "{{ansible_env.HOME}}/.config/fontconfig/fonts.conf"
+    - /etc/fonts/conf.d/37-repl-global-free.conf
+
+- name: Configure Liberation aliases 
+  become: yes
+  copy: src=35-repl-custom.conf
+        dest=/etc/fonts/conf.d/35-repl-custom.conf
