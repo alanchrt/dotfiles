@@ -6,6 +6,10 @@ set focuscontent
 set hintchars=hjklasdfgyuiopqwertnmzxcvb
 highlight Hint -append color:#ffffff;background-color:#222222;
 
+" Bell
+set visualbell
+highlight Bell display: none
+
 " Keybindings
 noremap ~ <NOP>
 noremap <C-j> <NOP>
