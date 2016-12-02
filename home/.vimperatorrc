@@ -25,6 +25,7 @@ imap <C-u> <Esc><C-u>
 
 " Browser settings
 set! beacon.enabled=false
+set! browser.cache.offline.enable=false
 set! browser.disableResetPrompt=true
 set! browser.download.dir=~/downloads
 set! browser.formfill.enable=false
@@ -34,7 +35,6 @@ set! browser.newtabpage.enabled=false
 set! browser.newtabpage.enhanced=false
 set! browser.newtabpage.introShown=false
 set! browser.pocket.enabled=false
-set! signon.rememberSignons=false
 set! browser.safebrowsing.appRepURL=
 set! browser.safebrowsing.enabled=false
 set! browser.safebrowsing.malware.enabled=false
@@ -52,13 +52,16 @@ set! extensions.autoDisableScopes=14
 set! extensions.getAddons.cache.enabled=false
 set! general.warnOnAboutConfig=false
 set! general.warnOnAboutConfig=false
+set! geo.enabled=false
 set! network.cookie.cookieBehavior=0
+set! network.cookie.lifetimePolicy=2
 set! network.dns.disablePrefetch=true
 set! network.prefetch-next=false
 set! privacy.donottrackheader.enabled=true
 set! privacy.donottrackheader.value=1
 set! privacy.trackingprotection.enabled=true
 set! privacy.trackingprotection.pbmode.enabled=true
+set! signon.rememberSignons=false
 set! toolkit.telemetry.enabled=false
 
 " Local settings
