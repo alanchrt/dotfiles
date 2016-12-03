@@ -5,6 +5,7 @@
   hosts: all
   roles:
     - i3
+    - plymouth
     - home
     - touchpad
     # - backlight
