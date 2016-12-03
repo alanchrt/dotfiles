@@ -74,6 +74,7 @@ values."
    '(
      base16-theme
      jinja2-mode
+     e2ansi
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()

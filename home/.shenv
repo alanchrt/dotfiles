@@ -39,6 +39,11 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
 export PIP_RESPECT_VIRTUALENV=true
 
+# Syntax highlighting
+export HIGHLIGHT_CMD="emacs --batch -l ~/.emacs.d/elpa/base16-theme-*/base16-theme.el -l ~/.emacs.d/elpa/base16-theme-*/base16-tomorrow-night-theme.el -l ~/.emacs.d/elpa/e2ansi-*/bin/e2ansi-cat --theme base16-tomorrow-night"
+export "LESSOPEN=|$HIGHLIGHT_CMD %s"
+export "LESS=-R"
+
 # Source nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
