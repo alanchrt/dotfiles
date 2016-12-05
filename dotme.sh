@@ -36,8 +36,10 @@ install_spacemacs() {
 
 configure_shell() {
     echo "Configuring common shell environment..."
+    mkdir -p $HOME/.local/share
     link_file .bash_aliases .bash_aliases
     link_file .shenv .shenv
+    link_file .local/share/highlight.el .local/share/highlight.el
 }
 
 configure_bash() {
@@ -64,6 +66,12 @@ configure_byobu() {
     mkdir -p $HOME/.byobu
     link_file .byobu/.tmux.conf .byobu/.tmux.conf
     link_file .byobu/status .byobu/status
+}
+
+configure_ranger() {
+    echo "Configuring ranger..."
+    mkdir -p $HOME/.config/ranger
+    link_file .config/ranger/scope.sh .config/ranger/scope.sh
 }
 
 configure_git() {
@@ -111,6 +119,7 @@ configure_bash
 configure_zsh
 configure_termite
 configure_byobu
+configure_ranger
 configure_git
 configure_emacs
 configure_python

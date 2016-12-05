@@ -15,14 +15,10 @@
           state=present
   with_items:
     - the_silver_searcher
-    - pygmentize
     - wavemon
     - jq
     - httpie
     - nmap
     - whois
     - markdown
-
-- name: Install syntax highlighter
-  yaourt: name=highlight
-          state=present
+    - atool
