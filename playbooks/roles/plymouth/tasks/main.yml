@@ -45,3 +45,9 @@
   become: yes
   command: grub-mkconfig -o /boot/grub/grub.cfg
   when: configure_kernel|changed
+
+- name: Configure smooth transition to LightDM
+  become: yes
+  file: src=/usr/lib/systemd/system/lightdm-plymouth.service
+        dest=/etc/systemd/system/display-manager.service
+        state=link
