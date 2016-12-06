@@ -339,6 +339,8 @@ you should place your code here."
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "firefox-esr")
 
+  (add-hook 'hack-local-variables-hook (lambda () (setq truncate-lines t)))
+
   (unless window-system
     (when (getenv "DISPLAY")
       (defun xclip-cut-function (text &optional push)
