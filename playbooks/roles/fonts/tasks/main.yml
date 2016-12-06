@@ -55,13 +55,14 @@
     - infinality-bundle-multilib
     - ibfonts-meta-extended
 
-- name: Install font manager and MS/Mac fonts
+- name: Install font manager and additional fonts
   yaourt: name={{item}}
           state=present
   with_items:
     - font-manager
     - ttf-ms-fonts
     - ttf-mac-fonts
+    - ttf-unifont
 
 - name: Copy Infinality settings
   become: yes
