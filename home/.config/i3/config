@@ -178,7 +178,6 @@ exec --no-startup-id urxvtd -q -o -f
 exec --no-startup-id nm-applet
 exec --no-startup-id xfce4-power-manager
 exec --no-startup-id xautolock -time 3 -corners -000 -locker blurlock
-exec --no-startup-id xss-lock -- /usr/bin/blurlock
 exec --no-startup-id unclutter
 exec --no-startup-id volumeicon
 # exec --no-startup-id dropboxd
