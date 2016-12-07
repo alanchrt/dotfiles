@@ -14,13 +14,19 @@
        state=absent
   when: not ansible_local.i3.docutils_installed
 
+- name: Remove built-in i3lock
+  become: yes
+  pacman: name=i3lock
+          state=absent
+          force=yes
+
 - name: Install i3-related software
   yaourt: name={{item}}
           state=present
   with_items:
     - cmake
     - python-docutils
-    - slock
+    - i3lock-custom
     - xss-lock
     - unclutter
     - rofi
@@ -62,3 +68,8 @@
   with_items:
     - "{{ansible_env.HOME}}/.i3"
     - "{{ansible_env.HOME}}/.i3status.conf"
+
+- name: Install customized blurlock
+  become: yes
+  copy: src=blurlock
+        dest=/usr/bin/blurlock
