@@ -30,8 +30,8 @@ bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 bindsym $mod+Return exec --no-startup-id terminal
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Ctrl+n exec terminal -e 'emacsclient -t ~/Dropbox/Notes' --title='notes'
-bindsym $mod+Ctrl+m exec terminal -e 'alsamixer' --title='alsamixer'
+bindsym $mod+Ctrl+n exec terminal -title 'notes' -e 'emacsclient -t ~/Dropbox/Notes'
+bindsym $mod+Ctrl+m exec terminal -title 'alsamixer' -e 'alsamixer'
 
 # Floating windows
 for_window [title="notes"] floating enable
