@@ -3,7 +3,7 @@ Description=Starts i3lock at suspend time
 Before=sleep.target
 
 [Service]
-User={{ansible_env.USER}}
+User=%I
 Type=forking
 Environment=DISPLAY=:0
 ExecStartPre=

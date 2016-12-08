@@ -66,8 +66,15 @@
   copy: src=blurlock
         dest=/usr/bin/blurlock
 
-- name: Set up systemd service to run screen lock on sleep
+- name: Create systemd service to run screen lock on sleep
   become: yes
-  template:
-    src: screenlock.service.jinja2
-    dest: /etc/systemd/system/sleep.target.wants/screenlock.service
+  copy:
+    src: screenlock@.service
+    dest: /usr/lib/systemd/system/screenlock@.service
+
+- name: Enable screen lock service for current user
+  become: yes
+  file:
+    src: /usr/lib/systemd/system/screenlock@.service
+    dest: "/etc/systemd/system/sleep.target.wants/screenlock@{{ansible_env.USER}}.service"
+    state: link
