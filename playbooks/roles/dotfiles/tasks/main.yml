@@ -14,3 +14,10 @@
   args:
     chdir: "{{ansible_env.HOME}}/.config/dotfiles"
     creates: "{{ansible_env.HOME}}/.dotted"
+
+- name: Remove default user dotfile extensions
+  file: path={{item}}
+        state=absent
+  with_items:
+    - "{{ansible_env.HOME}}/.extend.bashrc"
+    - "{{ansible_env.HOME}}/.extend.Xresources"
