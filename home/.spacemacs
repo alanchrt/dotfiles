@@ -326,10 +326,6 @@ you should place your code here."
   (setq org-startup-indented t)
   (setq neo-theme 'nerd)
   (setq neo-show-hidden-files nil)
-  (custom-set-faces
-   '(web-mode-html-tag-bracket-face ((t (:inherit web-mode-html-tag-face :foreground nil))))
-   '(neo-dir-link-face ((t (:foreground "blue"))))
-   '(neo-file-link-face ((t (:foreground "white")))))
 
   (setq-default
    ;; js2-mode
