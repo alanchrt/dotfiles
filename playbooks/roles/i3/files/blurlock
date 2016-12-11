@@ -1,5 +1,10 @@
 #!/bin/bash
-import -window root /tmp/screenshot.png
-convert /tmp/screenshot.png -blur 0x5 /tmp/screenshotblur.png
-rm /tmp/screenshot.png
-i3lock -xi /tmp/screenshotblur.png
+(
+    flock -x -w 2 200 || exit 1
+
+    import -window root /tmp/screenshot.png
+    convert /tmp/screenshot.png -blur 0x9 /tmp/screenshotblur.png
+    rm /tmp/screenshot.png
+    i3lock -nxi /tmp/screenshotblur.png
+
+) 200>/tmp/blurlock.lock

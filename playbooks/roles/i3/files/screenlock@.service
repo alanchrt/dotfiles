@@ -1,10 +1,10 @@
 [Unit]
-Description=Starts i3lock at suspend time
+Description=i3lock at suspend time
 Before=sleep.target
 
 [Service]
 User=%I
-Type=forking
+Type=simple
 Environment=DISPLAY=:0
 ExecStartPre=
 ExecStart=/usr/bin/blurlock
