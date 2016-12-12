@@ -55,9 +55,10 @@ configure_zsh() {
     rm -f $HOME/.zcompdump
 }
 
-configure_urxvt() {
-    echo "Configuring urxvt..."
-    link_file .Xresources .Xresources
+configure_termite() {
+    echo "Configuring termite..."
+    mkdir -p $HOME/.config/termite
+    link_file .config/termite/config .config/termite/config
 }
 
 configure_byobu() {
@@ -116,7 +117,7 @@ install_spacemacs
 configure_shell
 configure_bash
 configure_zsh
-configure_urxvt
+configure_termite
 configure_byobu
 configure_ranger
 configure_git

@@ -13,8 +13,8 @@ local current_dir='%{$terminfo[bold]$fg[blue]%} %~%{$reset_color%}'
 local git_branch='$(git_prompt_info)%{$reset_color%}'
 local virtual_env='$(virtualenv_prompt_info)'
 
-PROMPT="┌─${user_host} ${current_dir} ${virtual_env} ${git_branch}
-└─%B$%b "
+PROMPT="╭─${user_host} ${current_dir} ${virtual_env} ${git_branch}
+╰─%B$%b "
 RPS1="${return_code}"
 
 ZSH_THEME_VIRTUALENV_PREFIX="%{$fg[magenta]%}("

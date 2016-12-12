@@ -27,11 +27,11 @@ bindsym $mod+o exec --no-startup-id "rofi -show window -opacity 90 $rofi_colors"
 bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 
 # Software
-bindsym $mod+Return exec --no-startup-id terminal
+bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Shift+f exec --no-startup-id pcmanfm
 bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Ctrl+n exec terminal -title 'notes' -e 'emacsclient -t ~/Dropbox/Notes'
-bindsym $mod+Ctrl+m exec terminal -title 'alsamixer' -e 'alsamixer'
+bindsym $mod+Ctrl+n exec termite -e 'emacsclient -t ~/Dropbox/Notes' --title='notes'
+bindsym $mod+Ctrl+m exec termite -e 'alsamixer' --title='alsamixer'
 
 # Floating windows
 for_window [title="notes"] floating enable
@@ -173,12 +173,11 @@ bar {
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id nitrogen --restore; sleep 1; compton -b --config ~/.config/compton.conf
 exec --no-startup-id emacs --daemon
-exec --no-startup-id pcmanfm -d
-exec --no-startup-id urxvtd -q -o -f
 exec --no-startup-id nm-applet
 exec --no-startup-id xfce4-power-manager
 exec --no-startup-id xautolock -time 3 -corners -000 -locker blurlock
 exec --no-startup-id unclutter
+exec --no-startup-id pcmanfm -d
 exec --no-startup-id volumeicon
 # exec --no-startup-id dropboxd
 exec --no-startup-id fluxgui

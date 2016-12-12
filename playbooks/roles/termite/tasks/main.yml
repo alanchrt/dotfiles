@@ -1,0 +1,17 @@
+---
+- name: Remove vte3
+  become: yes
+  pacman: name=vte3
+          state=absent
+          force=yes
+  with_items:
+    - vte3
+
+- name: Install vte3-ng
+  become: yes
+  pacman: name=vte3-ng
+          state=present
+
+- name: Install termite
+  yaourt: name=termite
+          state=present

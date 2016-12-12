@@ -12,6 +12,7 @@
     - gtk
     - icons
     - fonts
+    - termite
     - cloudprint
     - dropbox
     - firefox
