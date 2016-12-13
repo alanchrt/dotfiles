@@ -33,7 +33,6 @@
   become: yes
   pacman: name={{item}}
           state=absent
-          update_cache=yes
           force=yes
   with_items:
     - freetype2

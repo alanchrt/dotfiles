@@ -5,13 +5,13 @@
   hosts: all
   roles:
     - i3
+    - fonts
     - plymouth
     - home
     - touchpad
     - clipboard
     - gtk
     - icons
-    - fonts
     - termite
     - cloudprint
     - dropbox
