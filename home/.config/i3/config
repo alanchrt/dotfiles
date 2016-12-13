@@ -166,7 +166,7 @@ bar {
         #                  border  bg      text
         focused_workspace  #16A085 #16A085 #EEE8D5
         active_workspace   #595B5B #353836 #FDF6E3
-        inactive_workspace #595B5B #353836 #EEE8D5
+        inactive_workspace #353836 #353836 #EEE8D5
         urgent_workspace   #900000 #900000 #F9FAF9
     }
 }
