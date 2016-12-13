@@ -35,7 +35,7 @@ bindsym $mod+Control+n exec termite -e 'emacsclient -t ~/Dropbox/Notes' --title=
 bindsym $mod+Control+m exec termite -e 'alsamixer' --title='alsamixer'
 
 # Floating windows
-for_window [title="dropterm"] floating enable, sticky enable, border none, resize set 800 220, move absolute position 0 0
+for_window [title="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
 for_window [title="notes"] floating enable
 for_window [title="alsamixer"] floating enable
 
