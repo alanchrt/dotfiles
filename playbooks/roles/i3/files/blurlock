@@ -1,6 +1,6 @@
 #!/bin/bash
 (
-    flock -x -w 2 200 || exit 1
+    flock -x -w 0.5 200 || exit 1
 
     tempfile=/tmp/blurlock.tmp.png
     resolution=`xdpyinfo | grep dimensions | awk '{print $2}'`
