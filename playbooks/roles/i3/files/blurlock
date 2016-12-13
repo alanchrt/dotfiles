@@ -3,7 +3,7 @@
     flock -x -w 2 200 || exit 1
 
     import -window root /tmp/screenshot.png
-    convert /tmp/screenshot.png -blur 0x9 /tmp/screenshotblur.png
+    convert /tmp/screenshot.png -resize 2% -resize 5000% /tmp/screenshotblur.png
     rm /tmp/screenshot.png
     i3lock -nxi /tmp/screenshotblur.png
 
