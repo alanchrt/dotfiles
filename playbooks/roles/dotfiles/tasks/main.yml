@@ -4,6 +4,11 @@
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.oh-my-zsh"
 
+- name: Sync zsh-nvm
+  git: repo=https://github.com/lukechilds/zsh-nvm.git
+       accept_hostkey=true
+       dest="{{ansible_env.HOME}}/.zsh-custom/plugins/zsh-nvm"
+
 - name: Sync spacemacs
   git: repo=https://github.com/syl20bnr/spacemacs.git
        accept_hostkey=true

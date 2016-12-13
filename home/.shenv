@@ -41,14 +41,12 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 export PIP_VIRTUALENV_BASE=$WORKON_HOME
 export PIP_RESPECT_VIRTUALENV=true
 
-# Source nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-
-# Source virtualenvwrapper
-if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
-  . /usr/local/bin/virtualenvwrapper.sh
-fi
+# Lazy load virtualenvwrapper
+# This is a major startup time improvement at the cost of bash completion for
+# the first workon command.
+export VIRTUALENVWRAPPER_SCRIPT=`which virtualenvwrapper.sh`
+export VIRTUALENVWRAPPER_LAZY_SCRIPT=`which virtualenvwrapper_lazy.sh`
+source $VIRTUALENVWRAPPER_LAZY_SCRIPT
 
 # Add android tools to path
 export PATH=/opt/android-sdk/platform-tools:$PATH

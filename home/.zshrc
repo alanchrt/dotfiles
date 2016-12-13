@@ -36,10 +36,11 @@ zstyle :omz:plugins:ssh-agent agent-forwarding on
 
 # Configure oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
-ZSH_CUSTOM=~/.zsh-custom
+ZSH_CUSTOM=$HOME/.zsh-custom
 ZSH_THEME='bira-python'
 DISABLE_VENV_CD=1
-plugins=(tmux vagrant ssh-agent python pip virtualenv virtualenvwrapper django fabric celery nvm npm heroku redis-cli colored-man-pages colorize history-substring-search safe-paste)
+export NVM_LAZY_LOAD=true
+plugins=(celery colored-man-pages django fabric heroku history-substring-search pip python redis-cli safe-paste ssh-agent tmux vagrant virtualenv zsh-nvm)
 source $ZSH/oh-my-zsh.sh
 
 # Redefine tmux wrapper to use byobu-tmux
