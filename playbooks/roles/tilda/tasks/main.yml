@@ -1,0 +1,5 @@
+---
+- name: Install tilda
+  become: yes
+  pacman: name=tilda
+          state=present

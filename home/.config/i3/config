@@ -28,10 +28,11 @@ bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 
 # Software
 bindsym $mod+Return exec --no-startup-id termite
-bindsym $mod+Shift+f exec --no-startup-id pcmanfm
-bindsym $mod+Shift+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Ctrl+n exec termite -e 'emacsclient -t ~/Dropbox/Notes' --title='notes'
-bindsym $mod+Ctrl+m exec termite -e 'alsamixer' --title='alsamixer'
+bindsym $mod+a exec tilda
+bindsym $mod+Control+f exec --no-startup-id pcmanfm
+bindsym $mod+Control+s exec --no-startup-id gnome-screenshot -i
+bindsym $mod+Control+n exec termite -e 'emacsclient -t ~/Dropbox/Notes' --title='notes'
+bindsym $mod+Control+m exec termite -e 'alsamixer' --title='alsamixer'
 
 # Floating windows
 for_window [title="notes"] floating enable
