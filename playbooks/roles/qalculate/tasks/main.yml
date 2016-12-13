@@ -1,0 +1,4 @@
+---
+- name: Install Qalculate
+  yaourt: name=qalculate-gtk-nognome
+          state=present
