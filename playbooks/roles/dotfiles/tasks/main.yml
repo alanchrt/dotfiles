@@ -9,6 +9,11 @@
        accept_hostkey=true
        dest="{{ansible_env.HOME}}/.zsh-custom/plugins/zsh-nvm"
 
+- name: Sync zsh-syntax-highlighting
+  git: repo=https://github.com/zsh-users/zsh-syntax-highlighting.git
+       accept_hostkey=true
+       dest="{{ansible_env.HOME}}/.zsh-custom/plugins/zsh-syntax-highlighting"
+
 - name: Sync spacemacs
   git: repo=https://github.com/syl20bnr/spacemacs.git
        accept_hostkey=true
