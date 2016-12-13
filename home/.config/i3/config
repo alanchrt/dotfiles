@@ -20,10 +20,9 @@ smart_gaps on
 font xft:Noto Sans 10
 
 # Menus
-set $rofi_colors  -color-window \\"#333333,#333333\\" -color-normal \\"#333333,#f1f1f1,#333333,#336699,#ffffff\\"
+set $rofi_colors  -color-window \\"#1a1a1a,#1a1a1a\\" -color-normal \\"#1a1a1a,#f1f1f1,#1a1a1a,#16a085,#ffffff\\"
 bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun -opacity 90 $rofi_colors"
-bindsym $mod+e exec --no-startup-id "rofi -show run -lines 3 -opacity 90 $rofi_colors"
-bindsym $mod+o exec --no-startup-id "rofi -show window -opacity 90 $rofi_colors"
+bindsym $mod+e exec --no-startup-id "rofi -show run -lines 5 -opacity 90 $rofi_colors"
 bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 
 # Software
@@ -159,15 +158,15 @@ bar {
     strip_workspace_numbers yes
 
 	  colors {
-        background #2B2C2B
-        statusline #F9FAF9
+        background #2b2c2b
+        statusline #f9faf9
         separator  #454947
 
         #                  border  bg      text
-        focused_workspace  #16A085 #16A085 #EEE8D5
-        active_workspace   #595B5B #353836 #FDF6E3
-        inactive_workspace #353836 #353836 #EEE8D5
-        urgent_workspace   #900000 #900000 #F9FAF9
+        focused_workspace  #16a085 #16a085 #eee8d5
+        active_workspace   #595b5b #353836 #fdf6e3
+        inactive_workspace #353836 #353836 #eee8d5
+        urgent_workspace   #900000 #900000 #f9faf9
     }
 }
 
