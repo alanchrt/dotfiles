@@ -8,23 +8,23 @@
 - name: Reload ansible local facts
   setup: filter=ansible_local
 
-- name: Install Arc icon theme
+- name: Install Flat Remix icon theme
   become: yes
-  pacman: name=arc-icon-theme
+  pacman: name=super-flat-remix-icon-theme
           state=present
 
-- name: Set icon theme to Arc for GTK+ 2
+- name: Set icon theme to Flat Remix for GTK+ 2
   lineinfile: dest="{{ansible_env.HOME}}/.gtkrc-2.0"
               regexp="^gtk-icon-theme-name="
-              line="gtk-icon-theme-name=\"Arc\""
+              line="gtk-icon-theme-name=\"Flat-Remix\""
               create=yes
 
-- name: Set icon theme to Arc for GTK+ 3
+- name: Set icon theme to Flat Remix for GTK+ 3
   lineinfile: dest="{{ansible_env.HOME}}/.config/gtk-3.0/settings.ini"
               regexp="^gtk-icon-theme-name="
-              line="gtk-icon-theme-name=Arc"
+              line="gtk-icon-theme-name=Flat-Remix"
               create=yes
 
-- name: Set icon theme to Arc in Gnome settings
-  command: gsettings set org.gnome.desktop.interface icon-theme "Arc"
-  when: ansible_local.icons.icon_theme != "Arc"
+- name: Set icon theme to Flat Remix in Gnome settings
+  command: gsettings set org.gnome.desktop.interface icon-theme "Flat-Remix"
+  when: ansible_local.icons.icon_theme != "Flat-Remix"
