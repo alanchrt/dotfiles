@@ -20,7 +20,6 @@
               regexp="^{{item}}"
               line="{{item}}=\"$HOME\""
   with_items:
-    - XDG_DESKTOP_DIR
     - XDG_TEMPLATES_DIR
     - XDG_PUBLICSHARE_DIR
     - XDG_DOCUMENTS_DIR
@@ -30,12 +29,16 @@
 
 - name: Ensure Downloads user directory is set
   lineinfile: dest="{{ansible_env.HOME}}/.config/user-dirs.dirs"
-              regexp="^XDG_DOWNLOAD_DIR"
-              line="XDG_DOWNLOAD_DIR=\"$HOME/Downloads\""
+              regexp={{item.regexp}}
+              line={{item.line}}
+  with_items:
+    - { regexp: "^XDG_DOWNLOAD_DIR", line: "XDG_DOWNLOAD_DIR=\"$HOME/Downloads\"" }
+    - { regexp: "^XDG_DESKTOP_DIR", line: "XDG_DESKTOP_DIR=\"$HOME/Desktop\"" }
 
 - name: Create home subdirectories
   file: path="{{ansible_env.HOME}}/{{item}}"
         state=directory
   with_items:
+    - Desktop
     - Downloads
     - Workspaces
