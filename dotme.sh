@@ -76,6 +76,7 @@ configure_ranger() {
     echo "Configuring ranger..."
     mkdir -p $HOME/.config/ranger
     link_file .config/ranger/scope.sh .config/ranger/scope.sh
+    link_file .config/ranger/rc.conf .config/ranger/rc.conf
 }
 
 configure_git() {

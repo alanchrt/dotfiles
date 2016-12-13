@@ -7,11 +7,10 @@
   with_items:
     - vte3
 
-- name: Install vte3-ng
+- name: Install vte3-ng and termite
   become: yes
-  pacman: name=vte3-ng
+  pacman: name={{item}}
           state=present
-
-- name: Install termite
-  yaourt: name=termite
-          state=present
+  with_items:
+    - vte3-ng
+    - termite
