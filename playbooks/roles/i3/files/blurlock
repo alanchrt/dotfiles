@@ -2,9 +2,10 @@
 (
     flock -x -w 2 200 || exit 1
 
-    import -window root /tmp/blurlock.raw.png
-    convert /tmp/blurlock.raw.png -filter point -resize 2% -resize 5000% /tmp/blurlock.png
-    rm /tmp/blurlock.raw.png
-    i3lock -nxi /tmp/blurlock.png
+    tempfile=/tmp/blurlock.tmp.png
+    resolution=`xdpyinfo | grep dimensions | awk '{print $2}'`
+    ffmpeg -f x11grab -video_size $resolution -i $DISPLAY -filter_complex "boxblur=10:1" -vframes 1 $tempfile -loglevel quiet
+    i3lock -nxi $tempfile
+    rm $tempfile
 
 ) 200>/tmp/blurlock.lock
