@@ -62,6 +62,7 @@ configure_termite() {
     echo "Configuring termite..."
     mkdir -p $HOME/.config/termite
     link_file .config/termite/config .config/termite/config
+    link_file .config/termite/drop_config .config/termite/drop_config
 }
 
 configure_byobu() {

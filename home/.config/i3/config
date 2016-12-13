@@ -28,13 +28,14 @@ bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
 
 # Software
 bindsym $mod+Return exec --no-startup-id termite
-bindsym $mod+a exec tilda
+bindsym $mod+a exec termite --title='dropterm' --config ~/.config/termite/drop_config
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
 bindsym $mod+Control+s exec --no-startup-id gnome-screenshot -i
 bindsym $mod+Control+n exec termite -e 'emacsclient -t ~/Dropbox/Notes' --title='notes'
 bindsym $mod+Control+m exec termite -e 'alsamixer' --title='alsamixer'
 
 # Floating windows
+for_window [title="dropterm"] floating enable, sticky enable, border none, resize set 800 220, move absolute position 0 0
 for_window [title="notes"] floating enable
 for_window [title="alsamixer"] floating enable
 
