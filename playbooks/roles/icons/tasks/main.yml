@@ -8,10 +8,12 @@
 - name: Reload ansible local facts
   setup: filter=ansible_local
 
-- name: Install Flat Remix icon theme
-  become: yes
-  pacman: name=super-flat-remix-icon-theme
+- name: Install Flat Remix and Numix Circle icon themes
+  yaourt: name={{item}}
           state=present
+  with_items:
+    - super-flat-remix-icon-theme
+    - numix-circle-icon-theme-git
 
 - name: Set icon theme to Flat Remix for GTK+ 2
   lineinfile: dest="{{ansible_env.HOME}}/.gtkrc-2.0"
