@@ -21,9 +21,9 @@ font xft:Noto Sans 10
 
 # Menus
 set $rofi_colors  -color-window \\"#1a1a1a,#1a1a1a\\" -color-normal \\"#1a1a1a,#f1f1f1,#1a1a1a,#16a085,#ffffff\\"
-bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun -opacity 90 $rofi_colors"
-bindsym $mod+e exec --no-startup-id "rofi -show run -lines 5 -opacity 90 $rofi_colors"
-bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 90 $rofi_colors"
+bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun -opacity 85 $rofi_colors"
+bindsym $mod+e exec --no-startup-id "rofi -show run -lines 5 -opacity 85 $rofi_colors"
+bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 85 $rofi_colors"
 
 # Software
 bindsym $mod+Return exec --no-startup-id termite
