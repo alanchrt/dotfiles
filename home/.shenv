@@ -49,4 +49,4 @@ export VIRTUALENVWRAPPER_LAZY_SCRIPT=`which virtualenvwrapper_lazy.sh`
 source $VIRTUALENVWRAPPER_LAZY_SCRIPT
 
 # Add android tools to path
-export PATH=/opt/android-sdk/platform-tools:$PATH
+export PATH=$PATH:/opt/android-sdk/platform-tools
