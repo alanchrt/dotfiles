@@ -14,7 +14,7 @@ fi
 export TERM=xterm-256color
 
 # Syntax highlighting
-export HIGHLIGHT_CMD="emacs --batch -l ~/.local/share/highlight.el --theme base16-tomorrow-night"
+export HIGHLIGHT_CMD="emacs --batch -l ~/.local/share/highlight.el --theme base16-tomorrow-night 2> /dev/null"
 export "LESSOPEN=|$HIGHLIGHT_CMD %s"
 export "LESS=-R"
 
