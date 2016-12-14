@@ -30,4 +30,3 @@
         state=absent
   with_items:
     - "{{ansible_env.HOME}}/.extend.bashrc"
-    - "{{ansible_env.HOME}}/.extend.Xresources"
