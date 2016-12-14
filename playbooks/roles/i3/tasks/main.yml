@@ -18,8 +18,10 @@
   yaourt: name={{item}}
           state=present
   with_items:
-    - cmake
+    - i3blocks
     - i3lock-custom
+    - acpi
+    - sysstat
     - unclutter
     - rofi
     - feh

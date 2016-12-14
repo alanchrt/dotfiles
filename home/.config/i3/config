@@ -34,6 +34,9 @@ bindsym $mod+Control+n exec termite -e 'emacsclient -t ~/Dropbox/Notes' --title=
 bindsym $mod+Control+c exec termite -e 'qalc' --title='qalc'  --config ~/.config/termite/drop_config
 bindsym $mod+Control+m exec termite -e 'alsamixer' --title='alsamixer'
 
+# Indicators
+bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
+
 # Floating windows
 for_window [title="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
 for_window [title="notes"] floating enable
@@ -151,7 +154,7 @@ mode "$mode_reboot" {
 
 # Workspace bar
 bar {
-    status_command i3status -c ~/.config/i3/i3status.conf
+    status_command i3blocks -c ~/.config/i3/i3blocks.conf
     position bottom
 
     bindsym button4 nop
