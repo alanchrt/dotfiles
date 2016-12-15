@@ -22,25 +22,30 @@ font xft:Noto Sans 10
 # Menus
 set $rofi_colors  -color-window \\"#1a1a1a,#1a1a1a\\" -color-normal \\"#1a1a1a,#f1f1f1,#1a1a1a,#16a085,#ffffff\\"
 bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun -opacity 85 $rofi_colors"
-bindsym $mod+e exec --no-startup-id "rofi -show run -lines 5 -opacity 85 $rofi_colors"
+bindsym $mod+o exec --no-startup-id "rofi -show run -lines 5 -opacity 85 $rofi_colors"
 bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 85 $rofi_colors"
 
-# Software
+# Dropdowns
 bindsym $mod+Return exec --no-startup-id termite
-bindsym $mod+a exec termite --title='dropterm' --config ~/.config/termite/drop_config
-bindsym $mod+z exec termite -e 'qalc' --title='qalc'  --config ~/.config/termite/drop_config
+bindsym $mod+a exec --no-startup-id termite --class='dropterm' --config ~/.config/termite/drop_config
+bindsym $mod+s exec --no-startup-id termite # scratchpad
+bindsym $mod+d exec --no-startup-id termite -e 'qalc' --class='qalc'  --config ~/.config/termite/drop_config
+
+# Software
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
 bindsym $mod+Control+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Control+m exec termite -e 'alsamixer' --title='alsamixer'
+bindsym $mod+Control+n exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --class='notes' --name='hotkeyNotes'
+bindsym $mod+Control+m exec --no-startup-id termite -e 'alsamixer' --class='alsamixer'
 
 # Indicators
 bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
 
 # Floating windows
-for_window [title="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
-for_window [title="notes"] floating enable, sticky enable, border none, resize set 800 440, move absolute position 0 0, move scratchpad
-for_window [title="qalc"] floating enable, sticky enable, border none, resize set 800 120, move absolute position 0 0
-for_window [title="alsamixer"] floating enable
+for_window [class="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
+for_window [class="notes"] floating enable, sticky enable, border none, resize set 800 440, move absolute position 0 0, move scratchpad
+for_window [instance="hotkeyNotes"] scratchpad show
+for_window [class="qalc"] floating enable, sticky enable, border none, resize set 800 120, move absolute position 0 0
+for_window [class="alsamixer"] floating enable
 
 # State
 bindsym $mod+Shift+q kill
@@ -77,9 +82,8 @@ mode "RESIZE" {
 }
 
 # Layout
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
-bindsym $mod+d layout default
+bindsym $mod+w layout default
+bindsym $mod+e layout tabbed
 
 # Colors
 #               border  bg      text
@@ -187,7 +191,7 @@ exec --no-startup-id volumeicon
 # exec --no-startup-id dropboxd
 exec --no-startup-id fluxgui
 exec --no-startup-id ~/.config/i3/prune_downloads.sh
-exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --title='notes' --config ~/.config/termite/drop_config
+exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --class='notes'
 exec_always --no-startup-id fix_xcursor
 
 # Run local scripts
