@@ -50,19 +50,23 @@ values."
      latex
      (markdown :variables
                markdown-live-preview-engine 'vmd)
-     org
+     nginx
+     (org :variables
+          org-startup-indented t
+          org-hide-emphasis-markers t)
      php
      puppet
      python
      react
      ruby
      rust
+     shaders
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom
             shell-default-term-shell "/bin/zsh")
+     shell-scripts
      syntax-checking
-     vagrant
      version-control
      yaml
      )
@@ -323,7 +327,6 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   (setq powerline-default-separator nil)
   (setq initial-buffer-choice "./")
-  (setq org-startup-indented t)
   (setq neo-theme 'nerd)
   (setq neo-show-hidden-files nil)
 
