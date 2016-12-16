@@ -18,7 +18,6 @@ width, height = dimensions['width'], dimensions['height']
 i3_msg('move', 'absolute', 'position', str(int(width / 2 - 400)), '0')
 i3_msg('move', 'scratchpad')
 i3_msg('resize', 'set', '800', str(dimensions['height']))
-i3_msg('resize', 'set', '800', str(dimensions['height']))
 i3_msg('sticky', 'enable')
 
 if visible:
