@@ -53,6 +53,7 @@ values."
      nginx
      (org :variables
           org-startup-indented t
+          org-startup-folded nil
           org-hide-emphasis-markers t)
      php
      puppet
