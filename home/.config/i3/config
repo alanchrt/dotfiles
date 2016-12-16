@@ -33,7 +33,7 @@ bindsym $mod+n exec --no-startup-id termite -e 'qalc' --class='qalc' --config ~/
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
 bindsym $mod+Control+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Control+n exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --name='orgnotes'
+bindsym $mod+Control+n exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --class='orgnotes'
 bindsym $mod+Control+m exec --no-startup-id termite -e 'alsamixer' --class='alsamixer'
 
 # State
@@ -146,7 +146,7 @@ bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
 # Floating windows
 for_window [class="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
 for_window [class="qalc"] floating enable, sticky enable, border none, resize set 800 120, move absolute position 0 0
-for_window [instance="orgnotes"] floating enable, border none, exec --no-startup-id python ~/.config/i3/tallscratch.py
+for_window [class="orgnotes"] floating enable, sticky enable, border none, resize set 800 440, move absolute position 0 0, move scratchpad
 for_window [class="alsamixer"] floating enable
 for_window [class="Pcmanfm"] floating enable
 
@@ -195,5 +195,5 @@ exec_always --no-startup-id fix_xcursor
 exec --no-startup-id ~/.i3_local
 
 # Desktop applications
-exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --name='orgnotes'
+exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --class='orgnotes'
 exec --no-startup-id firefox-esr
