@@ -186,7 +186,6 @@ exec --no-startup-id xfce4-power-manager
 exec --no-startup-id xautolock -time 3 -corners -000 -locker blurlock
 exec --no-startup-id unclutter
 exec --no-startup-id pcmanfm -d
-exec --no-startup-id volumeicon
 exec --no-startup-id dropbox
 exec --no-startup-id fluxgui
 exec --no-startup-id ~/.config/i3/prune_downloads.sh
