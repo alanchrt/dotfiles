@@ -23,18 +23,22 @@
   shell: "source {{ansible_env.HOME}}/.nvm/nvm.sh && nvm alias default lts/*"
   args:
     executable: /bin/bash
-  when: not ansible_local.node.default_set
+  when: not ansible_local.node.default_version
+
+- name: Reload ansible local facts
+  setup: filter=ansible_local
 
 - name: Install common node tools
   shell: "source {{ansible_env.HOME}}/.nvm/nvm.sh && nvm use --lts && npm install -g {{item}}"
   args:
     executable: /bin/bash
-    creates: "{{ansible_env.HOME}}/.nvm/versions/node/*/bin/{{item}}"
+    creates: "{{ansible_env.HOME}}/.nvm/versions/node/{{ansible_local.node.default_version}}/bin/{{item}}"
   with_items:
     - tern
+    - js-beautify
+    - eslint
     - gulp
     - yo
     - create-react-app
     - pushstate-server
-    - js-beautify
     - vmd
