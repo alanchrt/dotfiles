@@ -78,8 +78,8 @@ bindsym $mod+w layout tabbed
 workspace_auto_back_and_forth yes
 bindsym $mod+b workspace back_and_forth
 bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_and_forth
-bindsym $mod+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput.py workspace prev
-bindsym $mod+period exec --no-startup-id python ~/.config/i3/workspaceonoutput.py workspace next
+bindsym $mod+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput workspace prev
+bindsym $mod+period exec --no-startup-id python ~/.config/i3/workspaceonoutput workspace next
 bindsym $mod+Control+comma move workspace to output left
 bindsym $mod+Control+period move workspace to output right
 bindsym $mod+1 workspace 1
@@ -107,8 +107,8 @@ bindsym $mod+Shift+7 move container to workspace 7
 bindsym $mod+Shift+8 move container to workspace 8
 bindsym $mod+Shift+9 move container to workspace 9
 bindsym $mod+Shift+0 move container to workspace 10
-bindsym $mod+Shift+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput.py move prev
-bindsym $mod+Shift+period exec --no-startup-id python ~/.config/i3/workspaceonoutput.py move next
+bindsym $mod+Shift+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput move prev
+bindsym $mod+Shift+period exec --no-startup-id python ~/.config/i3/workspaceonoutput move next
 
 # i3 control
 bindsym $mod+Control+i restart
@@ -191,7 +191,7 @@ exec --no-startup-id unclutter
 exec --no-startup-id pcmanfm -d
 exec --no-startup-id dropbox
 exec --no-startup-id fluxgui
-exec --no-startup-id ~/.config/i3/prune_downloads.sh
+exec --no-startup-id ~/.config/i3/prune_downloads
 exec_always --no-startup-id fix_xcursor
 
 # Local scripts
