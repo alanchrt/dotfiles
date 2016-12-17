@@ -135,6 +135,9 @@ mode "$mode_reboot" {
 }
 
 # Multimedia
+bindsym XF86AudioRaiseVolume exec --no-startup-id ~/.config/i3/volumectrl up
+bindsym XF86AudioLowerVolume exec --no-startup-id ~/.config/i3/volumectrl down
+bindsym XF86AudioMute exec --no-startup-id ~/.config/i3/volumectrl mute
 # bindsym XF86AudioPlay exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause
 # bindsym XF86AudioStop exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop
 # bindsym XF86AudioPrev exec --no-startup-id dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous

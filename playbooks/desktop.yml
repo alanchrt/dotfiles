@@ -12,6 +12,7 @@
     - clipboard
     - gtk
     - icons
+    - pulseaudio
     - termite
     - cloudprint
     - dropbox
