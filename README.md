@@ -79,3 +79,11 @@ $ ngrok authtoken <token>
 ```
 $ sudo /usr/share/cloudprint-cups/setupcloudprint.py
 ```
+
+##### YubiKey
+
+This one may be necessary for OATH tokens if the YubiKey has a password. Insert YubiKey first.
+
+```
+$ yubioath -R
+```
