@@ -199,4 +199,4 @@ exec --no-startup-id ~/.i3_local
 
 # Desktop applications
 exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --class='orgnotes'
-exec --no-startup-id firefox-esr
+exec --no-startup-id firefox-beta

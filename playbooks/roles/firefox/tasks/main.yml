@@ -4,9 +4,9 @@
   pacman: name=palemoon-bin
           state=absent
 
-- name: Install Firefox ESR and Firefox Developer Edition
+- name: Install Firefox Beta and Firefox Developer Edition
   yaourt: name={{item}}
           state=present
   with_items:
-    - firefox-esr-bin
+    - firefox-beta-bin
     - firefox-developer
