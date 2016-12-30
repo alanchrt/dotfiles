@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+credential=$(yubioath | rofi -dmenu -i -p "yubikey:" $@)
+if [[ ! -z "${credential// }" ]]
+then
+    service=$(echo $credential | cut -d: -f 1)
+    token=$(echo $credential | awk '{print $NF}')
+    printf $token | xclip -selection clipboard
+    notify-send "$service token copied to clipboard."
+fi
