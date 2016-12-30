@@ -8,3 +8,4 @@
     - pulseaudio-alsa
     - lib32-libpulse
     - lib32-alsa-plugins
+    - pavucontrol

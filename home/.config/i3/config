@@ -28,13 +28,14 @@ bindsym $mod+i exec --no-startup-id "rofi -show ssh -opacity 85 $rofi_colors"
 # Dropdowns
 bindsym $mod+m exec --no-startup-id termite --class='dropterm' --config ~/.config/termite/drop_config
 bindsym $mod+n exec --no-startup-id termite -e 'qalc' --class='qalc' --config ~/.config/termite/drop_config
+bindsym $mod+b exec --no-startup-id yubioath gui
 
 # Software
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
 bindsym $mod+Control+s exec --no-startup-id gnome-screenshot -i
 bindsym $mod+Control+n exec --no-startup-id termite -e 'emacs -nw ~/Dropbox/Notes' --class='orgnotes'
-bindsym $mod+Control+m exec --no-startup-id termite -e 'alsamixer' --class='alsamixer'
+bindsym $mod+Control+m exec --no-startup-id pavucontrol
 
 # State
 bindsym $mod+Shift+q kill
@@ -76,8 +77,6 @@ bindsym $mod+w layout tabbed
 
 # Workspaces
 workspace_auto_back_and_forth yes
-bindsym $mod+b workspace back_and_forth
-bindsym $mod+Shift+b move container to workspace back_and_forth; workspace back_and_forth
 bindsym $mod+comma exec --no-startup-id python ~/.config/i3/workspaceonoutput workspace prev
 bindsym $mod+period exec --no-startup-id python ~/.config/i3/workspaceonoutput workspace next
 bindsym $mod+Control+comma move workspace to output left
@@ -150,7 +149,8 @@ bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
 for_window [class="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
 for_window [class="qalc"] floating enable, sticky enable, border none, resize set 800 120, move absolute position 0 0
 for_window [class="orgnotes"] floating enable, sticky enable, border none, resize set 800 440, move absolute position 0 0, move scratchpad
-for_window [class="alsamixer"] floating enable
+for_window [class="Yubioath gui"] floating enable, sticky enable, border none, resize set 800 440, move absolute position 0 0
+for_window [class="Pavucontrol"] floating enable
 for_window [class="Pcmanfm"] floating enable
 
 # Colors
