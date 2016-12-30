@@ -39,3 +39,11 @@
 - name: Set GTK theme to Arc-Darker in Gnome settings
   command: gsettings set org.gnome.desktop.interface gtk-theme "Arc-Darker"
   when: ansible_local.gtk.gtk_theme != "Arc-Darker"
+
+- name: Use GTK+ style in Qt
+  blockinfile:
+    dest: "{{ansible_env.HOME}}/.config/Trolltech.conf"
+    marker: '# {mark} GTK STYLE CONFIG'
+    block: |
+      [Qt]
+      style=GTK+
