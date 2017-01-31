@@ -1,10 +1,7 @@
 ---
 - name: Install desktop Yubico Authenticator
-  yaourt: name={{item}}
+  yaourt: name=yubico-yubioath-desktop
           state=present
-  with_items:
-    - acsccid
-    - yubico-yubioath-desktop
 
 - name: Enable pcscd
   become: yes
