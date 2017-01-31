@@ -187,7 +187,7 @@ exec --no-startup-id nitrogen --restore; sleep 1; compton -b --config ~/.config/
 exec --no-startup-id emacs --daemon
 exec --no-startup-id nm-applet
 exec --no-startup-id xfce4-power-manager
-exec --no-startup-id xautolock -secure -time 3 -corners -000 -locker blurlock -notify 11 -notifier "notify-send 'System Idle' 'Screen will lock in a few moments.'"
+exec --no-startup-id xautolock -secure -time 3 -corners -000 -locker blurlock
 exec --no-startup-id unclutter
 exec --no-startup-id pcmanfm -d
 exec --no-startup-id dropbox
