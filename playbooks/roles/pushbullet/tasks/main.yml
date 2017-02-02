@@ -1,0 +1,5 @@
+---
+- name: Install Pushbullet desktop app
+  yaourt:
+    name: pb-for-desktop
+    state: present
