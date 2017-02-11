@@ -342,7 +342,7 @@ you should place your code here."
    web-mode-attr-indent-offset 2)
 
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "firefox-beta")
+        browse-url-generic-program "google-chrome-stable")
 
   (add-hook 'hack-local-variables-hook (lambda () (setq truncate-lines t)))
 
