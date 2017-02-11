@@ -6,7 +6,6 @@
   roles:
     - i3
     - fonts
-    - plymouth
     - home
     - touchpad
     - clipboard
