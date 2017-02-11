@@ -110,11 +110,6 @@ configure_i3() {
     link_file .config/dunst/dunstrc .config/dunst/dunstrc
 }
 
-configure_vimperator() {
-    echo "Configuring Vimperator..."
-    link_file .vimperatorrc .vimperatorrc
-}
-
 set -e
 
 install_oh_my_zsh
@@ -130,7 +125,6 @@ configure_emacs
 configure_python
 configure_node
 configure_i3
-configure_vimperator
 
 touch $HOME/.dotted
 echo "Done."

@@ -1,6 +1,6 @@
 ## Overview
 
-This is my Arch Linux, Firefox/Vimperator, Byobu, Oh-my-zsh, and Spacemacs setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
+This is my Arch Linux, Byobu, Oh-my-zsh, and Spacemacs setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
 ![dotfiles screenshot](screenshot.png)
 
@@ -12,7 +12,6 @@ Here are some references for getting around the system:
 - **[i3 config](home/.config/i3/config) -** Desktop keybindings
 - **[Spacemacs documentation](http://spacemacs.org/doc/DOCUMENTATION.html) -** Development experience
 - **[Byobu man page](http://manpages.ubuntu.com/manpages/zesty/en/man1/byobu.1.html#contenttoc8) -** Tmux keybindings
-- **Vimperator Help -** Discoverable by installing Vimperator Firefox extension and typing `:help<Return>`
 - **[Bash aliases](home/.bash_aliases) -** Terminal aliases for zsh and bash
 
 ## Installation
