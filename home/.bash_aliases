@@ -56,6 +56,20 @@ function to {
     fi
 }
 
+# Start a recorded pairing session
+function pair {
+    filename=ttyrec-pairing-`date +%Y-%m-%d-%H%M%S`
+    read -q "REPLY?Save a recording of this session? [y/N] "
+    if [[ "$REPLY" =~ ^[yY]$ ]]
+    then
+        ttyrec -e tmate $filename
+        echo "\nSession finished. Recording saved to $filename."
+    else
+        tmate
+        echo "\nSession finished."
+    fi
+}
+
 # Remotely add authorized ssh key
 function rkey {
     if (( "$#" == 1 ))

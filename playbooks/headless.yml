@@ -6,6 +6,8 @@
     - git
     - zsh
     - byobu
+    - tmate
+    - ttyrec
     - emacs
     - vim
     - python
