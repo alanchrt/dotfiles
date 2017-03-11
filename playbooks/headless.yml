@@ -13,6 +13,7 @@
     - python
     - latex
     - node
+    - meteor
     - postgres
     #- mysql
     - nfs
