@@ -40,7 +40,7 @@ ZSH_CUSTOM=$HOME/.zsh-custom
 ZSH_THEME='bira-python'
 DISABLE_VENV_CD=1
 export NVM_LAZY_LOAD=true
-plugins=(celery colored-man-pages django fabric heroku history-substring-search pip python redis-cli safe-paste ssh-agent tmux vagrant virtualenv zsh-nvm zsh-syntax-highlighting)
+plugins=(celery colored-man-pages django meteor fabric heroku history-substring-search pip python redis-cli safe-paste ssh-agent tmux vagrant virtualenv zsh-nvm zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 # Redefine tmux wrapper to use byobu-tmux
