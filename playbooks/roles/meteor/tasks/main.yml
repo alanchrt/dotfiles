@@ -2,4 +2,4 @@
 - name: Install Meteor
   shell: "curl https://install.meteor.com/ | sh"
   args:
-    creates: /usr/bin/meteor
+    creates: /usr/local/bin/meteor
