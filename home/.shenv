@@ -49,7 +49,7 @@ export VIRTUALENVWRAPPER_LAZY_SCRIPT=`which virtualenvwrapper_lazy.sh`
 source $VIRTUALENVWRAPPER_LAZY_SCRIPT
 
 # Add android tools to path
-export PATH=$PATH:/opt/android-sdk/platform-tools
+export PATH=$PATH:/opt/android-sdk/tools:/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools
 
 # Set default node paths for things that need them before lazy-load (like emacs)
 follow_nvm_alias () {

@@ -3,5 +3,8 @@
   yaourt: name={{item}}
           state=present
   with_items:
+    - android-platform
+    - android-sdk
     - android-sdk-platform-tools
+    - android-sdk-build-tools
     - android-udev
