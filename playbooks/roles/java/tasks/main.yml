@@ -1,0 +1,13 @@
+---
+- name: Install OpenJDK 8
+  become: yes
+  pacman:
+    name: jdk8-openjdk
+    state: present
+
+- name: Set OpenJDK 8 as the default
+  become: yes
+  file:
+    src: /usr/lib/jvm/java-8-openjdk
+    dest: /usr/lib/jvm/default
+    state: link
