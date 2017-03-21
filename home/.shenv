@@ -51,6 +51,9 @@ source $VIRTUALENVWRAPPER_LAZY_SCRIPT
 # Add android tools to path
 export PATH=$PATH:/opt/android-sdk/tools:/opt/android-sdk/tools:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools
 
+# Add ruby gems to path
+PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
+
 # Set default node paths for things that need them before lazy-load (like emacs)
 follow_nvm_alias () {
     version=`cat $HOME/.nvm/alias/$1`

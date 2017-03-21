@@ -20,6 +20,7 @@
     - heroku
     - aws
     - ngrok
+    - jekyll
 
 - name: Configure dev environment
   hosts: all
