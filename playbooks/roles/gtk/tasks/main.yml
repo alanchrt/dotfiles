@@ -43,6 +43,7 @@
 - name: Use GTK+ style in Qt
   blockinfile:
     dest: "{{ansible_env.HOME}}/.config/Trolltech.conf"
+    create: yes
     marker: '# {mark} GTK STYLE CONFIG'
     block: |
       [Qt]
