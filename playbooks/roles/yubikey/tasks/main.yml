@@ -1,4 +1,10 @@
 ---
+- name: Remove system python pyasn1
+  become: yes
+  pip:
+    name: pyasn1
+    state: absent
+
 - name: Install desktop Yubico Authenticator
   yaourt: name=yubico-yubioath-desktop
           state=present
