@@ -1,9 +1,9 @@
 ---
+- name: Install Firefox Beta
+  yaourt: name=firefox-beta-bin
+          state=present
+
 - name: Remove Pale Moon
   become: yes
   pacman: name=palemoon-bin
           state=absent
-
-- name: Install Firefox Beta
-  yaourt: name=firefox-beta-bin
-          state=present
