@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-credential=$(yubioath | rofi -dmenu -i -p "yubikey:" $@)
+password=$(secret-tool lookup ykman oath)
+credential=$(ykman oath --password $password code | rofi -dmenu -i -p "yubikey:" $@)
 if [[ ! -z "${credential// }" ]]
 then
     service=$(echo $credential | cut -d: -f 1)
