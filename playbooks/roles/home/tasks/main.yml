@@ -22,3 +22,13 @@
 - name: Configure user directories
   copy: src=user-dirs.dirs
         dest="{{ansible_env.HOME}}/.config/user-dirs.dirs"
+
+- name: Remove deprecated mimeapps.list
+  file:
+    path: "{{ansible_env.HOME}}/.local/share/applications/mimeapps.list"
+    state: absent
+
+- name: Configure defaults
+  copy:
+    src: mimeapps.list
+    dest: "{{ansible_env.HOME}}/.config/mimeapps.list"
