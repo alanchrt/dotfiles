@@ -6,3 +6,4 @@
   with_items:
     - vagrant
     - virtualbox
+    - linux49-virtualbox-host-modules
