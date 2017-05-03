@@ -6,5 +6,5 @@ then
     service=$(echo $credential | cut -d: -f 1)
     token=$(echo $credential | awk '{print $NF}')
     printf $token | xclip -selection clipboard
-    notify-send "$service token copied to clipboard."
+    notify-send "YubiKey" "$service token copied to clipboard."
 fi
