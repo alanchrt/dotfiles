@@ -17,8 +17,7 @@ alias gco='git checkout'
 alias glo='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %C(cyan)(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
 alias gp="gist -p"
 
-# Emacs
-alias e='emacsclient -t'
+# Editor
 alias se='sudoedit'
 
 # Use proper terminal for weechat

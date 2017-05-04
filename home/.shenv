@@ -18,10 +18,10 @@ export HIGHLIGHT_CMD="emacs --batch -l ~/.local/share/highlight.el --theme base1
 export "LESSOPEN=|$HIGHLIGHT_CMD %s"
 export "LESS=-R"
 
-# Use emacs as default editor
+# Set default editors
 export ALTERNATE_EDITOR=''
-export EDITOR='emacsclient -t'
-export VISUAL='emacsclient -t'
+export EDITOR='vim'
+export VISUAL='emacs'
 
 # Use gnome keyring
 if [ "$DESKTOP_SESSION" = "i3" ]; then
