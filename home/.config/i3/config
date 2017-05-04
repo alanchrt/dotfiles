@@ -33,6 +33,7 @@ bindsym $mod+n exec --no-startup-id termite -e 'qalc' --class='qalc' --config ~/
 
 # Software
 bindsym $mod+Return exec --no-startup-id termite
+bindsym $mod+Control+e exec --no-startup-id emacs
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
 bindsym $mod+Control+s exec --no-startup-id gnome-screenshot -i
 bindsym $mod+Control+n exec --no-startup-id emacs ~/Dropbox/Notes -T orgnotes
