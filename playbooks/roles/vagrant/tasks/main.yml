@@ -7,3 +7,9 @@
     - vagrant
     - virtualbox
     - linux49-virtualbox-host-modules
+
+- name: Enable the vboxdrv module
+  become: yes
+  modprobe:
+    name: vboxdrv
+    state: present
