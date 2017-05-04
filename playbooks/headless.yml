@@ -16,7 +16,7 @@
     - node
     - meteor
     - postgres
-    #- mysql
+    - mysql
     - docker
     - nfs
     - heroku

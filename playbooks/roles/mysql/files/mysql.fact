@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-mysql_root_password_set=$(mysql -h localhost -u root -pdev -e 'quit' &> /dev/null && echo "true" || echo "false")
-
-echo "{\"mysql_root_password_set\": ${mysql_root_password_set}}"

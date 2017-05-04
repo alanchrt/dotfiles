@@ -84,3 +84,9 @@ $ sudo /usr/share/cloudprint-cups/setupcloudprint.py
 ```
 $ secret-tool store --label 'YubiKey' ykman oath
 ```
+
+##### MySQL
+
+```
+$ sudo mysql_secure_installation
+```

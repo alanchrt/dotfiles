@@ -1,29 +1,21 @@
 ---
-- name: Install mysql custom facts
+- name: Install MySQL
   become: yes
-  copy: src=mysql.fact
-        dest=/etc/ansible/facts.d/mysql.fact
-        mode=0755
+  pacman:
+    name: mariadb
+    state: present
+  register: install_mysql
 
-- name: Reload ansible local facts
-  setup: filter=ansible_local
-
-- name: Specify root MySQL password for development
+- name: Install database
   become: yes
-  debconf: name=mysql-server
-           question={{item}}
-           vtype="password"
-           value="dev"
-  with_items:
-    - mysql-server/root_password
-    - mysql-server/root_password_again
-  when: not ansible_local.mysql.mysql_root_password_set
+  shell: "mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql"
+  args:
+    executable: /bin/bash
+  when: install_mysql.changed
 
-- name: Install MySQL server and client
+- name: Enable mysql
   become: yes
-  apt: name={{item}}
-       state=present
-  with_items:
-    - mysql-server
-    - mysql-client
-    - libmysqlclient-dev
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
