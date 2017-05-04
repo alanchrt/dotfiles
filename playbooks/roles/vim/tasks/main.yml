@@ -10,19 +10,10 @@
   get_url: url=https://raw.githubusercontent.com/amix/vimrc/master/vimrcs/basic.vim
            dest="{{ansible_env.HOME}}/.vimrc"
 
-- name: Create vim colors directory
-  file: path="{{ansible_env.HOME}}/.vim/colors"
-        state=directory
-
-- name: Download solarized color scheme
-  get_url: url=https://raw.githubusercontent.com/altercation/vim-colors-solarized/master/colors/solarized.vim
-           dest="{{ansible_env.HOME}}/.vim/colors/solarized.vim"
-
 - name: Configure color scheme
   lineinfile: dest="{{ansible_env.HOME}}/.vimrc"
               line={{item}}
   with_items:
     - set t_ut=
     - set background=dark
-    - let g:solarized_termcolors=256
-    - colorscheme solarized
+    - colorscheme industry
