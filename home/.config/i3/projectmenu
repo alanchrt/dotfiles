@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+path=$(find $HOME -type d | rofi -dmenu -i -p "project:" $@)
+session=$(basename $path)
+termite -d $path -e "sh -c 'tmux new-session -s $session || tmux attach-session -t $session'"
