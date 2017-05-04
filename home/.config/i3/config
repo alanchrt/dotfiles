@@ -24,7 +24,7 @@ bindsym $mod+space exec --no-startup-id "rofi -mode drun -show drun"
 bindsym $mod+y exec --no-startup-id "~/.config/i3/oathmenu"
 bindsym $mod+u exec --no-startup-id "~/.config/i3/screenlayoutmenu"
 bindsym $mod+i exec --no-startup-id "rofi -show ssh"
-bindsym $mod+o exec --no-startup-id "rofi -show run -lines 5"
+bindsym $mod+o exec --no-startup-id "rofi -show run -lines 15"
 bindsym $mod+p exec --no-startup-id "~/.config/i3/projectmenu"
 
 # Dropdowns
