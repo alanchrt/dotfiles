@@ -1,0 +1,25 @@
+---
+- name: Configure loop module for startup
+  become: yes
+  copy:
+    src: loop.conf
+    dest: /etc/modules-load.d/loop.conf
+
+- name: Load loop module
+  become: yes
+  modprobe:
+    name: loop
+    state: present
+
+- name: Install docker
+  become: yes
+  pacman:
+    name: docker
+    state: present
+
+- name: Enable docker
+  become: yes
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
