@@ -1,0 +1,6 @@
+Cmnd_Alias VAGRANT_EXPORTS_CHOWN = /usr/bin/chown 0\:0 /tmp/*
+Cmnd_Alias VAGRANT_EXPORTS_MV = /usr/bin/mv -f /tmp/* /etc/exports
+Cmnd_Alias VAGRANT_NFSD_CHECK = /usr/bin/systemctl status --no-pager nfs-server.service
+Cmnd_Alias VAGRANT_NFSD_START = /usr/bin/systemctl start nfs-server.service
+Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
+%vagrant ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY

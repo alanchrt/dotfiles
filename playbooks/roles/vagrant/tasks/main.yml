@@ -24,3 +24,22 @@
     src: /etc/manjaro-release
     dest: /etc/arch-release
     state: link
+
+- name: Create vagrant group
+  become: yes
+  group:
+    name: vagrant
+    state: present
+
+- name: Add current user to the vagrant group
+  become: yes
+  user:
+    name: "{{ansible_env.USER}}"
+    groups: vagrant
+    append: yes
+
+- name: Provide vagrant group sudo access for NFS
+  become: yes
+  copy:
+    src: vagrant-syncedfolders
+    dest: /etc/sudoers.d/vagrant-syncedfolders
