@@ -74,6 +74,7 @@ mode "RESIZE" {
 }
 
 # Layout
+workspace_layout tabbed
 bindsym $mod+e layout default
 bindsym $mod+w layout tabbed
 
