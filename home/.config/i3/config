@@ -36,7 +36,7 @@ bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Control+e exec --no-startup-id emacsclient -c
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
 bindsym $mod+Control+s exec --no-startup-id gnome-screenshot -i
-bindsym $mod+Control+n exec --no-startup-id emacs ~/Dropbox/Notes -T orgnotes
+bindsym $mod+Control+n exec --no-startup-id emacsclient -c ~/Dropbox/Notes -F "((class . \"orgnotes\"))" "$@"
 bindsym $mod+Control+m exec --no-startup-id pavucontrol
 
 # State
@@ -200,5 +200,5 @@ exec_always --no-startup-id fix_xcursor
 exec --no-startup-id ~/.i3_local
 
 # Desktop applications
-exec --no-startup-id emacs ~/Dropbox/Notes -T orgnotes
+exec --no-startup-id emacsclient -c ~/Dropbox/Notes -F "((class . \"orgnotes\"))" "$@"
 exec --no-startup-id google-chrome-stable
