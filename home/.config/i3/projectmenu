@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -e
-path=$(find $HOME -type d | rofi -dmenu -i -p "project:" $@)
+path=$(printf '%s\n' ~/Workspaces/*/code/* | rofi -dmenu -i -p "project:" $@)
 session=$(echo $(basename $path) | sed -r 's/\./_/g')
 termite -d $path -e "sh -c 'byobu new-session -s $session || byobu attach-session -t $session'"
