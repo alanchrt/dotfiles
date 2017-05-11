@@ -16,4 +16,4 @@
   with_items:
     - set t_ut=
     - set background=dark
-    - colorscheme industry
+    - colorscheme elflord

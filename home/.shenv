@@ -11,7 +11,7 @@ if [ -t 0 ]; then
 fi
 
 # Use full color
-export TERM=xterm-256color
+export TERM=xterm
 
 # Syntax highlighting
 export HIGHLIGHT_CMD="emacs --batch -l ~/.local/share/highlight.el --theme base16-tomorrow-night 2> /dev/null"
@@ -21,7 +21,7 @@ export "LESS=-R"
 # Set default editors
 export ALTERNATE_EDITOR=''
 export EDITOR='vim'
-export VISUAL='emacs'
+export VISUAL='emacsclient -c'
 
 # Use gnome keyring
 if [ "$DESKTOP_SESSION" = "i3" ]; then

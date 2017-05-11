@@ -20,9 +20,6 @@ alias gp="gist -p"
 # Editor
 alias se='sudoedit'
 
-# Use proper terminal for weechat
-alias wee='TERM=screen-256color weechat'
-
 # Python
 alias py='python'
 alias ipy='ipython'
