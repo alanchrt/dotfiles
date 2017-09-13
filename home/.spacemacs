@@ -39,7 +39,8 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      ansible
-     auto-completion
+     (auto-completion :variables
+                      auto-completion-return-key-behavior nil)
      better-defaults
      django
      emacs-lisp
