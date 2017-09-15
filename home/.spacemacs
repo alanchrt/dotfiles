@@ -334,6 +334,7 @@ you should place your code here."
   (setq initial-buffer-choice "./")
   (setq neo-theme 'nerd)
   (setq neo-show-hidden-files nil)
+  (setq-default git-magit-status-fullscreen t)
 
   (load-library "find-lisp")
   (setq org-agenda-files
