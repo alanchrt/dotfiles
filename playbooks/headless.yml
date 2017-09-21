@@ -24,6 +24,7 @@
     - ngrok
     - hugo
     - jekyll
+    - pandoc
 
 - name: Configure dev environment
   hosts: all
