@@ -46,3 +46,15 @@
     - pushstate-server
     - vmd
     - "@storybook/cli"
+
+- name: Increase file watchers limit
+  become: yes
+  copy:
+    src: 99-sysctl.conf
+    dest: /etc/sysctl.d/99-sysctl.conf
+  register: increase_watchers
+
+- name: Restart sysctl
+  become: yes
+  shell: "sysctl --system"
+  when: increase_watchers.changed
