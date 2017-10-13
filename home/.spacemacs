@@ -330,6 +330,7 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+  (setq create-lockfiles nil)
   (setq powerline-default-separator nil)
   (setq initial-buffer-choice "./")
   (setq neo-theme 'nerd)
