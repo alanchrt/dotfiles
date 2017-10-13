@@ -21,7 +21,7 @@ export "LESS=-R"
 # Set default editors
 export ALTERNATE_EDITOR=''
 export EDITOR='vim'
-export VISUAL='emacsclient -c'
+export VISUAL='emacs'
 
 # Use gnome keyring
 if [ "$DESKTOP_SESSION" = "i3" ]; then
