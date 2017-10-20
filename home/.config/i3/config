@@ -150,7 +150,7 @@ bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
 # Floating windows
 for_window [class="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
 for_window [class="qalc"] floating enable, sticky enable, border none, resize set 800 120, move absolute position 0 0
-for_window [title="orgnotes"] floating enable, sticky enable, border none, resize set 1000 750, move absolute position 0 0, move scratchpad
+for_window [title="orgnotes"] floating enable, sticky enable, border none, resize set 1000 750, move absolute position 0 0, move scratchpad, scratchpad show
 for_window [class="Pavucontrol"] floating enable
 for_window [class="Pcmanfm"] floating enable
 
