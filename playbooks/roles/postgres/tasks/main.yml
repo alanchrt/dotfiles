@@ -5,3 +5,17 @@
           state=present
   with_items:
     - postgresql
+
+- name: Initialize database cluster
+  become: yes
+  shell: "su - postgres -c \"initdb --locale en_US.UTF-8 -D '/var/lib/postgres/data'\""
+  args:
+    executable: /bin/bash
+    creates: /var/lib/postgres/data/PG_VERSION
+
+- name: Start PostgreSQL
+  become: yes
+  systemd:
+    name: postgresql
+    enabled: yes
+    state: started
