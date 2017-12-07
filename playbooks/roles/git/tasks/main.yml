@@ -11,3 +11,8 @@
   yaourt:
     name: git-lfs-bin
     state: present
+
+- name: Install deepgit
+  yaourt:
+    name: deepgit
+    state: present
