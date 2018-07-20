@@ -28,7 +28,6 @@ install_oh_my_zsh() {
     echo "Installing oh-my-zsh..."
     mkdir -p $HOME/.zsh-custom/plugins
     clone_or_pull_repo robbyrussell/oh-my-zsh .oh-my-zsh
-    clone_or_pull_repo lukechilds/zsh-nvm .zsh-custom/plugins/zsh-nvm
     clone_or_pull_repo zsh-users/zsh-syntax-highlighting .zsh-custom/plugins/zsh-syntax-highlighting
 }
 

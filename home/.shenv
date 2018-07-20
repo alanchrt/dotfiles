@@ -54,15 +54,4 @@ export PATH=$PATH:/opt/android-sdk/tools:/opt/android-sdk/tools:/opt/android-sdk
 # Add ruby gems to path
 PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
 
-# Set default node paths for things that need them before lazy-load (like emacs)
-follow_nvm_alias () {
-    version=`cat $HOME/.nvm/alias/$1`
-    if [ -e "$HOME/.nvm/alias/$version" ]
-    then
-        follow_nvm_alias $version
-    else
-        echo $version
-    fi
-}
-export DEFAULT_NODE_VERSION=`follow_nvm_alias default`
 export PATH=$HOME/.nvm/versions/node/$DEFAULT_NODE_VERSION/bin:$PATH
