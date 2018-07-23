@@ -58,6 +58,14 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
+  # Include fonts.
+  fonts.fonts = with pkgs; [
+    noto-fonts
+    noto-fonts-cjk
+    noto-fonts-emoji
+    ubuntu_font_family
+  ];
+
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
