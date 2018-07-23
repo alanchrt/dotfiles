@@ -183,7 +183,6 @@ bar {
 # Startup scripts
 exec --no-startup-id nitrogen --restore; sleep 1; compton -b --config ~/.config/compton.conf
 exec --no-startup-id nm-applet
-exec --no-startup-id xfce4-power-manager
 exec --no-startup-id xautolock -secure -time 3 -corners -000 -locker blurlock
 exec --no-startup-id unclutter
 exec --no-startup-id pcmanfm -d

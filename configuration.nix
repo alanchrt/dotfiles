@@ -65,6 +65,9 @@
   sound.enable = true;
   hardware.pulseaudio.enable = true;
 
+  # Enable power management.
+  services.tlp.enable = true;
+
   services.xserver = {
     # Enable the X11 windowing system.
     enable = true;
