@@ -38,7 +38,7 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    python3 python36Packages.virtualenv python36Packages.virtualenvwrapper nodejs-9_x ruby pcmanfm wget whois xclip xautolock i3lock-fancy dunst nitrogen dropbox compton networkmanagerapplet pavucontrol i3blocks acpi sysstat unclutter rofi flameshot termite git byobu tmux tmate vim emacs jq httpie chromium virtualbox minikube kubectl kubernetes-helm nfs-utils redshift yubioath-desktop yubikey-manager libqalculate aws zathura
+    python3 python36Packages.virtualenv python36Packages.virtualenvwrapper nodejs-9_x ruby pcmanfm wget whois xclip xautolock i3lock-fancy dunst notify-desktop nitrogen dropbox compton networkmanagerapplet pavucontrol i3blocks acpi sysstat unclutter rofi flameshot termite git byobu tmux tmate vim emacs jq httpie chromium virtualbox minikube kubectl kubernetes-helm nfs-utils redshift yubioath-desktop yubikey-manager libqalculate aws zathura
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
