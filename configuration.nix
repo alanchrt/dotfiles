@@ -110,12 +110,15 @@
   users.extraUsers.alan = {
     isNormalUser = true;
     uid = 1000;
-    extraGroups = [ "wheel" "networkmanager" "adbusers" ];
+    extraGroups = [ "wheel" "networkmanager" "docker" "adbusers" ];
     shell = pkgs.zsh;
   };
 
   # Android devices.
   programs.adb.enable = true;
+
+  # Enable docker
+  virtualisation.docker.enable = true;
 
   # This value determines the NixOS release with which your system is to be
   # compatible, in order to avoid breaking some software such as database
