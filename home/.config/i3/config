@@ -197,4 +197,3 @@ exec --no-startup-id ~/.i3_local
 
 # Desktop applications
 exec --no-startup-id emacs -l /home/alan/Dropbox/Notes/start.el --title "orgnotes"
-exec --no-startup-id wavebox
