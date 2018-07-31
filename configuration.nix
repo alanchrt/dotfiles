@@ -41,7 +41,7 @@
     acpi
     ag
     ardour
-    aws
+    awscli
     byobu
     chromium
     compton
