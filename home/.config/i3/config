@@ -34,7 +34,7 @@ bindsym $mod+n exec --no-startup-id termite -e 'qalc' --class='qalc' --config ~/
 # Software
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
-bindsym $mod+Control+n exec --no-startup-id emacs -l /home/alan/Dropbox/Notes/start.el --title "orgnotes"
+bindsym $mod+Control+n exec --no-startup-id ~/.config/i3/orgnotes
 bindsym $mod+Control+m exec --no-startup-id pavucontrol
 
 # State
@@ -195,6 +195,3 @@ exec_always --no-startup-id fix_xcursor
 
 # Local scripts
 exec --no-startup-id ~/.i3_local
-
-# Desktop applications
-exec --no-startup-id emacs -l /home/alan/Dropbox/Notes/start.el --title "orgnotes"

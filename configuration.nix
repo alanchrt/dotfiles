@@ -125,6 +125,9 @@
   # Enable power management.
   services.tlp.enable = true;
 
+  # Enable emacs daemon
+  services.emacs.enable = true;
+
   services.xserver = {
     # Enable the X11 windowing system.
     enable = true;
