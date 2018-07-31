@@ -35,6 +35,7 @@ bindsym $mod+n exec --no-startup-id termite -e 'qalc' --class='qalc' --config ~/
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Control+f exec --no-startup-id pcmanfm
 bindsym $mod+Control+n exec --no-startup-id ~/.config/i3/orgnotes
+bindsym $mod+Control+s exec --no-startup-id flameshot gui
 bindsym $mod+Control+m exec --no-startup-id pavucontrol
 
 # State
