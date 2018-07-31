@@ -106,6 +106,7 @@
 
   # Include fonts.
   fonts.fonts = with pkgs; [
+    font-awesome_5
     noto-fonts
     noto-fonts-emoji
     ubuntu_font_family

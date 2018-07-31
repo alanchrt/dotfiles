@@ -35,11 +35,11 @@ $percent = $2;
 $full_text = "$percent%";
 
 if ($status eq 'Discharging') {
-	$full_text = " $full_text";
+	$full_text = " $full_text";
 } elsif ($status eq 'Charging') {
-	$full_text = "⚡ $full_text";
+	$full_text = " $full_text";
 } else {
-    $full_text = "🔌 $full_text";
+  $full_text = " $full_text";
 }
 
 $short_text = $full_text;
