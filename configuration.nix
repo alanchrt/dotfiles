@@ -65,6 +65,7 @@
     notify-desktop
     pavucontrol
     pcmanfm
+    python
     python3
     python36Packages.virtualenv
     python36Packages.virtualenvwrapper
