@@ -49,6 +49,7 @@
     dunst
     emacs
     flameshot
+    gist
     git
     httpie
     i3blocks
@@ -60,6 +61,7 @@
     minikube
     networkmanagerapplet
     nfs-utils
+    ngrok-1
     nitrogen
     nodejs-9_x
     notify-desktop
