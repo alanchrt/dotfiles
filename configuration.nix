@@ -83,6 +83,7 @@
     virtualbox
     wget
     whois
+    wmctrl
     xautolock
     xclip
     yubikey-manager

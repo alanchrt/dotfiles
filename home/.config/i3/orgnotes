@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+org_window=$(wmctrl -l | awk '$4~/^orgnotes$/')
+
+if [ -z "$org_window" ]; then
+    emacsclient --create-frame --frame-parameters="'(name . \"orgnotes\"))" ~/Dropbox/Notes
+else
+    i3-msg '[title="orgnotes"] focus'
+fi
