@@ -71,9 +71,9 @@
     python3
     python36Packages.virtualenv
     python36Packages.virtualenvwrapper
-    rofi
     ranger
     redshift
+    rofi
     ruby
     sysstat
     termite
