@@ -34,7 +34,7 @@ bindsym $mod+n exec --no-startup-id termite -e 'qalc' --class='qalc' --config ~/
 # Software
 bindsym $mod+Return exec --no-startup-id termite
 bindsym $mod+Control+e exec --no-startup-id emacsclient -c ~/Workspaces
-bindsym $mod+Control+f exec --no-startup-id thunar
+bindsym $mod+Control+f exec --no-startup-id caja
 bindsym $mod+Control+n exec --no-startup-id ~/.config/i3/orgnotes
 bindsym $mod+Control+s exec --no-startup-id flameshot gui
 bindsym $mod+Control+m exec --no-startup-id pavucontrol

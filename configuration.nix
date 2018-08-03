@@ -60,6 +60,7 @@
     kubectl
     kubernetes-helm
     libqalculate
+    mate.caja
     minikube
     networkmanagerapplet
     nfs-utils
@@ -89,7 +90,6 @@
     wmctrl
     xautolock
     xclip
-    xfce.thunar
     yubikey-manager
     yubioath-desktop
     zathura
