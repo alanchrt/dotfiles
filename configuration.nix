@@ -40,6 +40,7 @@
   environment.systemPackages = with pkgs; [
     acpi
     ag
+    arc-icon-theme
     arc-theme
     ardour
     awscli
