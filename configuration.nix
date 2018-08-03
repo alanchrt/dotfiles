@@ -72,6 +72,7 @@
     python36Packages.virtualenv
     python36Packages.virtualenvwrapper
     rofi
+    ranger
     redshift
     ruby
     sysstat
