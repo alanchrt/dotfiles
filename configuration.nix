@@ -66,7 +66,6 @@
     nodejs-9_x
     notify-desktop
     pavucontrol
-    pcmanfm
     python
     python3
     python36Packages.virtualenv
@@ -79,6 +78,7 @@
     termite
     tmate
     tmux
+    udiskie
     unclutter
     vim
     virtualbox
@@ -87,6 +87,7 @@
     wmctrl
     xautolock
     xclip
+    xfce.thunar
     yubikey-manager
     yubioath-desktop
     zathura
