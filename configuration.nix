@@ -52,6 +52,7 @@
     emacs
     firefox
     flameshot
+    gimp
     gist
     git
     gnumake
