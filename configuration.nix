@@ -59,6 +59,7 @@
     gnumake
     gopass
     httpie
+    hugo
     i3blocks
     i3lock-fancy
     jq
