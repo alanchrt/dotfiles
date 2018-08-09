@@ -50,6 +50,7 @@
     dropbox
     dunst
     emacs
+    firefox
     flameshot
     gist
     git
