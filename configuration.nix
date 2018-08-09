@@ -91,6 +91,7 @@
     rofi
     ruby
     sysstat
+    tectonic
     termite
     tmate
     tmux
