@@ -147,6 +147,9 @@
   # Enable emacs daemon
   services.emacs.enable = true;
 
+  # Enable NFS.
+  services.nfs.server.enable = true;
+
   services.xserver = {
     # Enable the X11 windowing system.
     enable = true;
