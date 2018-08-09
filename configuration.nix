@@ -57,6 +57,7 @@
     git
     git-lfs
     gnumake
+    gopass
     httpie
     i3blocks
     i3lock-fancy
