@@ -55,6 +55,7 @@
     gimp
     gist
     git
+    git-lfs
     gnumake
     httpie
     i3blocks
