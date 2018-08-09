@@ -77,6 +77,7 @@
     nmap
     nodejs-9_x
     notify-desktop
+    openjdk
     pavucontrol
     python
     python3
