@@ -144,7 +144,7 @@
   # Enable power management.
   services.tlp.enable = true;
 
-  # Enable emacs daemon
+  # Enable emacs daemon.
   services.emacs.enable = true;
 
   # Enable NFS.
