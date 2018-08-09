@@ -63,6 +63,7 @@
     i3blocks
     i3lock-fancy
     inkscape
+    # insomnia bin was in wrong path?
     jq
     kubectl
     kubernetes-helm
