@@ -62,6 +62,7 @@
     hugo
     i3blocks
     i3lock-fancy
+    inkscape
     jq
     kubectl
     kubernetes-helm
