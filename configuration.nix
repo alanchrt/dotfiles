@@ -78,6 +78,7 @@
     pavucontrol
     python
     python3
+    python36Packages.ipython
     python36Packages.virtualenv
     python36Packages.virtualenvwrapper
     ranger
