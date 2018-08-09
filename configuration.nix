@@ -43,6 +43,7 @@
     arc-icon-theme
     arc-theme
     ardour
+    autoflake
     awscli
     byobu
     chromium
@@ -82,10 +83,13 @@
     pavucontrol
     python
     python3
+    python36Packages.flake8
     python36Packages.i3-py
     python36Packages.ipython
+    python36Packages.pip
     python36Packages.virtualenv
     python36Packages.virtualenvwrapper
+    python36Packages.yapf
     ranger
     redshift
     rofi
