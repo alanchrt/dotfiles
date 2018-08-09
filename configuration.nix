@@ -53,6 +53,7 @@
     flameshot
     gist
     git
+    gnumake
     httpie
     i3blocks
     i3lock-fancy
@@ -66,6 +67,7 @@
     nfs-utils
     ngrok-1
     nitrogen
+    nmap
     nodejs-9_x
     notify-desktop
     pavucontrol
@@ -85,6 +87,7 @@
     unclutter
     vim
     virtualbox
+    wavemon
     wget
     whois
     wmctrl
