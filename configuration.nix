@@ -151,6 +151,12 @@
   # Enable NFS.
   services.nfs.server.enable = true;
 
+  # Enable MySQL.
+  services.mysql = {
+    enable = true;
+    package = pkgs.mysql;
+  };
+
   services.xserver = {
     # Enable the X11 windowing system.
     enable = true;
