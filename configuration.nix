@@ -99,6 +99,7 @@
     termite
     tmate
     tmux
+    ttyrec
     udiskie
     unclutter
     vim
