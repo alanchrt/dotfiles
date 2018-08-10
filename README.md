@@ -29,7 +29,7 @@ The following command will configure NixOS, rebuild it, create a user named `ala
 
 <!-- TODO NIXOS-BRANCH change the path to the bootstrap script after master merge -->
 ```
-bash <(https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
+bash <(curl https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
 ```
 
 ### Configure credentials
