@@ -1,4 +1,0 @@
----
-- name: Install gopass
-  yaourt: name=gopass
-          state=present

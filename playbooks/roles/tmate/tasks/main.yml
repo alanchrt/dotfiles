@@ -1,6 +1,0 @@
-
----
-- name: Install tmate
-  yaourt: 
-    name: tmate
-    state: present

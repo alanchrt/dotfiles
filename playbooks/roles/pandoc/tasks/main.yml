@@ -1,6 +1,0 @@
----
-- name: Install pandoc
-  become: yes
-  pacman:
-    name: pandoc
-    state: present

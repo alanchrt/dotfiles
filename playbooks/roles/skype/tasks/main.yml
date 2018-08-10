@@ -1,4 +1,0 @@
----
-- name: Install Skype
-  yaourt: name=skype
-          state=present

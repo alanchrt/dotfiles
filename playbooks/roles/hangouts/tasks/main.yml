@@ -1,4 +1,0 @@
----
-- name: Install Google Talk plugin
-  yaourt: name=google-talkplugin
-          state=present

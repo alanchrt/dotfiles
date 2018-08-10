@@ -1,4 +1,0 @@
----
-- name: Install f.lux
-  yaourt: name=xflux-gui-git
-          state=present

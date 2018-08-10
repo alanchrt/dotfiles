@@ -1,4 +1,0 @@
----
-- name: Install insomnia
-  yaourt: name=insomnia
-          state=present

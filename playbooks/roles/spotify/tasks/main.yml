@@ -1,4 +1,0 @@
----
-- name: Install Spotify
-  yaourt: name=spotify
-          state=present

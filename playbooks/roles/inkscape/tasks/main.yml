@@ -1,6 +1,0 @@
----
-- name: Install Inkscape
-  become: yes
-  pacman:
-    name: inkscape
-    state: present

@@ -1,8 +1,0 @@
----
-- name: Install zathura
-  yaourt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - zathura
-    - zathura-pdf-mupdf

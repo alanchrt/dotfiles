@@ -1,8 +1,0 @@
----
-- name: Install jekyll
-  gem:
-    name: "{{item}}"
-    state: present
-  with_items:
-    - jekyll
-    - bundler

@@ -1,5 +1,0 @@
----
-- name: Install xclip
-  become: yes
-  pacman: name=xclip
-          state=present
