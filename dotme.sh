@@ -110,6 +110,17 @@ configure_i3() {
     link_file .Xresources .Xresources
 }
 
+configure_gtk() {
+    echo "Configuring GTK..."
+    link_file .gtkrc-2.0 .gtkrc-2.0
+    link_directory .config/gtk-3.0 .config/gtk-3.0
+}
+
+configure_qt() {
+    echo "Configuring Qt..."
+    link_file .config/Trolltech.conf .config/Trolltech.conf
+}
+
 set -e
 
 install_oh_my_zsh
@@ -125,6 +136,8 @@ configure_emacs
 configure_python
 configure_node
 configure_i3
+configure_gtk
+configure_qt
 
 touch $HOME/.dotted
 echo "Done."
