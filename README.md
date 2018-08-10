@@ -1,10 +1,10 @@
 ## Overview
 
-This is NixOS, i3, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
+This is my NixOS, i3, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
 ![dotfiles screenshot](screenshot.png)
 
-The system requires a base [NixOS](https://nixos.org) before install. Note that by default a user named `alan` is configured. You will need to fork this repo and configure for your own user.
+The system requires a base [NixOS](https://nixos.org) before install. Note that, by default, a user named `alan` is configured. You will need to fork this repo and configure for your own user.
 
 Here are some references for getting around the system:
 
@@ -25,11 +25,11 @@ You may prefer to test out this setup in a virtual machine (on [VirtualBox](http
 
 ### Bootstrap this configuration
 
-The following command will configure NixOS, rebuild it, create a user named `alan`, and configure dotfiles from this repo for that user.
+The following command will configure NixOS, rebuild it, create a user named `alan`, and configure dotfiles from this repo for that user. It will need to be run as root (kids, don't try this at home) after the base system installation.
 
 <!-- TODO NIXOS-BRANCH change the path to the bootstrap script after master merge -->
 ```
-$ bash <(https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
+# bash <(https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
 ```
 
 ### Configure credentials
