@@ -1,14 +1,13 @@
 ## Overview
 
-This is my Arch Linux, Byobu, Oh-my-zsh, and Spacemacs setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
+This is NixOS, i3, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
 ![dotfiles screenshot](screenshot.png)
 
-The system requires [Manjaro Linux](https://manjaro.org/) (specifically [Manjaro i3](https://sourceforge.net/projects/manjaro-i3/files/)) as a base, then uses Ansible to provision additional software and configuration on top.
+The system requires a base [NixOS](https://nixos.org) before install. Note that by default a user named `alan` is configured. You will need to fork this repo and configure for your own user.
 
 Here are some references for getting around the system:
 
-- **[Ansible roles](playbooks/roles) -** Software and configuration
 - **[i3 config](home/.config/i3/config) -** Desktop keybindings
 - **[Spacemacs documentation](http://spacemacs.org/doc/DOCUMENTATION.html) -** Development experience
 - **[Byobu man page](http://manpages.ubuntu.com/manpages/zesty/en/man1/byobu.1.html#contenttoc8) -** Tmux keybindings
@@ -18,34 +17,22 @@ Here are some references for getting around the system:
 
 You may prefer to test out this setup in a virtual machine (on [VirtualBox](https://www.virtualbox.org/) or friends) before committing to an install on your host machine.
 
-### Base system setup
+### Set up the base system
 
-1. Download [the latest Manjaro i3 ISO](https://sourceforge.net/projects/manjaro-i3/files/).
+1. Download [the latest NixOS Installer ISO](https://nixos.org/nixos/download.html).
 2. Create bootable media for your machine or attach as bootable storage to a fresh VM.
-3. Boot into the image and use Calamares to complete the Manjaro i3 installation.
+3. Boot into the image and complete the installation. You may need to refer to the [NixOS Manual](https://nixos.org/nixos/manual/index.html#sec-installation).
 
-### Dotfiles installation
+### Bootstrap this configuration
 
-1. Install Ansible and Git:
+The following command will configure NixOS, rebuild it, create a user named `alan`, and configure dotfiles from this repo for that user.
 
-    ```
-    $ sudo pacman -S ansible git
-    ```
+<!-- TODO NIXOS-BRANCH change the path to the bootstrap script after master merge -->
+```
+$ bash <(https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
+```
 
-2. Clone this repo:
-
-    ```
-    $ git clone https://github.com/alanctkc/dotfiles.git ~/.config/dotfiles
-    ```
-
-3. Run the Ansible playbook:
-
-    ```
-    $ cd ~/.config/dotfiles
-    $ ./provision-local.sh
-    ```
-
-### Credentials
+### Configure credentials
 
 There are a few logins that might be worth setting up right off the bat if needed.
 
