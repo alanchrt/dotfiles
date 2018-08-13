@@ -5,6 +5,7 @@ rebuild_nixos() {
     # TODO NIXOS-BRANCH update this path after master merge
     curl https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/configuration.nix > /tmp/configuration.nix
     mv -f /tmp/configuration.nix /etc/nixos/configuration.nix
+    nixos-generate-config --show-hardware-config > /etc/nixos/hardware-configuration.nix
     nixos-rebuild switch
 }
 
