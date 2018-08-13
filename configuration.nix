@@ -81,6 +81,7 @@
     notify-desktop
     openjdk
     pavucontrol
+    peek
     pencil
     python
     python3
