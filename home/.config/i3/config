@@ -122,7 +122,7 @@ bindsym $mod+Control+Right mode "$mode_reboot"
 # Shut down mode
 set $mode_shutdown MOD+CTRL+SPACE TO SHUTDOWN
 mode "$mode_shutdown" {
-    bindsym $mod+Control+space exec --no-startup-id i3exit shutdown, mode "default"
+    bindsym $mod+Control+space exec --no-startup-id systemctl poweroff, mode "default"
     bindsym n mode "default"
     bindsym Escape mode "default"
     bindsym Return mode "default"
@@ -131,7 +131,7 @@ mode "$mode_shutdown" {
 # Reboot mode
 set $mode_reboot MOD+CTRL+SPACE TO REBOOT
 mode "$mode_reboot" {
-    bindsym $mod+Control+space exec --no-startup-id i3exit reboot, mode "default"
+    bindsym $mod+Control+space exec --no-startup-id systemctl reboot, mode "default"
     bindsym n mode "default"
     bindsym Escape mode "default"
     bindsym Return mode "default"
