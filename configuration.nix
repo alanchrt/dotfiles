@@ -59,6 +59,7 @@
     git-lfs
     gnumake
     gopass
+    hsetroot
     httpie
     hugo
     i3blocks
@@ -75,7 +76,6 @@
     networkmanagerapplet
     nfs-utils
     ngrok-1
-    nitrogen
     nmap
     nodejs-9_x
     notify-desktop

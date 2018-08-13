@@ -6,13 +6,13 @@ set $mod Mod4
 floating_modifier $mod
 
 # Borders
-new_window pixel 1
+new_window pixel 2
 new_float none
 hide_edge_borders none
 smart_borders on
 
 # Gaps
-gaps inner 10
+gaps inner 8
 gaps outer -4
 smart_gaps on
 
@@ -155,8 +155,9 @@ for_window [title="orgnotes"] floating enable, sticky enable, border none, resiz
 for_window [class="Pavucontrol"] floating enable
 
 # Colors
-#               border  bg      text
-client.focused  #2AA198 #16A085 #F9FAF9
+#                border  bg      text
+client.focused   #2aa198 #2aa198 #f9faf9
+client.unfocused #454947 #2c2c2b #f9faf9
 
 # Workspace bar
 bar {
@@ -182,7 +183,8 @@ bar {
 }
 
 # Startup scripts
-exec --no-startup-id nitrogen --restore; sleep 1; compton -b --config ~/.config/compton.conf
+exec --no-startup-id sleep 1; compton -b --config ~/.config/compton.conf
+exec --no-startup-id hsetroot -solid '#555555'
 exec --no-startup-id dunst
 exec --no-startup-id nm-applet
 exec --no-startup-id xautolock -secure -time 3 -corners -000 -locker i3lock-fancy -f Ubuntu-Mono
