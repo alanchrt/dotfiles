@@ -37,6 +37,7 @@ bindsym $mod+Control+e exec --no-startup-id emacsclient -c ~/Workspaces
 bindsym $mod+Control+f exec --no-startup-id caja
 bindsym $mod+Control+n exec --no-startup-id ~/.config/i3/orgnotes
 bindsym $mod+Control+s exec --no-startup-id flameshot gui
+bindsym $mod+Control+p exec --no-startup-id peek
 bindsym $mod+Control+m exec --no-startup-id pavucontrol
 
 # State
@@ -152,6 +153,7 @@ bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
 for_window [class="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
 for_window [class="qalc"] floating enable, sticky enable, border none, resize set 800 120, move absolute position 0 0
 for_window [title="orgnotes"] floating enable, sticky enable, border none, resize set 1000 750, move absolute position 0 0, move scratchpad, scratchpad show
+for_window [title="Peek"] floating enable, move scratchpad, scratchpad show
 for_window [class="Pavucontrol"] floating enable
 
 # Colors
