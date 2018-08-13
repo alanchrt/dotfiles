@@ -29,5 +29,3 @@ set -e
 
 rebuild_nixos
 install_dotfiles
-
-echo "Done."
