@@ -59,6 +59,7 @@
     git-lfs
     gnumake
     gopass
+    # heroku (broken)
     hsetroot
     httpie
     hugo
@@ -82,7 +83,7 @@
     openjdk
     pavucontrol
     peek
-    pencil
+    # pencil (broken)
     python
     python3
     python36Packages.flake8
@@ -96,6 +97,7 @@
     redshift
     rofi
     ruby
+    # skypeforlinux (broken)
     sysstat
     tectonic
     termite
@@ -105,6 +107,7 @@
     udiskie
     unclutter
     vim
+    # vimiv (broken)
     virtualbox
     wavemon
     wget
