@@ -81,6 +81,7 @@
     notify-desktop
     openjdk
     pavucontrol
+    pencil
     python
     python3
     python36Packages.flake8
