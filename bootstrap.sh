@@ -9,6 +9,13 @@ rebuild_nixos() {
     nixos-rebuild switch
 }
 
+setup_home() {
+    echo "Setting up home directory structure..."
+    mkdir -p /home/alan/Downloads
+    mkdir -p /home/alan/Dropbox/Notes
+    mkdir -p /home/alan/Workspaces
+}
+
 install_dotfiles() {
     echo "Installing dotfiles..."
     su alan -c 'mkdir -p /home/alan/.config'
@@ -28,4 +35,5 @@ install_dotfiles() {
 set -e
 
 rebuild_nixos
+setup_home
 install_dotfiles
