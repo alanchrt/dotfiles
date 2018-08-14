@@ -112,7 +112,6 @@
     viewnior
     vim
     # vimiv (broken)
-    virtualbox
     wavemon
     wget
     whois
@@ -206,12 +205,15 @@
   users.extraUsers.alan = {
     isNormalUser = true;
     uid = 1000;
-    extraGroups = [ "wheel" "networkmanager" "docker" "adbusers" ];
+    extraGroups = [ "wheel" "networkmanager" "docker" "vboxusers" "adbusers" ];
     shell = pkgs.zsh;
   };
 
   # Android devices.
   programs.adb.enable = true;
+
+  # Enable virtualbox
+  virtualisation.virtualbox.host.enable = true;
 
   # Enable docker
   virtualisation.docker.enable = true;
