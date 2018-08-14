@@ -212,10 +212,10 @@
   # Android devices.
   programs.adb.enable = true;
 
-  # Enable virtualbox
+  # Enable virtualbox.
   virtualisation.virtualbox.host.enable = true;
 
-  # Enable docker
+  # Enable docker.
   virtualisation.docker.enable = true;
 
   # This value determines the NixOS release with which your system is to be
