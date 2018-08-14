@@ -98,6 +98,7 @@
     redshift
     rofi
     ruby
+    shared-mime-info
     # skypeforlinux (broken)
     sysstat
     tectonic
