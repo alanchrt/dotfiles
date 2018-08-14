@@ -53,7 +53,6 @@
     emacs
     firefox
     flameshot
-    gimp
     gist
     git
     git-lfs
@@ -84,6 +83,7 @@
     pavucontrol
     peek
     # pencil (broken)
+    pinta
     python
     python3
     python36Packages.flake8
