@@ -59,6 +59,7 @@
     gnumake
     gopass
     # heroku (broken)
+    hicolor-icon-theme
     hsetroot
     httpie
     hugo
