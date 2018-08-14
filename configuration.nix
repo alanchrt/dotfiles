@@ -106,6 +106,7 @@
     ttyrec
     udiskie
     unclutter
+    viewnior
     vim
     # vimiv (broken)
     virtualbox
