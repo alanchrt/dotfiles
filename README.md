@@ -4,7 +4,7 @@ This is my NixOS, i3, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mne
 
 ![dotfiles screenshot](screenshot.png)
 
-The system requires a base [NixOS](https://nixos.org) before install. Note that, by default, a user named `alan` is configured. You will need to fork this repo and configure for your own user.
+The system requires a base [NixOS](https://nixos.org) system before install. Note that, by default, a user named `alan` is configured. You will need to fork this repo and configure for your own user.
 
 Here are some references for getting around the system:
 
@@ -30,6 +30,19 @@ The following command will configure NixOS, rebuild it, create a user named `ala
 <!-- TODO NIXOS-BRANCH change the path to the bootstrap script after master merge -->
 ```
 bash <(curl https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
+```
+
+If you're using the live CD/USB installer, you can mount your newly installed system and run the bootstrap against it using the `PREFIX` environment variable:
+
+<!-- TODO NIXOS-BRANCH change the path to the bootstrap script after master merge -->
+```
+PREFIX=/mnt bash <(curl https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
+```
+
+Set the new user's password:
+
+```
+passwd alan
 ```
 
 ### Configure credentials
