@@ -127,11 +127,6 @@ configure_default_apps() {
     link_file .config/user-dirs.dirs .config/user-dirs.dirs
 }
 
-configure_vimperator() {
-    echo "Configuring Vimperator..."
-    link_file .vimperatorrc .vimperatorrc
-}
-
 set -e
 
 install_oh_my_zsh
@@ -150,7 +145,6 @@ configure_i3
 configure_gtk
 configure_qt
 configure_default_apps
-configure_vimperator
 
 touch $HOME/.dotted
 echo "Done."
