@@ -1,0 +1,68 @@
+" UI
+set gui=nonavigation
+set focuscontent
+
+" Hints
+set hintchars=hjklasdfgyuiopqwertnmzxcvb
+highlight Hint -append color:#ffffff;background-color:#222222;
+
+" Bell
+set visualbell
+highlight Bell display: none
+
+" Keybindings
+noremap ~ <NOP>
+noremap <C-j> <NOP>
+noremap <C-k> <NOP>
+nmap <C-n> :tabnext<CR><Esc>
+nmap <C-p> :tabprevious<CR><Esc>
+imap <C-n> <Esc>:tabnext<CR><Esc>
+imap <C-p> <Esc>:tabprevious<CR><Esc>
+imap <C-o> <Esc>:back<CR><Esc>
+imap <C-i> <Esc>:forward<CR><Esc>
+imap <C-d> <Esc><C-d>
+imap <C-u> <Esc><C-u>
+
+" Browser settings
+set! beacon.enabled=false
+set! browser.cache.offline.enable=false
+set! browser.disableResetPrompt=true
+set! browser.download.dir=~/downloads
+set! browser.formfill.enable=false
+set! browser.link.open_newwindow.restriction=0
+set! browser.newtab.preload=false
+set! browser.newtabpage.enabled=false
+set! browser.newtabpage.enhanced=false
+set! browser.newtabpage.introShown=false
+set! browser.pocket.enabled=false
+set! browser.safebrowsing.appRepURL=
+set! browser.safebrowsing.enabled=false
+set! browser.safebrowsing.malware.enabled=false
+set! browser.search.suggest.enabled=false
+set! browser.selfsupport.url=
+set! browser.send_pings=false
+set! browser.shell.checkDefaultBrowser=false
+set! browser.startup.homepage=https://calendar.google.com/calendar/render
+set! browser.startup.homepage_override.mstone=9001.0.0
+set! datareporting.healthreport.service.enabled=false
+set! datareporting.healthreport.uploadEnabled=false
+set! datareporting.policy.dataSubmissionEnabled=false
+set! dom.battery.enabled=false
+set! extensions.autoDisableScopes=14
+set! extensions.getAddons.cache.enabled=false
+set! general.warnOnAboutConfig=false
+set! general.warnOnAboutConfig=false
+set! geo.enabled=false
+set! network.cookie.cookieBehavior=0
+set! network.cookie.lifetimePolicy=2
+set! network.dns.disablePrefetch=true
+set! network.prefetch-next=false
+set! privacy.donottrackheader.enabled=true
+set! privacy.donottrackheader.value=1
+set! privacy.trackingprotection.enabled=true
+set! privacy.trackingprotection.pbmode.enabled=true
+set! signon.rememberSignons=false
+set! toolkit.telemetry.enabled=false
+
+" Local settings
+source! .vimperatorrc.local
