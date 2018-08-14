@@ -121,9 +121,10 @@ configure_qt() {
     link_file .config/Trolltech.conf .config/Trolltech.conf
 }
 
-configure_mimeapps() {
-    echo "Configuring apps for mimetypes..."
+configure_default_apps() {
+    echo "Configuring default applications..."
     link_file .config/mimeapps.list .config/mimeapps.list
+    link_file .config/user-dirs.dirs .config/user-dirs.dirs
 }
 
 set -e
@@ -143,7 +144,7 @@ configure_node
 configure_i3
 configure_gtk
 configure_qt
-configure_mimeapps
+configure_default_apps
 
 touch $HOME/.dotted
 echo "Done."
