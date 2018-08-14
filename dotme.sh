@@ -121,6 +121,11 @@ configure_qt() {
     link_file .config/Trolltech.conf .config/Trolltech.conf
 }
 
+configure_mimeapps() {
+    echo "Configuring apps for mimetypes..."
+    link_file .config/mimeapps.list .config/mimeapps.list
+}
+
 set -e
 
 install_oh_my_zsh
@@ -138,6 +143,7 @@ configure_node
 configure_i3
 configure_gtk
 configure_qt
+configure_mimeapps
 
 touch $HOME/.dotted
 echo "Done."
