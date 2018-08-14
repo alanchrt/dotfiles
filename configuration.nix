@@ -100,6 +100,7 @@
     ruby
     shared-mime-info
     # skypeforlinux (broken)
+    spotify
     sysstat
     tectonic
     termite
