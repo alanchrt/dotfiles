@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-layout=$(find ~/.screenlayout -maxdepth 1 -type f -printf "%f\n" | cut -d. -f 1 | rofi -dmenu -i -p "screenlayout" $@)
+layout=$(find ~/.screenlayout -maxdepth 1 -type f -printf "%f\n" | cut -d. -f 1 | rofi -dmenu -matching fuzzy -i -p "screenlayout" $@)
 if [[ ! -z "${layout// }" ]]
 then
     sh -c "~/.screenlayout/$layout.sh"
