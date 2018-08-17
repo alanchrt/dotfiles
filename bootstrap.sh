@@ -18,9 +18,7 @@ rebuild_nixos() {
 
 configure_password() {
     echo "Configuring user password..."
-    if [ ! -z "$ROOT" ]; then
-        passwd --root "$ROOT" alan
-    fi
+    passwd --root "$ROOT" alan
 }
 
 activate_system() {
@@ -56,14 +54,14 @@ install_dotfiles() {
 set -e
 
 rebuild_nixos
-configure_password
 if [ -z "$ROOT" ]; then
+    configure_password
     activate_system
     export -f setup_home
     chroot "$ROOT" /run/current-system/sw/bin/bash -c "setup_home"
     export -f install_dotfiles
     chroot "$ROOT" /run/current-system/sw/bin/bash -c "install_dotfiles"
 else
-  setup_home
-  install_dotfiles
+    setup_home
+    install_dotfiles
 fi
