@@ -54,7 +54,7 @@ install_dotfiles() {
 set -e
 
 rebuild_nixos
-if [ -z "$ROOT" ]; then
+if [ ! -z "$ROOT" ]; then
     configure_password
     activate_system
     export -f setup_home
