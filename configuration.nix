@@ -19,6 +19,8 @@
   # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
 
+  boot.plymouth.enable = true;
+
   networking.hostName = "9480m"; # Define your hostname.
   networking.networkmanager.enable = true;
 
