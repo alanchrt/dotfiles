@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ROOT=${ROOT=:-}
+ROOT=${ROOT:-/mnt}
 
 rebuild_nixos() {
     echo "Rebuilding NixOS..."
@@ -9,11 +9,7 @@ rebuild_nixos() {
     mkdir -p $ROOT/etc/nixos
     mv -f /tmp/configuration.nix $ROOT/etc/nixos/configuration.nix
     nixos-generate-config --root "$ROOT" --show-hardware-config > $ROOT/etc/nixos/hardware-configuration.nix
-    if [ -z "$ROOT" ]; then
-        nixos-rebuild switch
-    else
-        nixos-install --root "$ROOT"
-    fi
+    nixos-install --root "$ROOT"
 }
 
 configure_password() {
@@ -21,18 +17,34 @@ configure_password() {
     passwd --root "$ROOT" alan
 }
 
+setup_home() {
+    echo "Setting up home directory structure..."
+    create_path $ROOT/home/alan/.gnupg
+    create_path $ROOT/home/alan/.config
+    create_path $ROOT/home/alan/Downloads
+    create_path $ROOT/home/alan/Dropbox/Notes
+    create_path $ROOT/home/alan/Workspaces
+}
+
+retrieve_dotfiles() {
+    echo "Retrieving dotfiles..."
+    which git || nix-env -f "<nixpkgs>" -iA git
+    if [ ! -d /home/alan/.config/dotfiles ]; then
+        git clone https://github.com/alanctkc/dotfiles.git /home/alan/.config/dotfiles
+    fi
+    # TODO NIXOS-BRANCH delete following two lines after master merge
+    git -C /home/alan/.config/dotfiles fetch origin nixos
+    git -C /home/alan/.config/dotfiles checkout nixos
+    git -C /home/alan/.config/dotfiles remote rm alanctkc || true
+    git -C /home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git
+    chown 1000:users /home/alan/.config/dotfiles
+}
+
 activate_system() {
     echo "Activating mounted NixOS system..."
     chroot $ROOT /nix/var/nix/profiles/system/activate
     mkdir -p $ROOT/home/alan/.gnupg
     chown 1000:users $ROOT/home/alan/.gnupg
-}
-
-setup_home() {
-    echo "Setting up home directory structure..."
-    su alan -c "mkdir -p /home/alan/Downloads"
-    su alan -c "mkdir -p /home/alan/Dropbox/Notes"
-    su alan -c "mkdir -p /home/alan/Workspaces"
 }
 
 install_dotfiles() {
@@ -54,14 +66,10 @@ install_dotfiles() {
 set -e
 
 rebuild_nixos
-if [ ! -z "$ROOT" ]; then
-    configure_password
-    activate_system
-    export -f setup_home
-    chroot "$ROOT" /run/current-system/sw/bin/bash -c "setup_home"
-    export -f install_dotfiles
-    chroot "$ROOT" /run/current-system/sw/bin/bash -c "install_dotfiles"
-else
-    setup_home
-    install_dotfiles
-fi
+configure_password
+setup_home
+activate_system
+export -f retrieve_dotfiles
+chroot "$ROOT" /run/current-system/sw/bin/bash -c "retrieve_dotfiles"
+export -f install_dotfiles
+chroot "$ROOT" /run/current-system/sw/bin/bash -c "install_dotfiles"

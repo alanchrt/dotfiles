@@ -13,3 +13,6 @@
     default = current
 [include]
     path = .gitconfig_local
+[user]
+	name = Alan Christopher Thomas
+	email = alan@tentmaker.co
