@@ -30,25 +30,25 @@ activate_system() {
 
 setup_home() {
     echo "Setting up home directory structure..."
-    su alan -c "mkdir -p $ROOT/home/alan/Downloads"
-    su alan -c "mkdir -p $ROOT/home/alan/Dropbox/Notes"
-    su alan -c "mkdir -p $ROOT/home/alan/Workspaces"
+    su alan -c "mkdir -p /home/alan/Downloads"
+    su alan -c "mkdir -p /home/alan/Dropbox/Notes"
+    su alan -c "mkdir -p /home/alan/Workspaces"
 }
 
 install_dotfiles() {
     echo "Installing dotfiles..."
-    su alan -c "mkdir -p $ROOT/home/alan/.config"
-    if [ ! -d $ROOT/home/alan/.config/dotfiles ]; then
-        su alan -c "git clone https://github.com/alanctkc/dotfiles.git $ROOT/home/alan/.config/dotfiles"
+    su alan -c "mkdir -p /home/alan/.config"
+    if [ ! -d /home/alan/.config/dotfiles ]; then
+        su alan -c "git clone https://github.com/alanctkc/dotfiles.git /home/alan/.config/dotfiles"
     fi
-    su alan -c "git -C $ROOT/home/alan/.config/dotfiles remote rm alanctkc || true"
-    su alan -c "git -C $ROOT/home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git"
+    su alan -c "git -C /home/alan/.config/dotfiles remote rm alanctkc || true"
+    su alan -c "git -C /home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git"
     # TODO NIXOS-BRANCH delete following two lines after master merge
-    su alan -c "git -C $ROOT/home/alan/.config/dotfiles fetch alanctkc nixos"
-    su alan -c "git -C $ROOT/home/alan/.config/dotfiles checkout nixos"
-    rm $ROOT/etc/nixos/configuration.nix
-    ln -sf $ROOT/home/alan/.config/dotfiles/configuration.nix $ROOT/etc/nixos/configuration.nix
-    su alan -c "cd $ROOT/home/alan/.config/dotfiles && ./dotme.sh"
+    su alan -c "git -C /home/alan/.config/dotfiles fetch alanctkc nixos"
+    su alan -c "git -C /home/alan/.config/dotfiles checkout nixos"
+    rm /etc/nixos/configuration.nix
+    ln -sf /home/alan/.config/dotfiles/configuration.nix /etc/nixos/configuration.nix
+    su alan -c "cd /home/alan/.config/dotfiles && ./dotme.sh"
 }
 
 set -e
