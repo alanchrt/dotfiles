@@ -16,11 +16,17 @@ rebuild_nixos() {
     fi
 }
 
+configure_password() {
+    if [ -z "$ROOT" ]; then
+        passwd --root "$ROOT" alan
+    fi
+}
+
 setup_home() {
     echo "Setting up home directory structure..."
-    mkdir -p $ROOT/home/alan/Downloads
-    mkdir -p $ROOT/home/alan/Dropbox/Notes
-    mkdir -p $ROOT/home/alan/Workspaces
+    su alan -c "mkdir -p $ROOT/home/alan/Downloads"
+    su alan -c "mkdir -p $ROOT/home/alan/Dropbox/Notes"
+    su alan -c "mkdir -p $ROOT/home/alan/Workspaces"
 }
 
 install_dotfiles() {
@@ -42,5 +48,6 @@ install_dotfiles() {
 set -e
 
 rebuild_nixos
+configure_password
 setup_home
 install_dotfiles
