@@ -17,7 +17,8 @@ rebuild_nixos() {
 }
 
 configure_password() {
-    if [ -z "$ROOT" ]; then
+    echo "Configuring user password..."
+    if [ ! -z "$ROOT" ]; then
         passwd --root "$ROOT" alan
     fi
 }
