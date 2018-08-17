@@ -64,6 +64,12 @@ configure_termite() {
     link_file .config/termite/drop_config .config/termite/drop_config
 }
 
+configure_kitty() {
+    echo "Configuring kitty..."
+    mkdir -p $HOME/.config/kitty
+    link_file .config/kitty/kitty.conf .config/kitty/kitty.conf
+}
+
 configure_byobu() {
     echo "Configuring byobu..."
     mkdir -p $HOME/.byobu
@@ -135,6 +141,7 @@ configure_shell
 configure_bash
 configure_zsh
 configure_termite
+configure_kitty
 configure_byobu
 configure_ranger
 configure_git
