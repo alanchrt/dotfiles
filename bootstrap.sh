@@ -23,6 +23,13 @@ configure_password() {
     fi
 }
 
+activate_system() {
+    echo "Activating mounted NixOS system..."
+    chroot $ROOT /nix/var/nix/profiles/system/activate
+    mkdir -p $ROOT/home/alan/.gnupg
+    chown 1000:users $ROOT/home/alan/.gnupg
+}
+
 setup_home() {
     echo "Setting up home directory structure..."
     su alan -c "mkdir -p $ROOT/home/alan/Downloads"
@@ -50,5 +57,13 @@ set -e
 
 rebuild_nixos
 configure_password
-setup_home
-install_dotfiles
+if [ -z "$ROOT" ]; then
+    activate_system
+    export -f setup_home
+    chroot "$ROOT" /run/current-system/sw/bin/bash -c "setup_home"
+    export -f install_dotfiles
+    chroot "$ROOT" /run/current-system/sw/bin/bash -c "install_dotfiles"
+else
+  setup_home
+  install_dotfiles
+fi
