@@ -26,9 +26,16 @@ setup_home() {
     create_path $ROOT/home/alan/Workspaces
 }
 
+activate_system() {
+    echo "Activating mounted NixOS system..."
+    chroot $ROOT /nix/var/nix/profiles/system/activate
+    mkdir -p $ROOT/home/alan/.gnupg
+    chown 1000:users $ROOT/home/alan/.gnupg
+}
+
 retrieve_dotfiles() {
     echo "Retrieving dotfiles..."
-    which git || nix-env -f "<nixpkgs>" -iA git
+    # which git || nix-env -f "<nixpkgs>" -iA git
     if [ ! -d /home/alan/.config/dotfiles ]; then
         git clone https://github.com/alanctkc/dotfiles.git /home/alan/.config/dotfiles
     fi
@@ -38,13 +45,6 @@ retrieve_dotfiles() {
     git -C /home/alan/.config/dotfiles remote rm alanctkc || true
     git -C /home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git
     chown 1000:users /home/alan/.config/dotfiles
-}
-
-activate_system() {
-    echo "Activating mounted NixOS system..."
-    chroot $ROOT /nix/var/nix/profiles/system/activate
-    mkdir -p $ROOT/home/alan/.gnupg
-    chown 1000:users $ROOT/home/alan/.gnupg
 }
 
 install_dotfiles() {
