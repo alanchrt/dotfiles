@@ -20,6 +20,9 @@ alias gp="gist -p"
 # Editor
 alias se='sudoedit'
 
+# Clipboard
+alias clip='xclip -sel clipboard'
+
 # Python
 alias py='python'
 alias ipy='ipython'
