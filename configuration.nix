@@ -106,7 +106,6 @@
     spotify
     sysstat
     tectonic
-    termite
     tmate
     tmux
     ttyrec

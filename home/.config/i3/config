@@ -28,11 +28,11 @@ bindsym $mod+o exec --no-startup-id "rofi -show run -lines 15"
 bindsym $mod+p exec --no-startup-id "~/.config/i3/projectmenu"
 
 # Dropdowns
-bindsym $mod+m exec --no-startup-id termite --class='dropterm' --config ~/.config/termite/drop_config
-bindsym $mod+n exec --no-startup-id termite -e 'qalc' --class='qalc' --config ~/.config/termite/drop_config
+bindsym $mod+m exec --no-startup-id kitty --class='dropterm' --config ~/.config/kitty/kitty_drop.conf
+bindsym $mod+n exec --no-startup-id kitty --class='qalc' --config ~/.config/kitty/kitty_drop.conf qalc
 
 # Software
-bindsym $mod+Return exec --no-startup-id termite
+bindsym $mod+Return exec --no-startup-id kitty
 bindsym $mod+Control+e exec --no-startup-id emacsclient -c ~/Workspaces
 bindsym $mod+Control+f exec --no-startup-id caja
 bindsym $mod+Control+n exec --no-startup-id ~/.config/i3/orgnotes

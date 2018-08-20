@@ -4,4 +4,4 @@ shorthand=$(printf '%s\n' ~/Workspaces/*/code/* | cut -d '/' -f 5,7 | rofi -dmen
 parts=(${shorthand//\// })
 path=~/Workspaces/${parts[0]}/code/${parts[1]}
 session=$(echo $(basename $path) | sed -r 's/\./_/g')
-termite -d $path -e "sh -c 'byobu new-session -s $session || byobu attach-session -t $session'"
+kitty -d $path sh -c "byobu new-session -s $session 2> /dev/null || byobu attach-session -t $session"

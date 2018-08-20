@@ -57,17 +57,11 @@ configure_zsh() {
     rm -f $HOME/.zcompdump
 }
 
-configure_termite() {
-    echo "Configuring termite..."
-    mkdir -p $HOME/.config/termite
-    link_file .config/termite/config .config/termite/config
-    link_file .config/termite/drop_config .config/termite/drop_config
-}
-
 configure_kitty() {
     echo "Configuring kitty..."
     mkdir -p $HOME/.config/kitty
     link_file .config/kitty/kitty.conf .config/kitty/kitty.conf
+    link_file .config/kitty/kitty_drop.conf .config/kitty/kitty_drop.conf
 }
 
 configure_byobu() {
@@ -140,7 +134,6 @@ install_spacemacs
 configure_shell
 configure_bash
 configure_zsh
-configure_termite
 configure_kitty
 configure_byobu
 configure_ranger
