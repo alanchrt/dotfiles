@@ -121,6 +121,12 @@ configure_qt() {
     link_file .config/Trolltech.conf .config/Trolltech.conf
 }
 
+configure_flameshot() {
+    echo "Configuring flameshot..."
+    mkdir -p $HOME/.config/Dharkael
+    link_file .config/Dharkael/flameshot.ini .config/Dharkael/flameshot.ini
+}
+
 configure_default_apps() {
     echo "Configuring default applications..."
     link_file .config/mimeapps.list .config/mimeapps.list
@@ -144,6 +150,7 @@ configure_node
 configure_i3
 configure_gtk
 configure_qt
+configure_flameshot
 configure_default_apps
 
 touch $HOME/.dotted
