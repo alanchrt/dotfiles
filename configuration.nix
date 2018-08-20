@@ -146,9 +146,9 @@
   # Include fonts.
   fonts.fonts = with pkgs; [
     font-awesome_5
+    hack-font
     noto-fonts
     noto-fonts-emoji
-    ubuntu_font_family
   ];
 
   # Enable CUPS to print documents.

@@ -1,5 +1,5 @@
 [options]
-font = Ubuntu Mono 12
+font = Hack 10
 
 [colors]
 background = rgba(26, 26, 26, 0.85)
