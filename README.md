@@ -32,12 +32,6 @@ The following command will configure NixOS, rebuild it, create a user named `ala
 bash <(curl https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
 ```
 
-Set the new user's password:
-
-```
-passwd alan
-```
-
 ### Configure credentials
 
 There are a few logins that might be worth setting up right off the bat if needed.
