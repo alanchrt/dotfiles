@@ -34,7 +34,7 @@ bash <(curl https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.
 
 ### Configure credentials
 
-There are a few logins that might be worth setting up right off the bat if needed.
+There are a few local settings and credentials that might be worth setting up right off the bat if needed.
 
 ##### AWS
 
@@ -46,6 +46,13 @@ $ aws configure
 
 ```
 $ heroku login
+```
+
+##### Git user
+
+```
+$ git config --file ~/.gitconfig_local user.name "<your name>"
+$ git config --file ~/.gitconfig_local user.name "<your email>"
 ```
 
 ##### Gist
