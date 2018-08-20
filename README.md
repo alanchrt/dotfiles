@@ -4,7 +4,7 @@ This is my NixOS, i3, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mne
 
 ![dotfiles screenshot](screenshot.png)
 
-The system requires either a base [NixOS](https://nixos.org) system or the [NixOS Installer](https://nixos.org/nixos/download.html) and a fresh partition before install. Note that, by default, a user named `alan` is configured. You will need to fork this repo and configure for your own user.
+The system requires the [NixOS Installer](https://nixos.org/nixos/download.html) and a fresh partition before install. Note that, by default, a user named `alan` is configured. You will need to fork this repo and configure for your own user.
 
 Here are some references for getting around the system:
 
@@ -25,14 +25,7 @@ You may prefer to test out this setup in a virtual machine (on [VirtualBox](http
 
 ### Bootstrap this configuration
 
-The following command will configure NixOS, rebuild it, create a user named `alan`, and link dotfiles from this repo for that user. It will need to be run as root (kids, don't try this at home). Set `ROOT` to the location of your newly mounted disk.
-
-<!-- TODO NIXOS-BRANCH change the path to the bootstrap script after master merge -->
-```
-ROOT=/mnt bash <(curl https://raw.githubusercontent.com/alanctkc/dotfiles/nixos/bootstrap.sh)
-```
-
-If you're bootstrapping an NixOS existing system instead of a fresh install, leave off the `ROOT` environment variable.
+The following command will configure NixOS, rebuild it, create a user named `alan`, and link dotfiles from this repo for that user. It will need to be run as root (kids, don't try this at home). You'll need to have your newly-created partition mounted at `/mnt` or set the `ROOT` environment variable to point to your mount location.
 
 <!-- TODO NIXOS-BRANCH change the path to the bootstrap script after master merge -->
 ```
