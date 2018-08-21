@@ -52,7 +52,7 @@ $ heroku login
 
 ```
 $ git config --file ~/.gitconfig_local user.name "<your name>"
-$ git config --file ~/.gitconfig_local user.name "<your email>"
+$ git config --file ~/.gitconfig_local user.email "<your email>"
 ```
 
 ##### Gist
