@@ -52,8 +52,8 @@ retrieve_dotfiles() {
     # TODO NIXOS-BRANCH delete following two lines after master merge
     git -C /home/alan/.config/dotfiles fetch origin nixos
     git -C /home/alan/.config/dotfiles checkout nixos
-    git -C /home/alan/.config/dotfiles remote rm alanctkc || true
-    git -C /home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git
+    git -C /home/alan/.config/dotfiles remote rm origin || true
+    git -C /home/alan/.config/dotfiles remote add origin git@github.com:alanctkc/dotfiles.git
 }
 
 link_configuration() {
@@ -65,6 +65,11 @@ link_configuration() {
 install_dotfiles() {
     echo "Installing dotfiles..."
     cd /home/alan/.config/dotfiles && ./dotme.sh
+}
+
+init_emacs() {
+    echo "Initializing emacs..."
+    emacs --daemon
 }
 
 restore_resolvconf() {
@@ -84,6 +89,8 @@ chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c 
 link_configuration
 export -f install_dotfiles
 chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c install_dotfiles"
+export -f init_emacs
+chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c init_emacs"
 restore_resolvconf
 
 echo "All done!"
