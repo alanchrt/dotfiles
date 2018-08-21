@@ -75,6 +75,7 @@
     kubectl
     kubernetes-helm
     libqalculate
+    lsof
     mate.caja
     minikube
     networkmanagerapplet
@@ -108,6 +109,7 @@
     tectonic
     tmate
     tmux
+    tree
     ttyrec
     udiskie
     unclutter
