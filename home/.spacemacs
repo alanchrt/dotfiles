@@ -322,6 +322,7 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq exec-path-from-shell-check-startup-files nil)
+  (setq custom-file "~/.spacemacs-custom")
   )
 
 (defun dotspacemacs/user-config ()
@@ -372,20 +373,3 @@ you should place your code here."
       (setq interprogram-paste-function 'xclip-paste-function)
       ))
   )
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (sql-indent paradox spinner orgit mmm-mode magit-gitflow magit-gh-pulls github-search github-clone evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-mc evil-matchit evil-magit magit magit-popup ghub let-alist evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree csv-mode company-auctex auctex adaptive-wrap yapfify yaml-mode xterm-color ws-butler winum which-key web-mode web-beautify volatile-highlights vmd-mode vi-tilde-fringe uuidgen use-package unfill toml-mode toc-org tagedit spaceline smeargle slim-mode shell-pop scss-mode sass-mode rvm ruby-tools ruby-test-mode rubocop rspec-mode robe restart-emacs rbenv rake rainbow-delimiters racer pyvenv pytest pyenv-mode py-isort puppet-mode pug-mode popwin pony-mode pip-requirements phpunit phpcbf php-extras php-auto-yasnippets persp-mode org-projectile org-present org-pomodoro org-mime org-download org-bullets open-junk-file nix-mode nginx-mode neotree mwim multi-term move-text minitest markdown-toc macrostep lorem-ipsum livid-mode live-py-mode linum-relative link-hint less-css-mode json-mode js2-refactor js-doc jinja2-mode insert-shebang indent-guide hydra hy-mode hungry-delete htmlize hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-themes helm-swoop helm-pydoc helm-projectile helm-nixos-options helm-mode-manager helm-make helm-gitignore helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio go-guru go-eldoc gnuplot glsl-mode github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gist gh-md fuzzy flycheck-rust flycheck-pos-tip flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist evil-numbers evil-nerd-commenter eval-sexp-fu eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav e2ansi dumb-jump drupal-mode diminish diff-hl define-word cython-mode company-web company-tern company-statistics company-shell company-nixos-options company-go company-ansible company-anaconda column-enforce-mode coffee-mode clean-aindent-mode chruby cargo bundler bind-map base16-theme auto-yasnippet auto-highlight-symbol auto-compile ansible-doc ansible aggressive-indent ace-window ace-link ace-jump-helm-line ac-ispell))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
