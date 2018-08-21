@@ -17,6 +17,11 @@ configure_password() {
     passwd --root "$ROOT" alan
 }
 
+create_path() {
+    mkdir -p $1
+    chown -R 1000:users $1
+}
+
 setup_home() {
     echo "Setting up home directory structure..."
     create_path $ROOT/home/alan/.gnupg
@@ -29,13 +34,18 @@ setup_home() {
 activate_system() {
     echo "Activating mounted NixOS system..."
     chroot $ROOT /nix/var/nix/profiles/system/activate
-    mkdir -p $ROOT/home/alan/.gnupg
-    chown 1000:users $ROOT/home/alan/.gnupg
+}
+
+override_resolvconf() {
+    echo "Temporarily overriding resolv.conf..."
+    if [ ! -f /mnt/etc/resolv.conf.bak ]; then
+        cp /mnt/etc/resolv.conf /mnt/etc/resolv.conf.bak
+        echo "nameserver 8.8.8.8" > /mnt/etc/resolv.conf
+    fi
 }
 
 retrieve_dotfiles() {
     echo "Retrieving dotfiles..."
-    # which git || nix-env -f "<nixpkgs>" -iA git
     if [ ! -d /home/alan/.config/dotfiles ]; then
         git clone https://github.com/alanctkc/dotfiles.git /home/alan/.config/dotfiles
     fi
@@ -44,23 +54,18 @@ retrieve_dotfiles() {
     git -C /home/alan/.config/dotfiles checkout nixos
     git -C /home/alan/.config/dotfiles remote rm alanctkc || true
     git -C /home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git
-    chown 1000:users /home/alan/.config/dotfiles
 }
 
 install_dotfiles() {
     echo "Installing dotfiles..."
-    su alan -c "mkdir -p /home/alan/.config"
-    if [ ! -d /home/alan/.config/dotfiles ]; then
-        su alan -c "git clone https://github.com/alanctkc/dotfiles.git /home/alan/.config/dotfiles"
-    fi
-    su alan -c "git -C /home/alan/.config/dotfiles remote rm alanctkc || true"
-    su alan -c "git -C /home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git"
-    # TODO NIXOS-BRANCH delete following two lines after master merge
-    su alan -c "git -C /home/alan/.config/dotfiles fetch alanctkc nixos"
-    su alan -c "git -C /home/alan/.config/dotfiles checkout nixos"
-    rm /etc/nixos/configuration.nix
+    rm -f /etc/nixos/configuration.nix
     ln -sf /home/alan/.config/dotfiles/configuration.nix /etc/nixos/configuration.nix
-    su alan -c "cd /home/alan/.config/dotfiles && ./dotme.sh"
+    cd /home/alan/.config/dotfiles && ./dotme.sh
+}
+
+restore_resolvconf() {
+    echo "Restoring resolv.conf..."
+    mv /mnt/etc/resolv.conf.bak /mnt/etc/resolv.conf
 }
 
 set -e
@@ -69,7 +74,11 @@ rebuild_nixos
 configure_password
 setup_home
 activate_system
+override_resolvconf
 export -f retrieve_dotfiles
-chroot "$ROOT" /run/current-system/sw/bin/bash -c "retrieve_dotfiles"
+chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c retrieve_dotfiles"
 export -f install_dotfiles
-chroot "$ROOT" /run/current-system/sw/bin/bash -c "install_dotfiles"
+chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c install_dotfiles"
+restore_resolvconf
+
+echo "All done!"
