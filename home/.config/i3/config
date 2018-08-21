@@ -28,8 +28,8 @@ bindsym $mod+o exec --no-startup-id "rofi -show run -lines 15"
 bindsym $mod+p exec --no-startup-id "~/.config/i3/projectmenu"
 
 # Dropdowns
-bindsym $mod+m exec --no-startup-id kitty --single-instance --class='dropterm' --config ~/.config/kitty/kitty_drop.conf
-bindsym $mod+n exec --no-startup-id kitty --single-instance --class='qalc' --config ~/.config/kitty/kitty_drop.conf qalc
+bindsym $mod+m exec --no-startup-id kitty --class='dropterm' --config ~/.config/kitty/kitty_drop.conf
+bindsym $mod+n exec --no-startup-id kitty --class='qalc' --config ~/.config/kitty/kitty_drop.conf qalc
 
 # Software
 bindsym $mod+Return exec --no-startup-id kitty --single-instance
