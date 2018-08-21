@@ -56,10 +56,14 @@ retrieve_dotfiles() {
     git -C /home/alan/.config/dotfiles remote add alanctkc git@github.com:alanctkc/dotfiles.git
 }
 
-install_dotfiles() {
-    echo "Installing dotfiles..."
+link_configuration() {
+    echo "Linking NixOS configuration..."
     rm -f /etc/nixos/configuration.nix
     ln -sf /home/alan/.config/dotfiles/configuration.nix /etc/nixos/configuration.nix
+}
+
+install_dotfiles() {
+    echo "Installing dotfiles..."
     cd /home/alan/.config/dotfiles && ./dotme.sh
 }
 
@@ -77,6 +81,7 @@ activate_system
 override_resolvconf
 export -f retrieve_dotfiles
 chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c retrieve_dotfiles"
+link_configuration
 export -f install_dotfiles
 chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c install_dotfiles"
 restore_resolvconf
