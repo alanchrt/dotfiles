@@ -38,9 +38,9 @@ activate_system() {
 
 override_resolvconf() {
     echo "Temporarily overriding resolv.conf..."
-    if [ ! -f /mnt/etc/resolv.conf.bak ]; then
-        cp /mnt/etc/resolv.conf /mnt/etc/resolv.conf.bak
-        echo "nameserver 8.8.8.8" > /mnt/etc/resolv.conf
+    if [ ! -f $ROOT/etc/resolv.conf.bak ]; then
+        cp $ROOT/etc/resolv.conf $ROOT/etc/resolv.conf.bak
+        echo "nameserver 8.8.8.8" > $ROOT/etc/resolv.conf
     fi
 }
 
@@ -74,7 +74,7 @@ init_emacs() {
 
 restore_resolvconf() {
     echo "Restoring resolv.conf..."
-    mv /mnt/etc/resolv.conf.bak /mnt/etc/resolv.conf
+    mv $ROOT/etc/resolv.conf.bak $ROOT/etc/resolv.conf
 }
 
 set -e
