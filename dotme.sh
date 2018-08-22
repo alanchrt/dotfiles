@@ -61,7 +61,6 @@ configure_kitty() {
     echo "Configuring kitty..."
     mkdir -p $HOME/.config/kitty
     link_file .config/kitty/kitty.conf .config/kitty/kitty.conf
-    link_file .config/kitty/kitty_drop.conf .config/kitty/kitty_drop.conf
 }
 
 configure_byobu() {
