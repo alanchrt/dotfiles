@@ -21,7 +21,7 @@ alias gp="gist -p"
 alias se='sudoedit'
 
 # Clipboard
-alias clip='xclip -sel clipboard'
+alias clip='xsel -ib'
 
 # Python
 alias py='python'
