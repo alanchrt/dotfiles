@@ -90,14 +90,15 @@
     # pencil (broken)
     pinta
     python
-    python3
-    python36Packages.flake8
-    python36Packages.i3-py
-    python36Packages.ipython
-    python36Packages.pip
-    python36Packages.virtualenv
-    python36Packages.virtualenvwrapper
-    python36Packages.yapf
+    (python3.withPackages (pypkgs: with pypkgs; [
+      flake8
+      i3-py
+      ipython
+      pip
+      virtualenv
+      virtualenvwrapper
+      yapf
+    ]))
     ranger
     redshift
     rofi
