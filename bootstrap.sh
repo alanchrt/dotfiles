@@ -22,13 +22,16 @@ create_path() {
     chown -R 1000:users $1
 }
 
-setup_home() {
-    echo "Setting up home directory structure..."
+setup_dirs() {
+    echo "Setting up directory structure..."
     create_path $ROOT/home/alan/.gnupg
     create_path $ROOT/home/alan/.config
     create_path $ROOT/home/alan/Downloads
     create_path $ROOT/home/alan/Dropbox/Notes
     create_path $ROOT/home/alan/Workspaces
+    if [ ! -d $ROOT/tmp ]; then
+        mkdir -p $ROOT/tmp && chmod -R 777 $ROOT/tmp
+    fi
 }
 
 activate_system() {
@@ -37,23 +40,20 @@ activate_system() {
 }
 
 override_resolvconf() {
-    echo "Temporarily overriding resolv.conf..."
-    if [ ! -f $ROOT/etc/resolv.conf.bak ]; then
-        cp $ROOT/etc/resolv.conf $ROOT/etc/resolv.conf.bak
-        echo "nameserver 8.8.8.8" > $ROOT/etc/resolv.conf
-    fi
+    echo "Overriding resolv.conf..."
+    echo "nameserver 8.8.8.8" > $ROOT/etc/resolv.conf
 }
 
 retrieve_dotfiles() {
     echo "Retrieving dotfiles..."
     if [ ! -d /home/alan/.config/dotfiles ]; then
         git clone https://github.com/alanctkc/dotfiles.git /home/alan/.config/dotfiles
+        # TODO NIXOS-BRANCH delete following two lines after master merge
+        git -C /home/alan/.config/dotfiles fetch origin nixos
+        git -C /home/alan/.config/dotfiles checkout nixos
+        git -C /home/alan/.config/dotfiles remote rm origin || true
+        git -C /home/alan/.config/dotfiles remote add origin git@github.com:alanctkc/dotfiles.git
     fi
-    # TODO NIXOS-BRANCH delete following two lines after master merge
-    git -C /home/alan/.config/dotfiles fetch origin nixos
-    git -C /home/alan/.config/dotfiles checkout nixos
-    git -C /home/alan/.config/dotfiles remote rm origin || true
-    git -C /home/alan/.config/dotfiles remote add origin git@github.com:alanctkc/dotfiles.git
 }
 
 link_configuration() {
@@ -69,19 +69,15 @@ install_dotfiles() {
 
 init_emacs() {
     echo "Initializing emacs..."
-    emacs --daemon
-}
-
-restore_resolvconf() {
-    echo "Restoring resolv.conf..."
-    mv $ROOT/etc/resolv.conf.bak $ROOT/etc/resolv.conf
+    # Glorious hack
+    emacs --batch --script /home/alan/.emacs.d/init.el 2>&1 | sed -e '/Loading find-lisp.../q'
 }
 
 set -e
 
 rebuild_nixos
 configure_password
-setup_home
+setup_dirs
 activate_system
 override_resolvconf
 export -f retrieve_dotfiles
@@ -91,6 +87,5 @@ export -f install_dotfiles
 chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c install_dotfiles"
 export -f init_emacs
 chroot "$ROOT" /run/wrappers/bin/su alan -c "/run/current-system/sw/bin/bash -c init_emacs"
-restore_resolvconf
 
 echo "All done!"
