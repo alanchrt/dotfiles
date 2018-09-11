@@ -94,7 +94,6 @@
       flake8
       i3-py
       ipython
-      pip
       virtualenv
       virtualenvwrapper
       yapf
