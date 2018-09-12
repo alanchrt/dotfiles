@@ -55,6 +55,7 @@
     emacs
     firefox
     flameshot
+    gcc
     gist
     git
     git-lfs
