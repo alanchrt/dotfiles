@@ -168,6 +168,9 @@
   # Enable NFS.
   services.nfs.server.enable = true;
 
+  # Enable PostgreSQL.
+  services.postgresql.enable = true;
+
   # Enable MySQL.
   services.mysql = {
     enable = true;
