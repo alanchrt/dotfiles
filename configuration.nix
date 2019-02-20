@@ -90,10 +90,8 @@
     peek
     # pencil (broken)
     pinta
-    python
     (python3.withPackages (pypkgs: with pypkgs; [
       flake8
-      i3-py
       ipython
       virtualenv
       virtualenvwrapper
@@ -105,7 +103,7 @@
     ruby
     shared-mime-info
     # skypeforlinux (broken)
-    #spotify
+    # spotify (broken)
     sysstat
     tectonic
     tmate
