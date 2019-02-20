@@ -126,6 +126,12 @@ configure_flameshot() {
     link_file .config/Dharkael/flameshot.ini .config/Dharkael/flameshot.ini
 }
 
+configure_redshift() {
+    echo "Configuring redshift..."
+    mkdir -p $HOME/.config/redshift
+    link_file .config/redshift/redshift.conf .config/redshift/redshift.conf
+}
+
 configure_default_apps() {
     echo "Configuring default applications..."
     link_file .config/mimeapps.list .config/mimeapps.list
@@ -150,6 +156,7 @@ configure_i3
 configure_gtk
 configure_qt
 configure_flameshot
+configure_redshift
 configure_default_apps
 
 touch $HOME/.dotted

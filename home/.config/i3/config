@@ -190,7 +190,7 @@ exec --no-startup-id unclutter
 exec --no-startup-id udiskie -ans
 exec --no-startup-id dropbox
 exec --no-startup-id flameshot
-exec --no-startup-id redshift -l 39.0997:94.5786
+exec --no-startup-id redshift-gtk -c ~/.config/redshift/redshift.conf
 exec --no-startup-id ~/.config/i3/prune_downloads
 exec_always --no-startup-id fix_xcursor
 
