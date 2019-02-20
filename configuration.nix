@@ -105,7 +105,7 @@
     ruby
     shared-mime-info
     # skypeforlinux (broken)
-    spotify
+    #spotify
     sysstat
     tectonic
     tmate
