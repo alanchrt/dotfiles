@@ -90,11 +90,11 @@
     peek
     # pencil (broken)
     pinta
+    pypi2nix
     (python3.withPackages (pypkgs: with pypkgs; [
       flake8
       ipython
-      virtualenv
-      virtualenvwrapper
+      rope
       yapf
     ]))
     ranger
