@@ -146,7 +146,7 @@ bindsym XF86AudioMute exec --no-startup-id ~/.config/i3/volumectrl mute
 bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
 
 # Floating windows
-for_window [class="dropterm"] floating enable, sticky enable, border none, resize set 800 260, move absolute position 0 0
+for_window [class="dropterm"] floating enable, sticky enable, border none, resize set 800 400, move absolute position 0 0
 for_window [class="qalc"] floating enable, sticky enable, border none, resize set 800 120, move absolute position 0 0
 for_window [title="orgnotes"] floating enable, sticky enable, border none, resize set 1000 750, move absolute position 0 0, move scratchpad, scratchpad show
 for_window [title="Peek"] floating enable, move scratchpad, scratchpad show
