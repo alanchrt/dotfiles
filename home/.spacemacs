@@ -82,8 +82,9 @@ values."
    dotspacemacs-additional-packages
    '(
      base16-theme
-     jinja2-mode
      e2ansi
+     jinja2-mode
+     prettier-js
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -351,6 +352,10 @@ you should place your code here."
    web-mode-code-indent-offset 2
    web-mode-attr-indent-offset 2)
   (add-to-list 'auto-mode-alist '("\\.js\\'" . react-mode))
+
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+  (add-hook 'react-mode-hook 'prettier-js-mode)
 
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "google-chrome-stable")
