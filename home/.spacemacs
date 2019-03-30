@@ -72,6 +72,7 @@ values."
             shell-default-term-shell "/bin/zsh")
      shell-scripts
      syntax-checking
+     typescript
      version-control
      yaml
      )
@@ -356,6 +357,7 @@ you should place your code here."
   (add-hook 'js2-mode-hook 'prettier-js-mode)
   (add-hook 'web-mode-hook 'prettier-js-mode)
   (add-hook 'react-mode-hook 'prettier-js-mode)
+  (add-hook 'typescript-mode-hook 'prettier-js-mode)
 
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "google-chrome-stable")
