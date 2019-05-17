@@ -49,8 +49,12 @@ values."
      go
      helm
      html
-     javascript
+     (javascript :variables
+                 javascript-backend 'tern
+                 js-indent-level 2)
      latex
+     (lsp :variables
+          lsp-ui-sideline-enable nil)
      (markdown :variables
                markdown-live-preview-engine 'vmd)
      nginx
@@ -71,7 +75,8 @@ values."
             shell-default-term-shell "/bin/zsh")
      shell-scripts
      syntax-checking
-     typescript
+     (typescript :variables
+                 typescript-backend 'tide)
      version-control
      yaml
      )
