@@ -276,6 +276,7 @@ values."
    dotspacemacs-show-transient-state-title t
    ;; If non nil show the color guide hint for transient state keys. (default t)
    dotspacemacs-show-transient-state-color-guide t
+   dotspacemacs-mode-line-theme 'spacemacs
    ;; If non nil unicode symbols are displayed in the mode line. (default t)
    dotspacemacs-mode-line-unicode-symbols t
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
@@ -347,7 +348,6 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   (setq create-lockfiles nil)
-  (setq powerline-default-separator nil)
   (setq initial-buffer-choice "./")
   (setq neo-theme 'nerd)
   (setq neo-show-hidden-files nil)
