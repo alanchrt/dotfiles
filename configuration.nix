@@ -79,6 +79,7 @@
     lsof
     mate.caja
     minikube
+    ncdu
     networkmanagerapplet
     nfs-utils
     ngrok-1
@@ -104,6 +105,7 @@
     shared-mime-info
     # skypeforlinux (broken)
     # spotify (broken)
+    sysdig
     sysstat
     tectonic
     tmate
