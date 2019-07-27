@@ -42,7 +42,6 @@ values."
      (auto-completion :variables
                       auto-completion-return-key-behavior nil
                       auto-completion-tab-key-behavior 'complete)
-     better-defaults
      django
      emacs-lisp
      git
@@ -50,8 +49,13 @@ values."
      go
      helm
      html
-     javascript
+     (javascript :variables
+                 javascript-backend 'tern
+                 js2-basic-offset 2
+                 js-indent-level 2)
      latex
+     (lsp :variables
+          lsp-ui-sideline-enable nil)
      (markdown :variables
                markdown-live-preview-engine 'vmd)
      nginx
@@ -73,6 +77,8 @@ values."
             shell-default-term-shell "/bin/zsh")
      shell-scripts
      syntax-checking
+     (typescript :variables
+                 typescript-backend 'tide)
      version-control
      yaml
      )
@@ -83,8 +89,9 @@ values."
    dotspacemacs-additional-packages
    '(
      base16-theme
-     jinja2-mode
      e2ansi
+     jinja2-mode
+     prettier-js
      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -182,7 +189,7 @@ values."
    ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
    dotspacemacs-major-mode-leader-key ","
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
-   ;; (default "C-M-m)
+   ;; (default "C-M-m")
    dotspacemacs-major-mode-emacs-leader-key "C-M-m"
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs C-i, TAB and C-m, RET.
@@ -273,6 +280,7 @@ values."
    dotspacemacs-show-transient-state-color-guide t
    ;; If non nil unicode symbols are displayed in the mode line. (default t)
    dotspacemacs-mode-line-unicode-symbols t
+   dotspacemacs-mode-line-theme 'spacemacs
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters point
    ;; when it reaches the top or bottom of the screen. (default t)
@@ -353,6 +361,11 @@ you should place your code here."
    web-mode-code-indent-offset 2
    web-mode-attr-indent-offset 2)
   (add-to-list 'auto-mode-alist '("\\.js\\'" . react-mode))
+
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+  (add-hook 'react-mode-hook 'prettier-js-mode)
+  (add-hook 'typescript-mode-hook 'prettier-js-mode)
 
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "google-chrome-stable")
