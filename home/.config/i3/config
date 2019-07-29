@@ -192,7 +192,6 @@ exec --no-startup-id dropbox
 exec --no-startup-id flameshot
 exec --no-startup-id redshift-gtk -c ~/.config/redshift/redshift.conf
 exec --no-startup-id ~/.config/i3/prune_downloads
-exec_always --no-startup-id fix_xcursor
 
 # Local scripts
 exec --no-startup-id ~/.i3_local

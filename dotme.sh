@@ -16,7 +16,11 @@ link_directory() {
 
 clone_or_pull_repo() {
     if [ ! -f $HOME/$2/README.md ]; then
-        git clone https://github.com/$1.git $HOME/$2
+        if [ -z "$3" ]; then
+            git clone https://github.com/$1.git $HOME/$2
+        else
+            git clone -b $3 https://github.com/$1.git $HOME/$2
+        fi
     else
         pushd $HOME/$2 > /dev/null
         git pull
@@ -33,7 +37,7 @@ install_oh_my_zsh() {
 
 install_spacemacs() {
     echo "Installing spacemacs..."
-    clone_or_pull_repo syl20bnr/spacemacs .emacs.d
+    clone_or_pull_repo syl20bnr/spacemacs .emacs.d develop
 }
 
 configure_shell() {
