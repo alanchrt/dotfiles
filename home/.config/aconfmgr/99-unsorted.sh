@@ -21,6 +21,7 @@ AddPackage dhcpcd # RFC2131 compliant DHCP client daemon
 AddPackage diffutils # Utility programs used for creating patch files
 AddPackage dunst # Customizable and lightweight notification-daemon
 AddPackage e2fsprogs # Ext2/3/4 filesystem utilities
+AddPackage efibootmgr # Tool to modify UEFI Firmware Boot Manager Variables
 AddPackage emacs # The extensible, customizable, self-documenting real-time display editor
 AddPackage fakeroot # Tool for simulating superuser privileges
 AddPackage file # File type identification utility
@@ -73,6 +74,7 @@ AddPackage noto-fonts-emoji # Google Noto emoji fonts
 AddPackage openssh # Premier connectivity tool for remote login with the SSH protocol
 AddPackage os-prober # Utility to detect other OSes on a set of drives
 AddPackage pacman # A library-based package manager with dependency support
+AddPackage pacutils # Helper tools for libalpm
 AddPackage patch # A utility to apply patch files to original sources
 AddPackage pavucontrol # PulseAudio Volume Control
 AddPackage pciutils # PCI bus configuration space access library and tools
@@ -127,7 +129,6 @@ AddPackage --foreign byobu # Enhanced profile and useful notifications for tmux/
 AddPackage --foreign dropbox # A free service that lets you bring your photos, docs, and videos anywhere and share them easily.
 AddPackage --foreign etcher-bin # Flash OS images to SD cards & USB drives, safely and easily
 AddPackage --foreign flat-remix # Flat remix is a pretty simple icon theme inspired on material design following a modern design using flat colors with high contrasts and sharp borders.
-AddPackage --foreign franz-bin # Franz is a free messaging app for services like WhatsApp, Slack, Messenger and many more
 AddPackage --foreign google-chrome # The popular and trusted web browser by Google (Stable Channel)
 AddPackage --foreign i3lock-fancy-git # i3lock-color script
 AddPackage --foreign rofi-git # A window switcher, run dialog and dmenu replacement
