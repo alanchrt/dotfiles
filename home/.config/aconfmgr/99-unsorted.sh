@@ -228,3 +228,9 @@ CopyFile /etc/passwd-
 AddPackage --foreign ttf-mac-fonts # Mac fonts including Lucida Grande, Apple Garamond and other fonts from Apple
 AddPackage --foreign ttf-ms-fonts # Core TTF Fonts from Microsoft
 AddPackage --foreign ttf-unifont # TrueType version of the GNU Unifont
+
+
+# Mon 29 Jul 2019 03:31:55 PM CDT - Unknown packages
+
+
+AddPackage python-i3-py # tools for i3 users and developers
