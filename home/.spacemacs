@@ -59,6 +59,7 @@ values."
      latex
      (lsp :variables
           lsp-ui-sideline-enable nil)
+     ;; install vmd
      (markdown :variables
                markdown-live-preview-engine 'vmd)
      nginx
