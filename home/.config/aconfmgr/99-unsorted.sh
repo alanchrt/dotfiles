@@ -229,3 +229,11 @@ CopyFile /etc/group
 CopyFile /etc/group-
 CopyFile /etc/passwd
 CopyFile /etc/passwd-
+
+
+# Mon 29 Jul 2019 04:46:45 PM CDT - Unknown foreign packages
+
+
+AddPackage --foreign ttf-mac-fonts # Mac fonts including Lucida Grande, Apple Garamond and other fonts from Apple
+AddPackage --foreign ttf-ms-fonts # Core TTF Fonts from Microsoft
+AddPackage --foreign ttf-unifont # TrueType version of the GNU Unifont
