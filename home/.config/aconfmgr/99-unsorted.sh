@@ -138,14 +138,11 @@ AddPackage --foreign yay # Yet another yogurt. Pacman wrapper and AUR helper wri
 
 
 CreateFile /etc/.pwd.lock 600 > /dev/null
-CopyFile /etc/adjtime
-CopyFile /etc/default/grub
 CopyFile /etc/group
 CopyFile /etc/group-
 CopyFile /etc/lightdm/lightdm.conf
 CopyFile /etc/locale.conf
 CreateLink /etc/localtime /usr/share/zoneinfo/US/Central
-CopyFile /etc/machine-id 444
 CopyFile /etc/mkinitcpio.conf
 CreateLink /etc/os-release ../usr/lib/os-release
 CopyFile /etc/pacman.d/mirrorlist
