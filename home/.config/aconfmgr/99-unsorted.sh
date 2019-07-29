@@ -168,3 +168,65 @@ CreateLink /etc/systemd/user/sockets.target.wants/gpg-agent-ssh.socket /usr/lib/
 CreateLink /etc/systemd/user/sockets.target.wants/gpg-agent.socket /usr/lib/systemd/user/gpg-agent.socket
 CreateLink /etc/systemd/user/sockets.target.wants/p11-kit-server.socket /usr/lib/systemd/user/p11-kit-server.socket
 CreateDir /lost+found 700
+
+
+# Mon 29 Jul 2019 04:50:51 AM CDT - Unknown packages
+
+
+AddPackage aws-cli # Universal Command Line Interface for Amazon Web Services
+AddPackage docker # Pack, ship and run any application as a lightweight container
+AddPackage flake8 # The modular source code checker
+AddPackage gist # Potentially the best command line gister
+AddPackage git-lfs # Git extension for versioning large files
+AddPackage gopass # The slightly more awesome standard unix password manager for teams.
+AddPackage httpie # cURL for humans
+AddPackage inkscape # Professional vector graphics editor
+AddPackage ipython # An enhanced Interactive Python shell.
+AddPackage jdk-openjdk # OpenJDK Java 12 development kit
+AddPackage linux-headers # Header files and scripts for building modules for Linux kernel
+AddPackage minikube # Minikube is a tool that makes it easy to run Kubernetes locally
+AddPackage ncdu # Disk usage analyzer with an ncurses interface
+AddPackage nfs-utils # Support programs for Network File Systems
+AddPackage nmap # Utility for network discovery and security auditing
+AddPackage powertop # A tool to diagnose issues with power consumption and power management
+AddPackage python2-rope # Refactoring library
+AddPackage the_silver_searcher # Code searching tool similar to Ack, but faster
+AddPackage vimiv # Image viewer with vim-like keybindings
+AddPackage virtualbox # Powerful x86 virtualization for enterprise as well as home use
+AddPackage wavemon # Ncurses-based monitoring application for wireless network devices
+AddPackage wget # Network utility to retrieve files from the Web
+AddPackage whois # Intelligent WHOIS client
+AddPackage wmctrl # Control your EWMH compliant window manager from command line
+AddPackage yapf # Python style guide checker
+AddPackage zathura # Minimalistic document viewer
+
+
+# Mon 29 Jul 2019 04:50:54 AM CDT - Missing packages
+
+
+RemovePackage lxappearance
+
+
+# Mon 29 Jul 2019 04:50:54 AM CDT - Unknown foreign packages
+
+
+AddPackage --foreign insomnia # HTTP and GraphQL client for developers
+AddPackage --foreign kubernetes-bin # Production-Grade Container Scheduling and Management - binary version.
+AddPackage --foreign kubernetes-helm # A tool to manage Kubernetes charts
+AddPackage --foreign nvm # Node Version Manager - Simple bash script to manage multiple active node.js versions
+AddPackage --foreign python-autoflake # Removes unused imports and unused variables
+AddPackage --foreign spotify # A proprietary music streaming service
+AddPackage --foreign station # The one app to rule them all
+AddPackage --foreign tectonic # Modernized, complete, self-contained TeX/LaTeX engine, powered by XeTeX and TeXLive
+AddPackage --foreign tmate # Instant Terminal Sharing
+AddPackage --foreign ttyrec # A tty recorder and player
+
+
+# Mon 29 Jul 2019 04:50:55 AM CDT - New files
+
+
+CopyFile /etc/pacman.conf
+CopyFile /etc/group
+CopyFile /etc/group-
+CopyFile /etc/passwd
+CopyFile /etc/passwd-

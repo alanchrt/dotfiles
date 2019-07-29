@@ -30,6 +30,9 @@ alias ipy='ipython'
 # Ranger
 alias rn='ranger'
 
+# Sysdig
+alias sys='sudo csysdig'
+
 # Virtualenv shortcuts
 alias mkve='mkvirtualenv'
 alias wo='workon'

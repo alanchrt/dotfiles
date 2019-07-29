@@ -49,8 +49,11 @@ values."
      go
      helm
      html
+     ;; install tern, import-js, eslint, and prettier
      (javascript :variables
                  javascript-backend 'tern
+                 javascript-import-tool 'import-js
+                 node-add-modules-path t
                  js2-basic-offset 2
                  js-indent-level 2)
      latex
@@ -65,18 +68,19 @@ values."
           org-startup-folded nil
           org-hide-emphasis-markers t)
      php
+     prettier
      puppet
      python
      react
      ruby
      rust
-     shaders
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom
             shell-default-term-shell "/bin/zsh")
      shell-scripts
      syntax-checking
+     ;; install typescript and tslint
      (typescript :variables
                  typescript-backend 'tide)
      version-control
@@ -331,6 +335,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq exec-path-from-shell-check-startup-files nil)
   (setq custom-file "~/.spacemacs-custom")
+
+  ;; node binaries
+  (add-to-list 'exec-path "/home/alan/.nvm/versions/node/v10.16.0/bin" t)
   )
 
 (defun dotspacemacs/user-config ()
@@ -362,10 +369,10 @@ you should place your code here."
    web-mode-attr-indent-offset 2)
   (add-to-list 'auto-mode-alist '("\\.js\\'" . react-mode))
 
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-  (add-hook 'react-mode-hook 'prettier-js-mode)
-  (add-hook 'typescript-mode-hook 'prettier-js-mode)
+  ;; (add-hook 'js2-mode-hook 'prettier-js-mode)
+  ;; (add-hook 'web-mode-hook 'prettier-js-mode)
+  ;; (add-hook 'react-mode-hook 'prettier-js-mode)
+  ;; (add-hook 'typescript-mode-hook 'prettier-js-mode)
 
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "google-chrome-stable")

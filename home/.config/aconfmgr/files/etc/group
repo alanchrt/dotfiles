@@ -48,3 +48,7 @@ lightdm:x:975:
 autologin:x:974:alan
 git:x:973:
 geoclue:x:972:
+kube:x:971:
+docker:x:970:
+rpc:x:32:
+vboxusers:x:108:
