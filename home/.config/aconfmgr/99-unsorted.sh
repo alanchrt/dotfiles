@@ -216,7 +216,6 @@ AddPackage --foreign kubernetes-helm # A tool to manage Kubernetes charts
 AddPackage --foreign nvm # Node Version Manager - Simple bash script to manage multiple active node.js versions
 AddPackage --foreign python-autoflake # Removes unused imports and unused variables
 AddPackage --foreign spotify # A proprietary music streaming service
-AddPackage --foreign station # The one app to rule them all
 AddPackage --foreign tectonic # Modernized, complete, self-contained TeX/LaTeX engine, powered by XeTeX and TeXLive
 AddPackage --foreign tmate # Instant Terminal Sharing
 AddPackage --foreign ttyrec # A tty recorder and player
