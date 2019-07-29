@@ -40,6 +40,12 @@ install_spacemacs() {
     clone_or_pull_repo syl20bnr/spacemacs .emacs.d develop
 }
 
+configure_aconfmgr() {
+    echo "Configuring aconfmgr..."
+    mkdir -p $HOME/.config/aconfmgr
+    link_directory .config/aconfmgr .config/aconfmgr
+}
+
 configure_shell() {
     echo "Configuring common shell environment..."
     mkdir -p $HOME/.local/share
@@ -146,6 +152,7 @@ set -e
 
 install_oh_my_zsh
 install_spacemacs
+configure_aconfmgr
 configure_shell
 configure_bash
 configure_zsh

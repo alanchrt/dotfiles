@@ -1,0 +1,8 @@
+# Pathnames of valid login shells.
+# See shells(5) for details.
+
+/bin/sh
+/bin/bash
+/usr/bin/git-shell
+/bin/zsh
+/usr/bin/zsh
