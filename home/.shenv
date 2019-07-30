@@ -32,7 +32,7 @@ fi
 export PATH=~/.local/bin:$PATH
 
 # Store Go code in home directory
-export GOPATH=$HOME/.gocode
+export GOPATH=$HOME/.go
 
 # Virtualenv settings
 export WORKON_HOME=$HOME/.virtualenvs
