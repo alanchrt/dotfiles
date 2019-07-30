@@ -282,3 +282,10 @@ AddPackage --foreign displaylink # Linux driver for DL-6xxx, DL-5xxx, DL-41xx an
 
 
 CreateLink /etc/systemd/system/graphical.target.wants/displaylink.service /usr/lib/systemd/system/displaylink.service
+
+
+# Tue 30 Jul 2019 01:37:47 PM CDT - Unknown foreign packages
+
+
+AddPackage --foreign ttf-symbola # Font for unicode symbols (part of Unicode Fonts for Ancient Scripts).
+AddPackage --foreign xcalib # A tiny monitor calibration loader for X.org
