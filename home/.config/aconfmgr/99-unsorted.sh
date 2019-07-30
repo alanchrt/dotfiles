@@ -127,7 +127,6 @@ AddPackage zsh # A very advanced and programmable command interpreter (shell) fo
 AddPackage --foreign aconfmgr-git # A configuration manager for Arch Linux
 AddPackage --foreign byobu # Enhanced profile and useful notifications for tmux/screen
 AddPackage --foreign dropbox # A free service that lets you bring your photos, docs, and videos anywhere and share them easily.
-AddPackage --foreign etcher-bin # Flash OS images to SD cards & USB drives, safely and easily
 AddPackage --foreign flat-remix # Flat remix is a pretty simple icon theme inspired on material design following a modern design using flat colors with high contrasts and sharp borders.
 AddPackage --foreign google-chrome # The popular and trusted web browser by Google (Stable Channel)
 AddPackage --foreign i3lock-fancy-git # i3lock-color script
