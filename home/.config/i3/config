@@ -187,7 +187,7 @@ exec --no-startup-id dunst
 exec --no-startup-id nm-applet
 exec --no-startup-id xautolock -secure -time 3 -corners -000 -locker i3lock-fancy -f Ubuntu-Mono
 exec --no-startup-id unclutter
-exec --no-startup-id udiskie -ans
+exec --no-startup-id udiskie -anT
 exec --no-startup-id dropbox
 exec --no-startup-id flameshot
 exec --no-startup-id redshift-gtk -c ~/.config/redshift/redshift.conf
