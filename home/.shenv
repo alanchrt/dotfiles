@@ -52,5 +52,3 @@ export PATH=$PATH:/opt/android-sdk/tools:/opt/android-sdk/tools:/opt/android-sdk
 
 # Add ruby gems to path
 PATH="$(ruby -e 'print Gem.user_dir')/bin:$PATH"
-
-export PATH=$HOME/.nvm/versions/node/$DEFAULT_NODE_VERSION/bin:$PATH
