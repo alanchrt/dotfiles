@@ -20,3 +20,5 @@ lightdm:x:975:975:Light Display Manager:/var/lib/lightdm:/usr/bin/nologin
 git:x:973:973:git daemon user:/:/usr/bin/git-shell
 geoclue:x:972:972:Geoinformation service:/var/lib/geoclue:/usr/bin/nologin
 kube:x:971:971:Kubernetes user:/:/sbin/nologin
+rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/usr/bin/nologin
+rtkit:x:133:133:RealtimeKit:/proc:/usr/bin/nologin

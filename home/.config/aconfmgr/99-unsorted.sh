@@ -234,3 +234,51 @@ AddPackage --foreign ttf-unifont # TrueType version of the GNU Unifont
 
 
 AddPackage python-i3-py # tools for i3 users and developers
+
+
+# Mon 29 Jul 2019 03:44:17 PM CDT - Unknown packages
+
+
+AddPackage ntp # Network Time Protocol reference implementation
+AddPackage pulseaudio # A featureful, general-purpose sound server
+
+
+# Mon 29 Jul 2019 03:44:17 PM CDT - New files
+
+
+CreateLink /etc/systemd/user/sockets.target.wants/pulseaudio.socket /usr/lib/systemd/user/pulseaudio.socket
+CopyFile /etc/group
+CopyFile /etc/group-
+CopyFile /etc/passwd
+CopyFile /etc/passwd-
+
+
+# Mon 29 Jul 2019 04:01:28 PM CDT - Unknown packages
+
+
+AddPackage dep # Go dependency management tool
+
+
+# Tue 30 Jul 2019 10:04:32 AM CDT - Unknown packages
+
+
+AddPackage alsa-utils # An alternative implementation of Linux sound support
+AddPackage pulseaudio-alsa # ALSA Configuration for PulseAudio
+
+
+# Tue 30 Jul 2019 10:04:32 AM CDT - New files
+
+
+CreateLink /etc/systemd/system/multi-user.target.wants/ntpd.service /usr/lib/systemd/system/ntpd.service
+
+
+# Tue 30 Jul 2019 10:32:24 AM CDT - Unknown foreign packages
+
+
+AddPackage --foreign displaylink # Linux driver for DL-6xxx, DL-5xxx, DL-41xx and DL-3x00
+
+
+# Tue 30 Jul 2019 10:32:24 AM CDT - New files
+
+
+CreateLink /etc/systemd/system/graphical.target.wants/displaylink.service /usr/lib/systemd/system/displaylink.service

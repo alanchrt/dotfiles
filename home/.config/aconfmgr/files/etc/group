@@ -52,3 +52,5 @@ kube:x:971:
 docker:x:970:
 rpc:x:32:
 vboxusers:x:108:
+rtkit:x:133:
+ntp:x:87:
