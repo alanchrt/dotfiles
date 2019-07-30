@@ -111,7 +111,7 @@ bindsym $mod+Shift+period exec --no-startup-id python ~/.config/i3/workspaceonou
 
 # i3 control
 bindsym $mod+Control+i restart
-bindsym $mod+Control+Up exec --no-startup-id i3lock-fancy -f Ubuntu-Mono
+bindsym $mod+Control+Up exec --no-startup-id i3lock-fancy -f Noto-Sans-Mono-Regular
 bindsym $mod+Control+Down mode "$mode_shutdown"
 bindsym $mod+Control+Right mode "$mode_reboot"
 
@@ -185,7 +185,7 @@ exec --no-startup-id sleep 1; compton -b --config ~/.config/compton.conf
 exec --no-startup-id hsetroot -solid '#555555'
 exec --no-startup-id dunst
 exec --no-startup-id nm-applet
-exec --no-startup-id xautolock -secure -time 3 -corners -000 -locker i3lock-fancy -f Ubuntu-Mono
+exec --no-startup-id xautolock -secure -time 3 -corners -000 -locker i3lock-fancy -f Noto-Sans-Mono-Regular
 exec --no-startup-id unclutter
 exec --no-startup-id udiskie -anT
 exec --no-startup-id dropbox
