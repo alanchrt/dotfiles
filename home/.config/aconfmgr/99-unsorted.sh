@@ -58,7 +58,6 @@ AddPackage linux # The Linux kernel and modules
 AddPackage linux-firmware # Firmware files for Linux
 AddPackage logrotate # Rotates system logs automatically
 AddPackage lvm2 # Logical Volume Manager 2 utilities
-AddPackage lxappearance # Feature-rich GTK+ theme switcher of the LXDE Desktop
 AddPackage m4 # The GNU macro processor
 AddPackage make # GNU make utility to maintain groups of programs
 AddPackage man-db # A utility for reading man pages
@@ -199,12 +198,6 @@ AddPackage whois # Intelligent WHOIS client
 AddPackage wmctrl # Control your EWMH compliant window manager from command line
 AddPackage yapf # Python style guide checker
 AddPackage zathura # Minimalistic document viewer
-
-
-# Mon 29 Jul 2019 04:50:54 AM CDT - Missing packages
-
-
-RemovePackage lxappearance
 
 
 # Mon 29 Jul 2019 04:50:54 AM CDT - Unknown foreign packages
