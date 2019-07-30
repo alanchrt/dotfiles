@@ -31,8 +31,9 @@ fi
 # Use local binaries
 export PATH=~/.local/bin:$PATH
 
-# Store Go code in home directory
+# Store Go code in home directory and add to path
 export GOPATH=$HOME/.go
+export PATH=$PATH:$HOME/.go/bin
 
 # Virtualenv settings
 export WORKON_HOME=$HOME/.virtualenvs

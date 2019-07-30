@@ -46,6 +46,7 @@ values."
      emacs-lisp
      git
      github
+     ;; install prereqs: http://develop.spacemacs.org/layers/+lang/go/README.html#pre-requisites
      go
      helm
      html
