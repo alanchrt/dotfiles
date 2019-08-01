@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+i3lock --blur 10 --veriftext "" --wrongtext "" --noinputtext "" --insidecolor 000000aa --ringcolor 16a085ff --line-uses-inside --keyhlcolor 63edd2ff --bshlcolor 49d3b8ff --separatorcolor 00000000 --insidewrongcolor 000000aa --ringwrongcolor c33333ff --insidevercolor 000000aa --ringvercolor 63edd2ff

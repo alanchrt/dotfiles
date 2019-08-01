@@ -129,7 +129,6 @@ AddPackage --foreign byobu # Enhanced profile and useful notifications for tmux/
 AddPackage --foreign dropbox # A free service that lets you bring your photos, docs, and videos anywhere and share them easily.
 AddPackage --foreign flat-remix # Flat remix is a pretty simple icon theme inspired on material design following a modern design using flat colors with high contrasts and sharp borders.
 AddPackage --foreign google-chrome # The popular and trusted web browser by Google (Stable Channel)
-AddPackage --foreign i3lock-fancy-git # i3lock-color script
 AddPackage --foreign rofi-git # A window switcher, run dialog and dmenu replacement
 AddPackage --foreign yay # Yet another yogurt. Pacman wrapper and AUR helper written in go.
 
@@ -288,3 +287,9 @@ CreateLink /etc/systemd/system/graphical.target.wants/displaylink.service /usr/l
 
 AddPackage --foreign ttf-symbola # Font for unicode symbols (part of Unicode Fonts for Ancient Scripts).
 AddPackage --foreign xcalib # A tiny monitor calibration loader for X.org
+
+
+# Wed 31 Jul 2019 11:56:58 PM CDT - Unknown foreign packages
+
+
+AddPackage --foreign i3lock-color # An improved screenlocker based upon XCB and PAM with color configuration support
