@@ -73,6 +73,7 @@ values."
      prettier
      puppet
      python
+     ;; install babel-eslint eslint-plugin-react
      react
      ruby
      rust
