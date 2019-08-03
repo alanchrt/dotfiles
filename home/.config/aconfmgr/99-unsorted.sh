@@ -293,3 +293,11 @@ AddPackage --foreign xcalib # A tiny monitor calibration loader for X.org
 
 
 AddPackage --foreign i3lock-color # An improved screenlocker based upon XCB and PAM with color configuration support
+
+
+# Sat 03 Aug 2019 08:47:29 AM CDT - Unknown packages
+
+
+AddPackage engrampa # Archive manipulator for MATE
+AddPackage unzip # For extracting and viewing files in .zip archives
+AddPackage xsel # XSel is a command-line program for getting and setting the contents of the X selection
