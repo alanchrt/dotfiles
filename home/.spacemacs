@@ -370,7 +370,6 @@ you should place your code here."
    web-mode-css-indent-offset 2
    web-mode-code-indent-offset 2
    web-mode-attr-indent-offset 2)
-  (add-to-list 'auto-mode-alist '("\\.js\\'" . react-mode))
 
   ;; (add-hook 'js2-mode-hook 'prettier-js-mode)
   ;; (add-hook 'web-mode-hook 'prettier-js-mode)
