@@ -301,3 +301,36 @@ AddPackage --foreign i3lock-color # An improved screenlocker based upon XCB and 
 AddPackage engrampa # Archive manipulator for MATE
 AddPackage unzip # For extracting and viewing files in .zip archives
 AddPackage xsel # XSel is a command-line program for getting and setting the contents of the X selection
+
+
+# Wed 07 Aug 2019 03:23:48 PM PDT - Unknown packages
+
+
+AddPackage unclutter # A small program for hiding the mouse cursor
+
+
+# Wed 07 Aug 2019 03:23:48 PM PDT - New files
+
+
+CreateLink /etc/systemd/system/dbus-org.freedesktop.Avahi.service /usr/lib/systemd/system/avahi-daemon.service
+CreateLink /etc/systemd/system/multi-user.target.wants/avahi-daemon.service /usr/lib/systemd/system/avahi-daemon.service
+CreateLink /etc/systemd/system/sockets.target.wants/avahi-daemon.socket /usr/lib/systemd/system/avahi-daemon.socket
+
+
+# Wed 21 Aug 2019 10:41:07 PM CDT - Unknown packages
+
+
+AddPackage acpilight # a backward-compatible xbacklight replacement based on ACPI
+AddPackage i3lock-color # An improved screenlocker based upon XCB and PAM with color configuration support
+
+
+# Wed 21 Aug 2019 10:41:07 PM CDT - Missing foreign packages
+
+
+RemovePackage --foreign i3lock-color
+
+
+# Wed 21 Aug 2019 10:41:07 PM CDT - New files
+
+
+CopyFile /etc/udev/rules.d/90-backlight.rules
