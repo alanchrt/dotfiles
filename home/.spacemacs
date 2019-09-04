@@ -85,7 +85,8 @@ values."
      syntax-checking
      ;; install typescript and tslint
      (typescript :variables
-                 typescript-backend 'tide)
+                 typescript-backend 'lsp
+                 typescript-linter 'eslint)
      version-control
      yaml
      )
