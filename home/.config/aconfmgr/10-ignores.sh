@@ -13,6 +13,7 @@ IgnorePath '/etc/*.gen'
 # Password files
 IgnorePath '/etc/*shadow*'
 IgnorePath '/usr/share/*'
+IgnorePath '/etc/docker/key.json'
 
 # Configuration database
 IgnorePath '/etc/dconf'
@@ -33,7 +34,7 @@ IgnorePath '/usr/local/lib/*'
 IgnorePath '/usr/local/share/applications/mimeinfo.cache'
 
 # Var databases, logs, swap and temp files
-IgnorePath '/var/db/sudo'
+IgnorePath '/var/db/*'
 IgnorePath '/var/lib/*'
 IgnorePath /var/log/*
 IgnorePath '/var/swap*'

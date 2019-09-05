@@ -206,7 +206,6 @@ AddPackage --foreign nvm # Node Version Manager - Simple bash script to manage m
 AddPackage --foreign python-autoflake # Removes unused imports and unused variables
 AddPackage --foreign spotify # A proprietary music streaming service
 AddPackage --foreign tectonic # Modernized, complete, self-contained TeX/LaTeX engine, powered by XeTeX and TeXLive
-AddPackage --foreign tmate # Instant Terminal Sharing
 AddPackage --foreign ttyrec # A tty recorder and player
 
 
@@ -334,3 +333,28 @@ RemovePackage --foreign i3lock-color
 
 
 CopyFile /etc/udev/rules.d/90-backlight.rules
+
+
+# Thu 05 Sep 2019 10:31:53 AM MDT - Unknown packages
+
+
+AddPackage graphicsmagick # Image processing system
+AddPackage hugo # Fast and Flexible Static Site Generator in Go
+AddPackage redis # Advanced key-value store
+AddPackage tmate # Instant Terminal Sharing
+
+
+# Thu 05 Sep 2019 10:31:53 AM MDT - Unknown foreign packages
+
+
+AddPackage --foreign websocat # Command-line client for web sockets, like netcat/curl/socat for ws
+
+
+# Thu 05 Sep 2019 10:31:53 AM MDT - Missing foreign packages
+
+
+
+# Thu 05 Sep 2019 10:31:53 AM MDT - New files
+
+
+CreateLink /etc/systemd/system/multi-user.target.wants/docker.service /usr/lib/systemd/system/docker.service

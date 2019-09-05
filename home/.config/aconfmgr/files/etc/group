@@ -49,8 +49,9 @@ autologin:x:974:alan
 git:x:973:
 geoclue:x:972:
 kube:x:971:
-docker:x:970:
+docker:x:970:alan
 rpc:x:32:
 vboxusers:x:108:
 rtkit:x:133:
 ntp:x:87:
+redis:x:969:

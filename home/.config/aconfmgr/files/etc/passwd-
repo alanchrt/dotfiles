@@ -22,3 +22,4 @@ geoclue:x:972:972:Geoinformation service:/var/lib/geoclue:/usr/bin/nologin
 kube:x:971:971:Kubernetes user:/:/sbin/nologin
 rpc:x:32:32:Rpcbind Daemon:/var/lib/rpcbind:/usr/bin/nologin
 rtkit:x:133:133:RealtimeKit:/proc:/usr/bin/nologin
+ntp:x:87:87:Network Time Protocol:/var/lib/ntp:/bin/false
