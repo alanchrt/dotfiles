@@ -363,19 +363,13 @@ you should place your code here."
         (find-lisp-find-files "~/Dropbox/Notes" "\.org$"))
 
   (setq-default
-   ;; js2-mode
    js2-basic-offset 2
-   ;; web-mode
    css-indent-offset 2
+   typescript-indent-level 2
    web-mode-markup-indent-offset 2
    web-mode-css-indent-offset 2
    web-mode-code-indent-offset 2
    web-mode-attr-indent-offset 2)
-
-  ;; (add-hook 'js2-mode-hook 'prettier-js-mode)
-  ;; (add-hook 'web-mode-hook 'prettier-js-mode)
-  ;; (add-hook 'react-mode-hook 'prettier-js-mode)
-  ;; (add-hook 'typescript-mode-hook 'prettier-js-mode)
 
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "google-chrome-stable")
