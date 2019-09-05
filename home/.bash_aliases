@@ -33,7 +33,7 @@ alias rn='ranger'
 # Sysdig
 alias sys='sudo csysdig'
 
-# Virtualenv shortcuts
+# Virtualenv
 alias mkve='mkvirtualenv'
 alias wo='workon'
 
