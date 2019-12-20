@@ -195,6 +195,7 @@ exec --no-startup-id udiskie -anT
 exec --no-startup-id dropbox
 exec --no-startup-id flameshot
 exec --no-startup-id redshift-gtk -c ~/.config/redshift/redshift.conf
+exec --no-startup-id blueman-applet
 exec --no-startup-id ~/.config/i3/prune_downloads
 
 # Local scripts
