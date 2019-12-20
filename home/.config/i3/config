@@ -185,7 +185,7 @@ bar {
 }
 
 # Startup scripts
-exec --no-startup-id sleep 1; compton -b --config ~/.config/compton.conf
+exec --no-startup-id sleep 1; picom -b --config ~/.config/picom.conf
 exec --no-startup-id hsetroot -solid '#555555'
 exec --no-startup-id dunst
 exec --no-startup-id nm-applet

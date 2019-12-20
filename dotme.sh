@@ -114,7 +114,7 @@ configure_i3() {
     mkdir -p $HOME/.config
     mkdir -p $HOME/.config/dunst
     link_directory .config/i3 .config/i3
-    link_file .config/compton.conf .config/compton.conf
+    link_file .config/picom.conf .config/picom.conf
     link_file .config/dunst/dunstrc .config/dunst/dunstrc
     link_file .Xresources .Xresources
 }
