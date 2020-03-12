@@ -27,7 +27,7 @@
     separator_color = auto
     startup_notification = false
     dmenu = /usr/bin/dmenu -p dunst:
-    browser = /usr/bin/google-chrome-stable
+    browser = /usr/bin/firefox-developer-edition
     icon_position = off
     icon_folders = /usr/share/icons/Arc/status/16/:/usr/share/icons/Arc/devices/16/
 
