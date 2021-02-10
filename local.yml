@@ -1,0 +1,4 @@
+---
+- name: Provision base software
+  roles:
+    - nodejs

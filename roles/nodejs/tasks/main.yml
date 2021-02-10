@@ -1,0 +1,23 @@
+---
+- name: Install oh-my-zsh
+  roles:
+    - role: moviedo.nvm
+      nvm_user: alan
+      nvm_version: "0.37.2"
+      nvm_node_version: "v14.15.5"
+
+- name: Install common node tools
+  community.general.npm:
+    name: "{{ item }}"
+    global: yes
+  with_items:
+    - yarn
+    - typescript
+    - tern
+    - eslint
+    - babel-eslint
+    - eslint-plugin-react
+    - prettier
+    - js-beautify
+    - import-js
+    - vmd
