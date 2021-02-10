@@ -1,5 +1,5 @@
 ---
-- name: Install oh-my-zsh
+- name: Install nvm and node.js
   roles:
     - role: moviedo.nvm
       nvm_user: alan
