@@ -1,3 +1,9 @@
+### WIP README STUFF
+
+```shell
+wget -q -O - https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/bootstrap.sh
+```
+
 ## Overview
 
 This is my NixOS, i3, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
