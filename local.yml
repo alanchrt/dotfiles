@@ -1,7 +1,5 @@
 ---
-- hosts: all
-
-  tasks:
-    - name: Provision base software
-      roles:
-        - nodejs
+- name: Provision base software
+  hosts: all
+  roles:
+    - nodejs
