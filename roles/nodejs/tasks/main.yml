@@ -1,10 +1,19 @@
 ---
-- name: Install nvm and node.js
-  roles:
-    - role: moviedo.nvm
-      nvm_user: alan
-      nvm_version: "0.37.2"
-      nvm_node_version: "v14.15.5"
+- name: Install nodesource gpg key
+  become: yes
+  apt_key:
+    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+
+- name: Install the node.js repo
+  become: yes
+  apt_repository:
+    repo: "deb https://deb.nodesource.com/node_14.x {{ ansible_distribution_release }} main"
+    update_cache: yes
+
+- name: Install node.js
+  become: yes
+  apt:
+    name: nodejs
 
 - name: Install common node tools
   community.general.npm:
@@ -21,3 +30,11 @@
     - js-beautify
     - import-js
     - vmd
+
+- name: Install nvm
+  include_role:
+    name: moviedo.nvm
+  vars:
+    nvm_user: "{{ ansible_env.USER }}"
+    nvm_version: "v0.37.2"
+    nvm_node_version: "v14.15.5"
