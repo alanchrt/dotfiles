@@ -88,6 +88,7 @@ This function should only modify configuration layer settings."
      treemacs
      (typescript :variables
                  typescript-backend 'tide
+                 tide-tsserver-executable "/home/alan/.nvm/versions/node/v14.15.5/bin/tsserver"
                  typescript-fmt-tool 'prettier
                  typescript-fmt-on-save t
                  typescript-linter 'tslint)
@@ -106,7 +107,7 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(nvm)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -257,7 +258,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '()
+   dotspacemacs-themes '(spacemacs-dark)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
@@ -550,6 +551,9 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; mode line theme
   (setq dotspacemacs-mode-line-theme '(spacemacs :separator nil))
 
+  ;; add npm binaries
+  (add-to-list 'exec-path "/home/alan/.nvm/versions/node/v14.15.5/bin" t)
+
   ;; full screen magit
   (setq-default git-magit-status-fullscreen t)
 
@@ -581,6 +585,8 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  ;; specify nvm node version
+  (nvm-use "v14.15.5")
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
