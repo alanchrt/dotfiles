@@ -2,3 +2,4 @@
 - hosts: all
   roles:
     - nodejs
+    - emacs
