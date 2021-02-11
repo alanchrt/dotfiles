@@ -51,10 +51,9 @@ This function should only modify configuration layer settings."
      github
      go
      graphql
-     ;; helm
+     helm
      html
      import-js
-     ivy
      (javascript :variables
                  javascript-backend 'tern
                  javascript-import-tool 'import-js
