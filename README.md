@@ -1,7 +1,7 @@
 ### WIP README STUFF
 
 ```shell
-wget -q -O - https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/bootstrap.sh | bash
+wget -qO- https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/bootstrap.sh | bash
 ```
 
 ## Overview
