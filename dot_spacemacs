@@ -55,7 +55,7 @@ This function should only modify configuration layer settings."
      html
      import-js
      (javascript :variables
-                 javascript-backend 'tern
+                 javascript-backend 'tide
                  javascript-import-tool 'import-js
                  javascript-fmt-tool 'prettier
                  node-add-modules-path t
@@ -91,7 +91,7 @@ This function should only modify configuration layer settings."
                  tide-tsserver-executable (concat (getenv "HOME") "/.nvm/versions/node/v14.15.5/bin/tsserver")
                  typescript-fmt-tool 'prettier
                  typescript-fmt-on-save t
-                 typescript-linter 'tslint)
+                 typescript-linter 'eslint)
      unicode-fonts
      version-control
      web-beautify

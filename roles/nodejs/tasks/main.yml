@@ -17,7 +17,6 @@
   with_items:
     - yarn
     - typescript
-    - tern
     - eslint
     - babel-eslint
     - eslint-plugin-react
