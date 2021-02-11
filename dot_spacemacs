@@ -90,7 +90,6 @@ This function should only modify configuration layer settings."
      treemacs
      (typescript :variables
                  typescript-backend 'tide
-                 tide-tsserver-executable "/home/alan/.nvm/versions/node/v14.15.5/bin/tsserver"
                  typescript-fmt-tool 'prettier
                  typescript-fmt-on-save t
                  typescript-linter 'tslint)
@@ -109,7 +108,7 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(nvm)
+   dotspacemacs-additional-packages '()
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -556,9 +555,6 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; full screen magit
   (setq-default git-magit-status-fullscreen t)
 
-  ;; specify node bin path
-  (add-to-list 'exec-path "/home/alan/.nvm/versions/node/v14.15.5/bin" t)
-
   ;; indent 2 spaces
   (setq-default
    css-indent-offset 2
@@ -587,8 +583,6 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  ;; specify nvm node version
-  (nvm-use "v14.15.5")
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
