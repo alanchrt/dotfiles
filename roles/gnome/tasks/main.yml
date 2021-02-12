@@ -1,0 +1,15 @@
+---
+- name: Install psutil
+  become: yes
+  apt:
+    name: python3-psutil
+
+- name: Copy wallpaper graphic
+  copy:
+    src: files/dracula-arab-tile.png
+    dest: "{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png"
+
+- name: Set wallpaper
+  community.general.dconf:
+    key: /org/gnome/desktop/background/picture-uri
+    value: "'file://{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png'"
