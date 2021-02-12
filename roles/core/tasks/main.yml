@@ -1,0 +1,18 @@
+---
+- name: Install core packages
+  become: yes
+  apt:
+    name:
+      - build-essential
+      - software-properties-common
+      - python-is-python3
+      - ansible
+      - curl
+      - git
+      - ranger
+      - ripgrep
+      - jq
+      - cmake
+      - whois
+      - ldnsutils
+    update_cache: yes
