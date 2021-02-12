@@ -1,0 +1,36 @@
+---
+- name: Install zsh
+  become: yes
+  apt:
+    name: zsh
+
+- name: Configure default shell
+  become: yes
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: /usr/bin/zsh
+
+- name: Set up oh-my-zsh
+  git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh"
+
+- name: Clone dracula theme
+  git:
+    repo: https://github.com/dracula/zsh.git
+    dest: "{{ ansible_env.HOME }}/.local/share/dracula"
+
+- name: Install dracula theme
+  file:
+    src: "{{ ansible_env.HOME }}/.local/share/dracula/dracula.zsh-theme"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/dracula.zsh-theme"
+    state: link
+
+- name: Clone zsh-users plugins
+  git:
+    repo: "https://github.com/zsh-users/{{ item }}.git"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/{{ item }}"
+  with_items:
+    - zsh-syntax-highlighting
+    - zsh-autosuggestions
+    - zsh-history-substring-search
