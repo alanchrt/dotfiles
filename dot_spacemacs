@@ -587,6 +587,25 @@ Put your configuration code here, except for variables that should be set
 before packages are loaded."
   ;; specify nvm node version
   (nvm-use "v14.15.5")
+
+  ;; create a tide setup for use in rjsx-mode
+  (defun setup-tide-mode ()
+    "Setup function for tide."
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+
+  ;; aligns annotation to the right hand side
+  (setq company-tooltip-align-annotations t)
+
+  ;; use rjsx-mode for .js* files except json and use tide with rjsx
+  (add-to-list 'auto-mode-alist '("\\.js.*$" . rjsx-mode))
+  (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
+  (add-hook 'rjsx-mode-hook #'setup-tide-mode)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
