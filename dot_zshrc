@@ -6,7 +6,7 @@ bindkey -e
 # Use oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="dracula"
-plugins=(zsh-syntax-highlighting zsh-autosuggestions zsh-history-substring-search)
+plugins=(zsh-syntax-highlighting zsh-history-substring-search)
 source $ZSH/oh-my-zsh.sh
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
@@ -38,6 +38,3 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 # Bind history substring search
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
-
-# Style autosuggestions
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#6272a4"

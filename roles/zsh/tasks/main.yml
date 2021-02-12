@@ -32,5 +32,4 @@
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/{{ item }}"
   with_items:
     - zsh-syntax-highlighting
-    - zsh-autosuggestions
     - zsh-history-substring-search
