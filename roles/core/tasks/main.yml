@@ -15,4 +15,5 @@
       - cmake
       - whois
       - ldnsutils
+      - markdown
     update_cache: yes
