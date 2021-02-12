@@ -6,7 +6,7 @@
       - build-essential
       - software-properties-common
       - python-is-python3
-      - regolith-look-dracula
+      - regolith-look-dracula # TODO move to i3 role
       - ansible
       - curl
       - git
@@ -21,9 +21,9 @@
       - ldnsutils
       - markdown
       - acpi
-      - i3xrocks-battery
-      - fonts-noto-core
+      - i3xrocks-battery # TODO move to i3 role
+      - fonts-noto-core # TODO move to emacs role
       - fonts-source-code-pro-ttf
-      - fonts-hack-ttf
-      - unifont
+      - fonts-hack-ttf # TODO move to emacs role
+      - unifont # TODO move to emacs role
     update_cache: yes
