@@ -10,9 +10,10 @@ wget --no-clobber https://github.com/twpayne/chezmoi/releases/download/v1.8.11/c
 sudo apt install /tmp/dotfiles/chezmoi.deb
 
 # init and apply chezmoi
-if [ ! -d ~/.local/share/chezmoi ] ; then
-    git clone -b regolith git@github.com:alanchrt/dotfiles.git ~/.local/share/chezmoi
-    chmod 0700 ~/.local/share/chezmoi/
+mkdir -p $HOME/Projects $HOME/.config/chezmoi
+if [ ! -d $HOME/Projects/dotfiles ] ; then
+    git clone -b regolith git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+    cp $HOME/Projects/dotfiles/dot_config/chezmoi/chezmoi.toml $HOME/.config/chezmoi/chezmoi.toml
 fi
 chezmoi apply
 
