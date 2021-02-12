@@ -5,7 +5,7 @@
     name: emacs
 
 - name: Clone spacemacs distribution
-  ansible.builtin.git:
+  git:
     repo: https://github.com/syl20bnr/spacemacs
     dest: "{{ ansible_env.HOME }}/.emacs.d"
     version: develop
