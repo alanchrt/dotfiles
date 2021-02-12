@@ -6,14 +6,24 @@
       - build-essential
       - software-properties-common
       - python-is-python3
+      - regolith-look-dracula
       - ansible
       - curl
       - git
+      - vim
+      - byobu
       - ranger
       - ripgrep
       - jq
       - cmake
+      - imagemagick
       - whois
       - ldnsutils
       - markdown
+      - acpi
+      - i3xrocks-battery
+      - fonts-noto-core
+      - fonts-source-code-pro-ttf
+      - fonts-hack-ttf
+      - unifont
     update_cache: yes
