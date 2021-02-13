@@ -9,3 +9,20 @@
     repo: https://github.com/syl20bnr/spacemacs
     dest: "{{ ansible_env.HOME }}/.emacs.d"
     version: develop
+
+- name: Create user systemd directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+
+- name: Set up systemd unit file
+  copy:
+    src: files/emacs.service
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/emacs.service"
+
+- name: Enable and start emacs server
+  systemd:
+    name: emacs
+    scope: user
+    state: started
+    enabled: yes
