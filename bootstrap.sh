@@ -2,6 +2,8 @@
 
 set -e
 
+ORIGIN_USERNAME="${DOTFILES_ORIGIN_USERNAME:-alanchrt}"
+
 # install base deps
 sudo apt upgrade --assume-yes
 sudo apt install --assume-yes git curl software-properties-common python-is-python3 ansible build-essential libssl-dev
@@ -15,7 +17,8 @@ sudo apt install /tmp/dotfiles/chezmoi.deb
 
 # init and apply chezmoi
 if [ ! -d $HOME/Projects/dotfiles ] ; then
-    git clone -b regolith git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+    git clone -b regolith --origin upstream https://github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+    git -C $HOME/Projects/dotfiles remote add origin git@github.com:$ORIGIN_USERNAME/dotfiles.git
 fi
 chezmoi apply --source $HOME/Projects/dotfiles
 
