@@ -22,8 +22,4 @@
       - markdown
       - acpi
       - i3xrocks-battery # TODO move to i3 role
-      - fonts-noto-core # TODO move to emacs role
-      - fonts-source-code-pro-ttf
-      - fonts-hack-ttf # TODO move to emacs role
-      - unifont # TODO move to emacs role
     update_cache: yes

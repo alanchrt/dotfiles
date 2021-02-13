@@ -1,0 +1,25 @@
+---
+- name: Install system fonts
+  become: yes
+  apt:
+    name:
+      - fonts-symbola
+      - fonts-noto-core
+      - fonts-source-code-pro-ttf
+      - fonts-hack-ttf
+    update_cache: yes
+
+- name: Create fonts directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/fonts"
+    state: directory
+
+- name: Install Quivira font
+  get_url:
+    url: http://www.quivira-font.com/files/Quivira.ttf
+    dest: "{{ ansible_env.HOME }}/.local/share/fonts/Quivira.ttf"
+  register: install_quivira
+
+- name: Refresh font cache
+  shell: fc-cache --force
+  when: install_quivira.changed

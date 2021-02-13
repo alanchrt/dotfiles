@@ -3,6 +3,7 @@
   roles:
     - core
     - gnome
+    - fonts
     - zsh
     - nodejs
     - emacs
