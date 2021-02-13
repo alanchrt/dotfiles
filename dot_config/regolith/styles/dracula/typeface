@@ -1,7 +1,7 @@
 ! Typeface: Hack
-#define typeface_bar_glyph  Hack Bold 12
-#define typeface_wm         pango:Hack Bold 12
-#define typeface_bar        pango:Hack Bold 12, Material Design Icons 12
+#define typeface_bar_glyph  Hack 12
+#define typeface_wm         pango:Hack 10
+#define typeface_bar        pango:Hack 12, Material Design Icons 12
 #define typeface_rofi       Hack Bold 14
 #define typeface_terminal   Hack:pixelsize=12:antialias=true:autohint=true
 #define typeface_gnome_terminal Hack 12
