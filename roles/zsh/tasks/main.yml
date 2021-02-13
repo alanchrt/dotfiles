@@ -33,3 +33,8 @@
   with_items:
     - zsh-syntax-highlighting
     - zsh-history-substring-search
+
+- name: Clone zsh-nvm
+  git:
+    repo: "https://github.com/lukechilds/zsh-nvm"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/zsh-nvm"
