@@ -3,9 +3,6 @@ setopt histignorealldups sharehistory
 # Use emacs keybindings
 bindkey -e
 
-# Configure dotfiles installation path
-export DOTFILES_INSTALL_PATH={{ env "DOTFILES_INSTALL_PATH" }}
-
 # Use oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 export ZSH_THEME="dracula"
