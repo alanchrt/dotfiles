@@ -5,8 +5,10 @@ bindkey -e
 
 # Use oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
-ZSH_THEME="dracula"
-plugins=(zsh-syntax-highlighting zsh-history-substring-search)
+export ZSH_THEME="dracula"
+export NVM_LAZY_LOAD=true
+export NVM_COMPLETION=true
+plugins=(zsh-syntax-highlighting zsh-history-substring-search zsh-nvm)
 source $ZSH/oh-my-zsh.sh
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
