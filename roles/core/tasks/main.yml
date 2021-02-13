@@ -23,3 +23,8 @@
       - acpi
       - i3xrocks-battery # TODO move to i3 role
     update_cache: yes
+
+- name: Insure local bin path exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory

@@ -3,6 +3,9 @@ setopt histignorealldups sharehistory
 # Use emacs keybindings
 bindkey -e
 
+# Add local bin path to PATH
+export PATH="$PATH:$HOME/.local/bin"
+
 # Use oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 export ZSH_THEME="dracula"
