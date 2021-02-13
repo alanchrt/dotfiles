@@ -17,7 +17,7 @@ sudo apt install /tmp/dotfiles/chezmoi.deb
 
 # init and apply chezmoi
 if [ ! -d $HOME/Projects/dotfiles ] ; then
-    git clone -b regolith --origin upstream https://github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+    git clone -b regolith --origin upstream https://github.com/alanchrt/dotfiles.git $HOME/Projects/dotfiles
     git -C $HOME/Projects/dotfiles remote add origin git@github.com:$ORIGIN_USERNAME/dotfiles.git
 fi
 chezmoi apply --source $HOME/Projects/dotfiles
