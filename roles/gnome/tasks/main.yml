@@ -4,6 +4,11 @@
   apt:
     name: python3-psutil
 
+- name: Create backgrounds directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/backgrounds"
+    state: directory
+
 - name: Copy wallpaper graphic
   copy:
     src: files/dracula-arab-tile.png
