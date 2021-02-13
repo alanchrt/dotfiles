@@ -1,0 +1,9 @@
+# screen
+screen_upper_left="color"
+screen_upper_right="color menu"
+screen_lower_left="session"
+screen_lower_right="hostname"
+
+# tmux
+tmux_left="session"
+tmux_right="hostname"
