@@ -2,7 +2,7 @@
 
 set -e
 
-export DOTFILES_INSTALL_PATH="${DOTFILES_INSTALL_PATH:-$HOME/Projects}"
+export DOTFILES_INSTALL_PATH="${DOTFILES_INSTALL_PATH:-$HOME/Projects/dotfiles}"
 
 # install base deps
 sudo apt upgrade --assume-yes
@@ -17,10 +17,10 @@ sudo apt install /tmp/dotfiles/chezmoi.deb
 
 # init and apply chezmoi
 mkdir -p $DOTFILES_INSTALL_PATH
-if [ ! -d $DOTFILES_INSTALL_PATH/dotfiles ] ; then
-    git clone -b regolith git@github.com:alanchrt/dotfiles.git $DOTFILES_INSTALL_PATH/dotfiles
+if [ ! -d $DOTFILES_INSTALL_PATH ] ; then
+    git clone -b regolith git@github.com:alanchrt/dotfiles.git $DOTFILES_INSTALL_PATH
 fi
-chezmoi apply --source $DOTFILES_INSTALL_PATH/dotfiles
+chezmoi apply --source $DOTFILES_INSTALL_PATH
 
 # install ansible galaxy dependencies
 ansible-galaxy collection install community.general

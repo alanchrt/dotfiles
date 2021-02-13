@@ -4,6 +4,12 @@
 wget -qO- https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/bootstrap.sh | bash
 ```
 
+alt (custom path):
+
+```shell
+wget -qO- https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/bootstrap.sh | DOTFILES_INSTALL_PATH=$HOME/.dotfiles bash
+```
+
 ## Overview
 
 This is my NixOS, i3, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
