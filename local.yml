@@ -2,8 +2,8 @@
 - hosts: all
   roles:
     - core
-    - gnome
-    - fonts
-    - zsh
+    # - gnome
+    # - fonts
+    # - zsh
     - nodejs
-    - emacs
+    # - emacs

@@ -24,7 +24,7 @@ ansible-galaxy collection install community.general
 if [ ! -f /tmp/dotfiles/requirements.yml ] ; then
     wget --no-clobber -O /tmp/dotfiles/requirements.yml https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/requirements.yml
 fi
-ansible-galaxy install -r /tmp/dotfiles/requirements.yml
+#ansible-galaxy install -r /tmp/dotfiles/requirements.yml
 
 # clean up
 rm -r /tmp/dotfiles

@@ -53,10 +53,10 @@ This function should only modify configuration layer settings."
      graphql
      helm
      html
-     import-js
+     ;; import-js
      (javascript :variables
                  javascript-backend 'tide
-                 javascript-import-tool 'import-js
+                 ;; javascript-import-tool 'import-js
                  javascript-fmt-tool 'prettier
                  node-add-modules-path t
                  js2-include-node-externs t
@@ -90,7 +90,7 @@ This function should only modify configuration layer settings."
      treemacs
      (typescript :variables
                  typescript-backend 'tide
-                 tide-tsserver-executable (concat (getenv "HOME") "/.nvm/versions/node/v14.15.5/bin/tsserver")
+                 tide-tsserver-executable (concat (getenv "HOME") "/.fnm/node-versions/v14.15.5/installation/bin/tsserver")
                  typescript-fmt-tool 'prettier
                  typescript-fmt-on-save t
                  typescript-linter 'eslint)
@@ -109,7 +109,7 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(nvm)
+   dotspacemacs-additional-packages '()
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -551,7 +551,7 @@ configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; add npm binaries
-  (add-to-list 'exec-path (concat (getenv "HOME") "/.nvm/versions/node/v14.15.5/bin") t)
+  (add-to-list 'exec-path (concat (getenv "HOME") "/.fnm/node-versions/v14.15.5/installation/bin") t)
 
   ;; full screen magit
   (setq-default git-magit-status-fullscreen t)
@@ -584,9 +584,6 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  ;; specify nvm node version
-  (nvm-use "v14.15.5")
-
   ;; create a tide setup for use in rjsx-mode
   (defun setup-tide-mode ()
     "Setup function for tide."
@@ -630,7 +627,7 @@ This function is called at the very end of Spacemacs initialization."
  '(evil-want-Y-yank-to-eol nil)
  '(package-selected-packages
    (quote
-    (systemd toml-mode ron-mode racer helm-gtags ggtags flycheck-rust dap-mode lsp-treemacs bui lsp-mode counsel-gtags counsel swiper ivy cargo rust-mode company-statistics yasnippet-snippets yapfify yaml-mode ws-butler writeroom-mode winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toc-org tide tern tagedit symon symbol-overlay string-inflection sql-indent sphinx-doc spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode rjsx-mode restart-emacs request ranger rainbow-delimiters pytest pyenv-mode py-isort pug-mode protobuf-mode prettier-js popwin pony-mode poetry pippel pipenv pip-requirements pcre2el password-generator paradox overseer orgit org-superstar org-rich-yank org-projectile org-present org-pomodoro org-mime org-download org-cliplink org-brain open-junk-file nvm npm-mode nodejs-repl nginx-mode nameless move-text mmm-mode markdown-toc magit-svn magit-section magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode link-hint json-navigator js2-refactor js-doc ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy insert-shebang indent-guide importmagic import-js impatient-mode hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make grip-mode graphql-mode google-translate golden-ratio godoctor go-tag go-rename go-impl go-guru go-gen-test go-fill-struct go-eldoc gnuplot gitignore-templates gitignore-mode github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ gist gh-md fuzzy forge font-lock+ flycheck-pos-tip flycheck-package flycheck-elsa flycheck-bashate flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr emojify emoji-cheat-sheet-plus emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode dockerfile-mode docker dired-quick-sort diminish devdocs define-word cython-mode csv-mode counsel-projectile counsel-css copy-as-format company-web company-terraform company-shell company-reftex company-quickhelp company-math company-go company-emoji company-auctex company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent add-node-modules-path ace-link ac-ispell)))
+    (systemd toml-mode ron-mode racer helm-gtags ggtags flycheck-rust dap-mode lsp-treemacs bui lsp-mode counsel-gtags counsel swiper ivy cargo rust-mode company-statistics yasnippet-snippets yapfify yaml-mode ws-butler writeroom-mode winum which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unicode-fonts undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toc-org tide tern tagedit symon symbol-overlay string-inflection sql-indent sphinx-doc spaceline-all-the-icons smex smeargle slim-mode scss-mode sass-mode rjsx-mode restart-emacs request ranger rainbow-delimiters pytest pyenv-mode py-isort pug-mode protobuf-mode prettier-js popwin pony-mode poetry pippel pipenv pip-requirements pcre2el password-generator paradox overseer orgit org-superstar org-rich-yank org-projectile org-present org-pomodoro org-mime org-download org-cliplink org-brain open-junk-file npm-mode nodejs-repl nginx-mode nameless move-text mmm-mode markdown-toc magit-svn magit-section magit-gitflow macrostep lorem-ipsum livid-mode live-py-mode link-hint json-navigator js2-refactor js-doc ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ivy-avy insert-shebang indent-guide importmagic import-js impatient-mode hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-make grip-mode graphql-mode google-translate golden-ratio godoctor go-tag go-rename go-impl go-guru go-gen-test go-fill-struct go-eldoc gnuplot gitignore-templates gitignore-mode github-search github-clone gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ gist gh-md fuzzy forge font-lock+ flycheck-pos-tip flycheck-package flycheck-elsa flycheck-bashate flx-ido fish-mode fill-column-indicator fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu emr emojify emoji-cheat-sheet-plus emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode dockerfile-mode docker dired-quick-sort diminish devdocs define-word cython-mode csv-mode counsel-projectile counsel-css copy-as-format company-web company-terraform company-shell company-reftex company-quickhelp company-math company-go company-emoji company-auctex company-anaconda column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote blacken auto-yasnippet auto-highlight-symbol auto-compile aggressive-indent add-node-modules-path ace-link ac-ispell)))
  '(spacemacs-theme-custom-colors
    (quote
     ((base . "#ffffff")
