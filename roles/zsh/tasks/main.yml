@@ -31,6 +31,7 @@
     repo: "https://github.com/zsh-users/{{ item }}.git"
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/{{ item }}"
   with_items:
+    - zsh-completions
     - zsh-syntax-highlighting
     - zsh-history-substring-search
 
