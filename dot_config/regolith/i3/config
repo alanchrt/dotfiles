@@ -600,7 +600,7 @@ font $i3-wm.font
 ###############################################################################
 
 set_from_resource $i3-wm.bar.position i3-wm.bar.position bottom
-set_from_resource $i3-wm.bar.font i3-wm.bar.font pango:Hack 12, Material Design Icons 12
+set_from_resource $i3-wm.bar.font i3-wm.bar.font pango:Hack Bold 12, Material Design Icons 12
 set_from_resource $i3-wm.bar.separator i3-wm.bar.separator "|"
 set_from_resource $i3-wm.bar.trayoutput i3-wm.bar.trayoutput primary
 set_from_resource $i3-wm.bar.stripworkspacenumbers i3-wm.bar.stripworkspacenumbers yes
