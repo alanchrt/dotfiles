@@ -8,6 +8,9 @@ case $- in
       *) return;;
 esac
 
+# Configure dotfiles installation path
+export DOTFILES_INSTALL_PATH={{ env "DOTFILES_INSTALL_PATH" }}
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -116,6 +119,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# set up nvm
+# Set up nvm
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
