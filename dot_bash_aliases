@@ -1,0 +1,3 @@
+# dotfiles
+alias dotme="chezmoi update && ansible-pull --checkout regolith --url git@github.com:alanchrt/dotfiles.git --ask-become-pass -i hosts"
+alias dotme-local="chezmoi apply && ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts"

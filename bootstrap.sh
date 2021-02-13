@@ -30,5 +30,4 @@ ansible-galaxy install -r /tmp/dotfiles/requirements.yml
 rm -r /tmp/dotfiles
 
 # run ansible playbook
-# test locally: ansible-playbook --ask-become-pass -c local local.yml -i hosts
 ANSIBLE_FORCE_COLOR=true ansible-pull --checkout regolith --url git@github.com:alanchrt/dotfiles.git --ask-become-pass -i hosts

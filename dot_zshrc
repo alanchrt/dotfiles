@@ -22,3 +22,8 @@ zstyle ':completion:*' menu select=2
 # Bind history substring search
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
+
+# Include bash aliases
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
