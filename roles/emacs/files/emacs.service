@@ -4,11 +4,11 @@ Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/emacs --fg-daemon
+ExecStart=/usr/bin/emacs --daemon
 ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
 Environment=SSH_AUTH_SOCK=%t/keyring/ssh
- # long start timeout for initial spacemacs install
-TimeoutStartSec=600
+ # don't worry about start time (spacemacs install takes time)
+TimeoutStartSec=0
 Restart=on-failure
 
 [Install]

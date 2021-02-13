@@ -24,6 +24,13 @@
   copy:
     src: files/emacs.service
     dest: "{{ ansible_env.HOME }}/.config/systemd/user/emacs.service"
+  register: emacs_unit_file
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+    scope: user
+  when: emacs_unit_file.changed
 
 - name: Enable and start emacs server
   systemd:
