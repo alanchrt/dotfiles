@@ -14,12 +14,10 @@ fi
 sudo apt install /tmp/dotfiles/chezmoi.deb
 
 # init and apply chezmoi
-mkdir -p $HOME/Projects $HOME/.config/chezmoi
 if [ ! -d $HOME/Projects/dotfiles ] ; then
     git clone -b regolith git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
-    cp $HOME/Projects/dotfiles/dot_config/chezmoi/chezmoi.toml $HOME/.config/chezmoi/chezmoi.toml
 fi
-chezmoi apply
+chezmoi apply --source $HOME/Projects/dotfiles
 
 # install ansible galaxy dependencies
 ansible-galaxy collection install community.general
