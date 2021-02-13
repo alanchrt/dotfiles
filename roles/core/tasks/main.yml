@@ -21,6 +21,7 @@
       - ldnsutils
       - markdown
       - acpi
+      - unzip
       - i3xrocks-battery # TODO move to i3 role
     update_cache: yes
 
