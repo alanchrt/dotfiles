@@ -18,3 +18,20 @@
   community.general.dconf:
     key: /org/gnome/desktop/background/picture-uri
     value: "'file://{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png'"
+
+- name: Add papirus PPA
+  become: yes
+  apt_repository:
+    repo: ppa:papirus/papirus
+
+- name: Install papirus icon theme
+  become: yes
+  apt:
+    name: papirus-icon-theme
+    update_cache: yes
+  register: papirus_icons
+
+- name: Set icon theme
+  community.general.dconf:
+    key: /org/gnome/desktop/interface/icon-theme
+    value: "'Papirus'"
