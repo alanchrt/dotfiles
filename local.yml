@@ -7,3 +7,4 @@
     - zsh
     - nodejs
     - emacs
+    - completion # keep last

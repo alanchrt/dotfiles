@@ -9,7 +9,7 @@ export PATH="$PATH:$HOME/.local/bin"
 # Use oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 export ZSH_THEME="dracula"
-plugins=(zsh-completions zsh-syntax-highlighting zsh-history-substring-search)
+plugins=(zsh-syntax-highlighting zsh-completions zsh-history-substring-search)
 source $ZSH/oh-my-zsh.sh
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
@@ -18,8 +18,10 @@ SAVEHIST=1000
 HISTFILE=~/.zsh_history
 
 # Use modern completion system
+skip_global_compinit=1
 autoload -Uz compinit
-compinit
+# for some reason, specifying a different zcompdump makes this faster
+compinit -d ~/.zcompdump_completion
 zstyle ':completion:*' menu select=2
 
 # Bind history substring search
