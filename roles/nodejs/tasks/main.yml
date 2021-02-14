@@ -16,8 +16,6 @@
     name: "{{ item }}"
     global: yes
     executable: "{{ ansible_env.HOME }}/.fnm/node-versions/v14.15.5/installation/bin/npm"
-  # environment:
-  #   PATH: "{{ ansible_env.HOME }}/.nvm/versions/node/v14.15.5/bin:{{ ansible_env.PATH }}"
   with_items:
     - yarn
     - typescript
