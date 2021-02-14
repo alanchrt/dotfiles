@@ -54,6 +54,7 @@ This function should only modify configuration layer settings."
      graphql
      helm
      html
+     ;; FIXME see https://github.com/alanchrt/dotfiles/issues/141
      ;; import-js
      (javascript :variables
                  javascript-backend 'tide
