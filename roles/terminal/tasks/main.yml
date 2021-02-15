@@ -1,4 +1,36 @@
 ---
+- name: Symlink vte script
+  become: yes
+  file:
+    src: /etc/profile.d/vte-2.91.sh
+    dest: /etc/profile.d/vte.sh
+    state: link
+
+- name: Install tilix
+  become: yes
+  apt:
+    name: tilix
+
+# TODO configure tilix
+# ~ dconf dump /com/gexperts/Tilix/
+# [/]
+# control-click-titlebar=true
+# quake-specific-monitor=0
+# terminal-title-show-when-single=false
+# unsafe-paste-alert=false
+# window-style='borderless'
+
+# [profiles/2b7c4080-0ddd-46c5-8f23-563fd3ba789d]
+# font='Hack 12'
+# use-system-font=false
+# visible-name='Default'
+
+- name: Set tilix as default terminal
+  become: yes
+  alternatives:
+    name: x-terminal-emulator
+    path: /usr/bin/tilix.wrapper
+
 - name: Install zsh
   become: yes
   apt:

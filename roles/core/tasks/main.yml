@@ -7,7 +7,6 @@
       - software-properties-common
       - checkinstall
       - python-is-python3
-      - regolith-look-dracula # TODO move to i3 role
       - python3-pip
       - ipython3
       - ansible
@@ -25,7 +24,6 @@
       - markdown
       - acpi
       - unzip
-      - i3xrocks-battery # TODO move to i3 role
       - tree
     update_cache: yes
 

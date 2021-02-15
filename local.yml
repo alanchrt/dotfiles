@@ -2,9 +2,12 @@
 - hosts: all
   roles:
     - core
+    - i3
     - gnome
     - fonts
-    - zsh
+    - terminal
     - nodejs
     - emacs
-    - completions # keep last
+
+    # keep completions last since they depend on programs to generate
+    - completions

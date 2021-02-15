@@ -31,6 +31,11 @@ bindkey -M emacs '^N' history-substring-search-down
 # Set up fnm
 eval "$(fnm env)"
 
+# Set up vte for tilix
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+    source /etc/profile.d/vte.sh
+fi
+
 # Include bash aliases
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases

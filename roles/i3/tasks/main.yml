@@ -1,0 +1,7 @@
+---
+- name: Install i3 configuration dependencies
+  become: yes
+  apt:
+    name:
+      - regolith-look-dracula
+      - i3xrocks-battery
