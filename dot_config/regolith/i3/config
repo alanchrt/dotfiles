@@ -470,7 +470,7 @@ set_from_resource $i3-wm.binding.inc_gaps_big i3-wm.binding.inc_gaps_big Shift+p
 set_from_resource $i3-wm.binding.dec_gaps_big i3-wm.binding.dec_gaps_big Shift+minus
 
 ## Resize // Enter Resize Mode // <> r ##
-mode "Resize Mode" {
+mode "RESIZE" {
         # These bindings trigger as soon as you enter the resize mode
 
         ## Resize // Resize Window // ↑ ↓ ← → ##
@@ -506,7 +506,7 @@ mode "Resize Mode" {
         bindsym Escape mode "default"
         bindsym $mod+r mode "default"
 }
-bindsym $mod+r mode "Resize Mode"
+bindsym $mod+r mode "RESIZE"
 
 ###############################################################################
 # i3 Appearance and Behavior
