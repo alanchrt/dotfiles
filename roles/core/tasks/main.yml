@@ -5,8 +5,10 @@
     name:
       - build-essential
       - software-properties-common
+      - checkinstall
       - python-is-python3
       - regolith-look-dracula # TODO move to i3 role
+      - python3-pip
       - ipython3
       - ansible
       - curl
@@ -24,6 +26,7 @@
       - acpi
       - unzip
       - i3xrocks-battery # TODO move to i3 role
+      - tree
     update_cache: yes
 
 - name: Insure local bin path exists
