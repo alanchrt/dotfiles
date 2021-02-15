@@ -7,6 +7,7 @@
       - software-properties-common
       - python-is-python3
       - regolith-look-dracula # TODO move to i3 role
+      - ipython3
       - ansible
       - curl
       - git
