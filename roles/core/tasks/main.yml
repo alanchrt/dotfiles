@@ -6,9 +6,6 @@
       - build-essential
       - software-properties-common
       - checkinstall
-      - python-is-python3
-      - python3-pip
-      - ipython3
       - ansible
       - curl
       - git
