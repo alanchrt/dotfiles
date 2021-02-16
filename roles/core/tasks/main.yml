@@ -16,6 +16,7 @@
       - jq
       - cmake
       - imagemagick
+      - xclip
       - whois
       - ldnsutils
       - markdown
