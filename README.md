@@ -1,5 +1,9 @@
 ### WIP README STUFF
 
+instructions for regolith iso (`dd`)
+
+make sure key is configured on gh
+
 ```shell
 wget -qO- https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/bootstrap.sh | bash
 ```
