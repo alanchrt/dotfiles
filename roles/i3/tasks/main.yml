@@ -5,3 +5,9 @@
     name:
       - regolith-look-dracula
       - i3xrocks-battery
+
+- name: Add wolfram alpha script to local bin
+  copy:
+    src: files/wa
+    dest: "{{ ansible_env.HOME }}/.local/bin/wa"
+    mode: +x

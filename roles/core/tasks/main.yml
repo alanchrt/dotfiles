@@ -22,10 +22,10 @@
       - acpi
       - unzip
       - tree
-      - units
+      - rlwrap
     update_cache: yes
 
-- name: Insure local bin path exists
+- name: Ensure local bin path exists
   file:
     path: "{{ ansible_env.HOME }}/.local/bin"
     state: directory
