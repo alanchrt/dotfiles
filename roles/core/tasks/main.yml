@@ -25,6 +25,7 @@
       - acpi
       - unzip
       - tree
+      - units
     update_cache: yes
 
 - name: Insure local bin path exists
