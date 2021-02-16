@@ -10,6 +10,7 @@
 - name: Install common packages
   pip:
     name:
+      - prompt-toolkit
       - python3-pip-autoremove
       # used in spacemacs
       - importmagic
