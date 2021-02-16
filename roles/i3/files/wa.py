@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
 import sys
+import os
+import time
+from pathlib import Path
 from prompt_toolkit import PromptSession
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.styles import Style
+from yaspin import yaspin
 
 style = Style.from_dict({
     # default
@@ -21,7 +25,7 @@ prompt_text = [
 
 
 def main():
-    history = FileHistory('/tmp/.wa-history')
+    history = FileHistory(os.path.join(Path.home(), '.wahistory'))
     session = PromptSession(history=history)
 
     while True:
@@ -31,7 +35,10 @@ def main():
             if text == 'exit':
                 raise EOFError
 
-            # TODO call wolfram alpha
+            with yaspin():
+                time.sleep(2)
+                # TODO call wolfram alpha
+
             print("You said: %s" % text)
 
         except KeyboardInterrupt:

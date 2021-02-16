@@ -11,6 +11,7 @@
   pip:
     name:
       - prompt-toolkit
+      - yaspin
       - python3-pip-autoremove
       # used in spacemacs
       - importmagic
