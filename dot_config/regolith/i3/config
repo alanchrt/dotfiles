@@ -104,13 +104,8 @@ set_from_resource $i3-wm.binding.launcher.app i3-wm.binding.launcher.app space
 set_from_resource $i3-wm.program.launcher.app i3-wm.program.launcher.app rofi -show drun -display-drun open -theme $rofiTheme
 bindsym $mod+$i3-wm.binding.launcher.app exec $i3-wm.program.launcher.app
 
-## Launch // Command // <><Shift> Space ##
-set_from_resource $i3-wm.binding.launcher.cmd i3-wm.binding.launcher.cmd Shift+space
-set_from_resource $i3-wm.program.launcher.cmd i3-wm.program.launcher.cmd rofi -show run -theme $rofiTheme
-bindsym $mod+$i3-wm.binding.launcher.cmd exec $i3-wm.program.launcher.cmd
-
-## Navigate // Window by Name // <><Ctrl> Space ##
-set_from_resource $i3-wm.binding.launcher.window i3-wm.binding.launcher.window Ctrl+space
+## Navigate // Window by Name // <><Shift> Space ##
+set_from_resource $i3-wm.binding.launcher.window i3-wm.binding.launcher.window Shift+space
 set_from_resource $i3-wm.program.launcher.window i3-wm.program.launcher.window rofi -show window -theme $rofiTheme
 bindsym $mod+$i3-wm.binding.launcher.window exec $i3-wm.program.launcher.window
 
@@ -118,16 +113,6 @@ bindsym $mod+$i3-wm.binding.launcher.window exec $i3-wm.program.launcher.window
 set_from_resource $i3-wm.binding.help i3-wm.binding.help Shift+question
 set_from_resource $i3-wm.program.help i3-wm.program.help /usr/bin/remontoire-toggle
 bindsym $mod+$i3-wm.binding.help exec --no-startup-id $i3-wm.program.help
-
-## Launch // File Search // <><Alt> Space ##
-set_from_resource $i3-wm.binding.file_search i3-wm.binding.file_search Mod1+space
-set_from_resource $i3-wm.program.file_search i3-wm.program.file_search rofi -show find -modi find:/usr/share/rofi/modi/finder.sh
-bindsym $mod+$i3-wm.binding.file_search exec $i3-wm.program.file_search
-
-## Launch // Look Selector // <><Alt> l ##
-set_from_resource $i3-wm.binding.look_selector i3-wm.binding.look_selector Mod1+l
-set_from_resource $i3-wm.program.look_selector i3-wm.program.look_selector rofi -show look -modi look:/usr/share/rofi/modi/look-selector.sh
-bindsym $mod+$i3-wm.binding.look_selector exec $i3-wm.program.look_selector
 
 ###############################################################################
 # Window and Workspace Navigation

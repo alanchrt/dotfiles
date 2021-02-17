@@ -28,7 +28,6 @@
   horizontal_padding = 15
   separator_color = auto
   startup_notification = false
-  dmenu = /usr/bin/rofi -dmenu -p dunst
   browser = /usr/bin/google-chrome
   icon_position = left
   max_icon_size = 24
