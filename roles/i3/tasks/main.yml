@@ -5,6 +5,7 @@
     name:
       - regolith-look-dracula
       - i3xrocks-battery
+      - dunst
 
 - name: Add wolfram alpha script to local bin
   copy:

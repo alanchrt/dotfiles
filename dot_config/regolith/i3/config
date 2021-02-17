@@ -430,11 +430,6 @@ set_from_resource $i3-wm.binding.files i3-wm.binding.files Shift+n
 set_from_resource $i3-wm.program.files i3-wm.program.files /usr/bin/nautilus --new-window
 bindsym $mod+$i3-wm.binding.files exec $i3-wm.program.files
 
-## Launch // Notification Viewer // <> n ##
-set_from_resource $i3-wm.binding.notification_ui i3-wm.binding.notification_ui n
-set_from_resource $i3-wm.program.notification_ui i3-wm.program.notification_ui /usr/bin/rofication-gui
-bindsym $mod+$i3-wm.binding.notification_ui exec $i3-wm.program.notification_ui
-
 ## Launch // Dropterm // <> n ##
 set_from_resource $i3-wm.binding.dropterm i3-wm.binding.dropterm m
 set_from_resource $i3-wm.program.dropterm i3-wm.program.dropterm tilix --quake --command "byobu new-session -As dropterm"
@@ -648,8 +643,8 @@ bar {
 set_from_resource $i3-wm.program.compositor i3-wm.program.compositor /usr/share/regolith-compositor/init
 exec_always --no-startup-id $i3-wm.program.compositor
 
-# Start Rofication for notifications
-set_from_resource $i3-wm.program.notifications i3-wm.program.notifications /usr/bin/rofication-daemon
+# Start dunst for notifications
+set_from_resource $i3-wm.program.notifications i3-wm.program.notifications /usr/bin/dunst
 exec --no-startup-id $i3-wm.program.notifications
 
 # Launch first time user experience script
