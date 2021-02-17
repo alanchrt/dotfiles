@@ -7,7 +7,7 @@
 - name: Ignore completions directory in git
   lineinfile:
     path: "{{ ansible_env.HOME }}/.oh-my-zsh/.git/info/exclude"
-    line: completions/``
+    line: completions/
     create: yes
 
 - name: Install completions
