@@ -1,124 +1,69 @@
-#!/bin/env bash
+#!/usr/bin/env python
 
-# Copied from https://github.com/ASzc/tungsten
-# But reworked to loop for query input (to be used with rlwrap)
+import sys
+import os
+from pathlib import Path
+import requests
+from prompt_toolkit import PromptSession
+from prompt_toolkit.history import FileHistory
+from prompt_toolkit.styles import Style
+from yaspin import yaspin
 
-set -euo pipefail
+HISTORY_FILE = os.path.join(Path.home(), '.wahistory')
+APPID_FILE = os.path.join(Path.home(), '.waid')
 
-error () {
-    echo "$@" >&2
-}
+with open(APPID_FILE) as f:
+    APPID = f.read().strip()
 
-#
-# Load stored API key
-#
+style = Style.from_dict({
+    # default
+    '':          '#f8f8f2',
 
-key_path="$HOME/.wolfram_api_key"
-key_pattern='[A-Z0-9]{6}-[A-Z0-9]{10}'
+    # prompt
+    'logo':    '#ff79c6',
+    'colon': '#ff5555',
+})
 
-if ! [ -v WOLFRAM_API_KEY ]
-then
-    if [ -f "$key_path" ]
-    then
-        # Load the contents of $key_path file as WOLFRAM_API_KEY
-        WOLFRAM_API_KEY="$(<"$key_path")"
-        if ! [[ "$WOLFRAM_API_KEY" =~ $key_pattern ]]
-        then
-            error "WolframAlpha API key read from file '$key_path' doesn't match the validation pattern"
-            exit 2
-        fi
+prompt_text = [
+    ('class:logo', '𖣔 '),
+    ('class:colon',    ': '),
+]
 
-    elif [ -e "$key_path" ]
-    then
-        error "WolframAlpha API key path '$key_path' exists, but isn't a file."
-        exit 3
 
-    else
-        WOLFRAM_API_KEY=""
-    fi
-fi
+def main():
+    history = FileHistory(HISTORY_FILE)
+    session = PromptSession(history=history)
 
-#
-# Read the query
-#
+    while True:
+        try:
+            input = session.prompt(prompt_text, style=style)
 
-while read query; do
-    if [ -z "$query" ]
-    then
-        error "You must specify a query to make"
-        exit 5
-    fi
+            if input == 'exit':
+                raise EOFError
 
-    #
-    # Perform the query
-    #
-    curl_args=(
-        -sSf -G
-        --data-urlencode "output=JSON"
-        --data-urlencode "format=plaintext"
-        --data-urlencode "input=$query"
-    )
-    if [ -n "$WOLFRAM_API_KEY" ]
-    then
-        curl_args+=(
-            --data-urlencode "appid=$WOLFRAM_API_KEY"
-            "https://api.wolframalpha.com/v2/query"
-        )
-        iconv_from="UTF-8"
-    else
-        error "Querying without an API key. There may be incorrect / missing characters."
-        error "To query with an API key, add the key to $key_path as described in the README"
-        curl_args+=(
-            --data-urlencode "type=full"
-            -e "https://products.wolframalpha.com/api/explorer/"
-            "https://www.wolframalpha.com/input/apiExplorer.jsp"
-        )
-        iconv_from="ISO-8859-1"
-    fi
-    result="$(curl "${curl_args[@]}" | iconv -f "$iconv_from" -t UTF-8)"
+            with yaspin():
+                response = requests.get('https://api.wolframalpha.com/v2/query', params={
+                    'input': input,
+                    'appid': APPID,
+                    'output': 'json',
+                    })
 
-    #
-    # Process the result of the query
-    #
+            result = response.json()
 
-    query_result () {
-        set -euo pipefail
-        jq -r "$1" <<<"$result"
-    }
+            try:
+                pod = next(pod for pod in result['queryresult']['pods'] if pod.get('primary'))
+                subpod = next(subpod for subpod in pod['subpods'] if subpod.get('plaintext'))
+                print(subpod['plaintext'])
+            except StopIteration:
+                print('No answer available')
 
-    # Handle error results
-    if [ "$(query_result '.queryresult.error')" != "false" ]
-    then
-        error_msg="$(query_result '.queryresult.error.msg')"
 
-        if [ "$error_msg" = "Invalid appid" ]
-        then
-            error "WolframAlpha API rejected the given API key"
-            error "Modify or remove the key stored in file '$key_path'"
-            exit 6
-        else
-            error "WolframAlpha API returned an error: $error_msg"
-            exit 7
-        fi
-    fi
+        except KeyboardInterrupt:
+            continue
 
-    # Only colourise if stdout is a terminal
-    if [ -t 1 ]
-    then
-        titleformat='\e[1;34m%s\e[m\n'
-    else
-        titleformat='%s\n'
-    fi
+        except EOFError:
+            sys.exit()
 
-    # Print title+plaintext for each pod with text in it's subpod/plaintext child
-    while read -r title
-    do
-        printf "$titleformat" "$title"
 
-        # Process the >0 plaintext elements decendent of the current pod
-        query_result ".queryresult.pods[] | select(.title == \"$title\") | .subpods[].plaintext"
-    done < <(query_result '.queryresult.pods[] | select(.subpods[0].plaintext != "") | .title')
-
-    # Newline
-    echo
-done
+if __name__ == "__main__":
+    main()

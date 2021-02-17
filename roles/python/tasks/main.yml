@@ -10,6 +10,7 @@
 - name: Install common packages
   pip:
     name:
+      - requests
       - prompt-toolkit
       - yaspin
       - python3-pip-autoremove
