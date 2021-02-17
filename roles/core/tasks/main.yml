@@ -23,7 +23,6 @@
       - acpi
       - unzip
       - tree
-      - rlwrap
     update_cache: yes
 
 - name: Ensure local bin path exists
