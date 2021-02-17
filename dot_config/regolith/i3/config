@@ -101,7 +101,7 @@ set_from_resource $rofiTheme rofi.theme /etc/regolith/styles/dracula/rofi.rasi
 
 ## Launch // Application // <> Space ##
 set_from_resource $i3-wm.binding.launcher.app i3-wm.binding.launcher.app space
-set_from_resource $i3-wm.program.launcher.app i3-wm.program.launcher.app rofi -show drun -theme $rofiTheme
+set_from_resource $i3-wm.program.launcher.app i3-wm.program.launcher.app rofi -show drun -display-drun open -theme $rofiTheme
 bindsym $mod+$i3-wm.binding.launcher.app exec $i3-wm.program.launcher.app
 
 ## Launch // Command // <><Shift> Space ##
