@@ -35,3 +35,8 @@
   community.general.dconf:
     key: /org/gnome/desktop/interface/icon-theme
     value: "'Papirus'"
+
+- name: Set 12h clock format
+  community.general.dconf:
+    key: /org/gnome/desktop/interface/clock-format
+    value: "'12h'"
