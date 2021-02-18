@@ -36,16 +36,10 @@
     repo: https://github.com/ohmyzsh/ohmyzsh.git
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh"
 
-- name: Clone dracula theme
+- name: Clone powerlevel10k theme
   git:
-    repo: https://github.com/dracula/zsh.git
-    dest: "{{ ansible_env.HOME }}/.local/share/dracula"
-
-- name: Install dracula theme
-  file:
-    src: "{{ ansible_env.HOME }}/.local/share/dracula/dracula.zsh-theme"
-    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/dracula.zsh-theme"
-    state: link
+    repo: https://github.com/romkatv/powerlevel10k.git
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/powerlevel10k"
 
 - name: Clone zsh-users plugins
   git:

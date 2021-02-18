@@ -3,7 +3,7 @@
 #define typeface_wm         pango:Hack 10
 #define typeface_bar        pango:Hack 12, Material Design Icons 12
 #define typeface_rofi       Hack Bold 14
-#define typeface_terminal   Hack:pixelsize=12:antialias=true:autohint=true
+#define typeface_terminal   MesloLGS NF:pixelsize=12:antialias=true:autohint=true
 #define typeface_gnome_terminal Hack 12
 
 #define typeface_bar_glyph_battery_0 
