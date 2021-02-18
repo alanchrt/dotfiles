@@ -29,3 +29,8 @@
   file:
     path: "{{ ansible_env.HOME }}/.local/bin"
     state: directory
+
+- name: Install lsd
+  become: yes
+  apt:
+    deb: https://github.com/Peltoche/lsd/releases/download/0.19.0/lsd_0.19.0_amd64.deb

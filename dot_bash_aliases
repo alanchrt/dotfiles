@@ -6,3 +6,9 @@ alias dotme-local="chezmoi apply --verbose && ansible-playbook --ask-become-pass
 alias cz="chezmoi"
 alias czd="chezmoi diff"
 alias cza="chezmoi apply -v"
+
+# lsd
+alias ls="lsd"
+alias ll="lsd -l"
+alias la="lsd -A"
+alias lla="lsd -lA"
