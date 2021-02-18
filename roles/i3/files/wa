@@ -54,7 +54,7 @@ def main():
                 pod = next(pod for pod in result['queryresult']['pods'] if pod.get('primary'))
                 subpod = next(subpod for subpod in pod['subpods'] if subpod.get('plaintext'))
                 print(subpod['plaintext'])
-            except StopIteration:
+            except (StopIteration, KeyError):
                 print('No answer available')
 
 
