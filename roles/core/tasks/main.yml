@@ -5,18 +5,28 @@
     name:
       - build-essential
       - software-properties-common
+      - gnome-disk-utility
       - checkinstall
       - ansible
       - curl
       - git
+      - gnupg
+      - rng-tools
       - vim
       - byobu
       - ranger
       - ripgrep
+      - gopass
       - jq
       - cmake
       - imagemagick
       - xclip
+      - texlive-latex-base
+      - texlive-fonts-recommended
+      - texlive-fonts-extra
+      - texlive-latex-extra
+      - pandoc
+      - paperkey
       - whois
       - ldnsutils
       - markdown
