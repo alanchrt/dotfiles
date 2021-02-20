@@ -7,8 +7,16 @@
       - i3xrocks-battery
       - dunst
 
-- name: Add wolfram alpha script to local bin
+- name: Install gopass
+  become: yes
+  apt:
+    deb: https://github.com/gopasspw/gopass/releases/download/v1.12.0/gopass_1.12.0_linux_amd64.deb
+
+- name: Add helper scripts to local bin
   copy:
-    src: files/wa
-    dest: "{{ ansible_env.HOME }}/.local/bin/wa"
+    src: "files/{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.local/bin/{{ item }}"
     mode: +x
+  with_items:
+    - wa
+    - rofi-gopass
