@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+kill_session=false
+shorthand=$(printf '%s\n' ~/Projects/* | cut -d '/' -f 5,7 | rofi -dmenu -matching fuzzy -i -p "project" -kb-custom-1 "Ctrl+x" $@)
+if [ "$?" = "10" ]; then
+    kill_session=true;
+fi
+parts=(${shorthand//\// })
+path=~/Projects/${parts[0]}
+session=$(echo $(basename $path) | sed -r 's/\./_/g')
+if [ "$kill_session" = "true" ]; then
+    byobu kill-session -t $session
+    zenity --notification --window-icon emblem-warning --text "Killed session $session"
+    exit;
+fi
+byobu list-sessions -F '#{session_name}' | grep "^$session\$" > /dev/null && zenity --notification --window-icon emblem-warning --text "Session $session already active" && exit
+tilix  --command "byobu new-session -c $path -s $session"

@@ -20,3 +20,4 @@
   with_items:
     - wa
     - rofi-gopass
+    - rofi-projects

@@ -119,6 +119,11 @@ set_from_resource $i3-wm.binding.launcher.password i3-wm.binding.launcher.passwo
 set_from_resource $i3-wm.program.launcher.password i3-wm.program.launcher.password rofi-gopass
 bindsym $mod+$i3-wm.binding.launcher.password exec $i3-wm.program.launcher.password
 
+## Launch // Project // <> p ##
+set_from_resource $i3-wm.binding.launcher.projects i3-wm.binding.launcher.projects p
+set_from_resource $i3-wm.program.launcher.projects i3-wm.program.launcher.projects rofi-projects
+bindsym $mod+$i3-wm.binding.launcher.projects exec $i3-wm.program.launcher.projects
+
 ###############################################################################
 # Window and Workspace Navigation
 ###############################################################################
