@@ -2,7 +2,10 @@
 
 kill_session=false
 shorthand=$(printf '%s\n' ~/Projects/* | cut -d '/' -f 5,7 | rofi -dmenu -matching fuzzy -i -p "project" -kb-custom-1 "Ctrl+x" $@)
-if [ "$?" = "10" ]; then
+result="$?"
+if [ "$result" = "1" ]; then
+    exit;
+elif [ "$result" = "10" ]; then
     kill_session=true;
 fi
 parts=(${shorthand//\// })

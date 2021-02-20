@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 pass=$(gopass list --flat | rofi -dmenu -matching fuzzy -i -p "pass" -kb-custom-1 "Ctrl+c")
-if [ "$?" = "10" ]; then
+result="$?"
+if [ "$result" = "10" ]; then
     gopass show -c $pass
-else
+elif [ ! -z "$pass" ]; then
     gopass show -o $pass | xdotool type --clearmodifiers --file -
 fi
