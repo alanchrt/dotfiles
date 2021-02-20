@@ -1,0 +1,13 @@
+---
+- name: Add yubico PPA
+  become: yes
+  apt_repository:
+    repo: ppa:yubico/stable
+
+- name: Install yubikey tools
+  become: yes
+  apt:
+    name:
+      - yubikey-manager
+      - yubioath-desktop
+    update_cache: yes

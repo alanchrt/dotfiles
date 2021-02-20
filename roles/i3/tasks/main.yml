@@ -20,4 +20,5 @@
   with_items:
     - wa
     - rofi-gopass
+    - rofi-ykman
     - rofi-projects

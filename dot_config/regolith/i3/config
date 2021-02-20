@@ -114,6 +114,11 @@ set_from_resource $i3-wm.binding.help i3-wm.binding.help Shift+question
 set_from_resource $i3-wm.program.help i3-wm.program.help /usr/bin/remontoire-toggle
 bindsym $mod+$i3-wm.binding.help exec --no-startup-id $i3-wm.program.help
 
+## Launch // OATH // <> y ##
+set_from_resource $i3-wm.binding.launcher.oath i3-wm.binding.launcher.oath y
+set_from_resource $i3-wm.program.launcher.oath i3-wm.program.launcher.oath rofi-ykman
+bindsym $mod+$i3-wm.binding.launcher.oath exec $i3-wm.program.launcher.oath
+
 ## Launch // Password // <> i ##
 set_from_resource $i3-wm.binding.launcher.password i3-wm.binding.launcher.password i
 set_from_resource $i3-wm.program.launcher.password i3-wm.program.launcher.password rofi-gopass

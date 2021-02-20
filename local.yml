@@ -9,6 +9,7 @@
     - nodejs
     - python
     - emacs
+    - yubikey
 
     # keep completions last since they depend on programs to generate
     - completions
