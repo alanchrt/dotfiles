@@ -14,7 +14,6 @@
       - rng-tools
       - vim
       - byobu
-      - ranger
       - ripgrep
       - gopass
       - jq
@@ -44,3 +43,8 @@
   become: yes
   apt:
     deb: https://github.com/Peltoche/lsd/releases/download/0.19.0/lsd_0.19.0_amd64.deb
+
+- name: Install lf
+  become: yes
+  apt:
+    deb: https://download.opensuse.org/repositories/home:/Provessor/xUbuntu_20.04/amd64/lf_16+git20200907.61442f8-1_amd64.deb
