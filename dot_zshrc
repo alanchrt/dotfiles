@@ -23,6 +23,9 @@ HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.zsh_history
 
+# Use vim as default editor
+export EDITOR=vim
+
 # Use modern completion system
 skip_global_compinit=1
 autoload -Uz compinit

@@ -98,6 +98,7 @@ This function should only modify configuration layer settings."
                  typescript-linter 'eslint)
      unicode-fonts
      version-control
+     vimscript
      web-beautify
      xclipboard
      yaml)

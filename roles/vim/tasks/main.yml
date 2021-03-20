@@ -1,0 +1,15 @@
+---
+- name: Install vim
+  become: yes
+  apt:
+    name: vim
+
+- name: Create themes
+  file:
+    path: "{{ ansible_env.HOME }}/.vim/pack/themes/start"
+    state: directory
+
+- name: Clone dracula theme
+  git:
+    repo: https://github.com/dracula/vim.git
+    dest: "{{ ansible_env.HOME }}/.vim/pack/themes/start/dracula"
