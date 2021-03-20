@@ -654,6 +654,10 @@ exec --no-startup-id $i3-wm.program.unclutter
 set_from_resource $i3-wm.program.nm-applet i3-wm.program.nm-applet /usr/bin/nm-applet
 exec --no-startup-id $i3-wm.program.nm-applet
 
+# Cadmus for noise suppresion
+set_from_resource $i3-wm.program.cadmus i3-wm.program.cadmus /opt/cadmus/cadmus
+exec --no-startup-id $i3-wm.program.cadmus
+
 # User programs from Xresources
 # To use, define an Xresource key i3-wm.program.[1-3] with the value of the program to launch.
 # See https://regolith-linux.org/docs/howto/override-xres/ for details.

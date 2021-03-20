@@ -49,3 +49,8 @@
   become: yes
   apt:
     deb: https://download.opensuse.org/repositories/home:/Provessor/xUbuntu_20.04/amd64/lf_16+git20200907.61442f8-1_amd64.deb
+
+- name: Install cadmus
+  become: yes
+  apt:
+    deb: https://github.com/josh-richardson/cadmus/releases/download/0.0.3/cadmus.deb
