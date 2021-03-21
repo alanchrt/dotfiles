@@ -18,6 +18,7 @@
       - ripgrep
       - gopass
       - qtpass
+      - seahorse
       - jq
       - cmake
       - imagemagick
