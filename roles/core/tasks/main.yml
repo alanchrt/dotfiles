@@ -7,6 +7,7 @@
       - software-properties-common
       - gnome-disk-utility
       - checkinstall
+      - dconf-editor
       - ansible
       - curl
       - git
@@ -16,6 +17,7 @@
       - flameshot
       - ripgrep
       - gopass
+      - qtpass
       - jq
       - cmake
       - imagemagick
@@ -29,6 +31,7 @@
       - whois
       - ldnsutils
       - markdown
+      - ncdu
       - acpi
       - unzip
       - tree
