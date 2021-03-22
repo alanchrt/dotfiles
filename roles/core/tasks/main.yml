@@ -16,8 +16,6 @@
       - byobu
       - flameshot
       - ripgrep
-      - gopass
-      - qtpass
       - seahorse
       - jq
       - cmake
@@ -57,3 +55,15 @@
   become: yes
   apt:
     deb: https://github.com/josh-richardson/cadmus/releases/download/0.0.3/cadmus.deb
+
+- name: Install bitwarden
+  become: Yes
+  apt:
+    deb: https://github.com/bitwarden/desktop/releases/download/v1.25.1/Bitwarden-1.25.1-amd64.deb
+
+- name: Install bitwarden CLI
+  unarchive:
+    src: https://github.com/bitwarden/cli/releases/download/v1.15.1/bw-linux-1.15.1.zip
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
