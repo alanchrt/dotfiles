@@ -7,11 +7,6 @@
       - i3xrocks-battery
       - dunst
 
-- name: Install gopass
-  become: yes
-  apt:
-    deb: https://github.com/gopasspw/gopass/releases/download/v1.12.0/gopass_1.12.0_linux_amd64.deb
-
 - name: Add helper scripts to local bin
   copy:
     src: "files/{{ item }}"
@@ -19,6 +14,6 @@
     mode: +x
   with_items:
     - wa
-    - rofi-gopass
+    - rofi-bw
     - rofi-ykman
     - rofi-projects

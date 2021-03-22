@@ -57,7 +57,7 @@
     deb: https://github.com/josh-richardson/cadmus/releases/download/0.0.3/cadmus.deb
 
 - name: Install bitwarden
-  become: Yes
+  become: yes
   apt:
     deb: https://github.com/bitwarden/desktop/releases/download/v1.25.1/Bitwarden-1.25.1-amd64.deb
 
