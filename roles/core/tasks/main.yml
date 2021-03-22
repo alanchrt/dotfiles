@@ -13,6 +13,7 @@
       - git
       - gnupg
       - rng-tools
+      - diceware
       - byobu
       - flameshot
       - ripgrep
