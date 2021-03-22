@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+list=$(bw list items | jq -r '.[] | select(.type | contains(1))')
+names=$(echo $list | jq -r '.name')
+passwords=$(echo $list | jq -r '.login.password')
+selection=$(echo $list | jq -r '"\(.name)\t\(.login.username)"' | column -s$'\t' | rofi -dmenu -matching fuzzy -i -p "pass" -format i -kb-custom-1 "Ctrl+c")
+result="$?"
+
+name=$(echo $names | sed -n "${selection+1}p")
+pass=$(echo $passwords | sed -n "${selection+1}p")
+
+auto_clear_clipboard() {
+    sleep 30
+    echo -n "" | xclip -sel clipboard
+}
+
+if [ "$result" = "0" ]; then
+    echo -n $pass | xdotool type --clearmodifiers --file -
+elif [ "$result" = "10" ]; then
+    echo -n $pass | xclip -sel clipboard
+    zenity --notification --window-icon emblem-warning --text "$name password copied to clipboard for 30 seconds"
+    auto_clear_clipboard &
+    disown
+fi
