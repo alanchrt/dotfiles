@@ -18,6 +18,7 @@
       - flameshot
       - ripgrep
       - seahorse
+      - lollypop
       - jq
       - cmake
       - imagemagick
