@@ -50,8 +50,11 @@
 
 - name: Install lf
   become: yes
-  apt:
-    deb: https://download.opensuse.org/repositories/home:/Provessor/xUbuntu_20.04/amd64/lf_16+git20200907.61442f8-1_amd64.deb
+  unarchive:
+    src: https://github.com/gokcehan/lf/releases/download/r22/lf-linux-amd64.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
 
 - name: Install bitwarden
   become: yes
