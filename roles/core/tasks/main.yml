@@ -61,9 +61,7 @@
   apt:
     deb: https://github.com/bitwarden/desktop/releases/download/v1.25.1/Bitwarden-1.25.1-amd64.deb
 
-- name: Install bitwarden CLI
-  unarchive:
-    src: https://github.com/bitwarden/cli/releases/download/v1.15.1/bw-linux-1.15.1.zip
-    dest: "{{ ansible_env.HOME }}/.local/bin"
-    mode: +x
-    remote_src: yes
+- name: Install rbw
+  become: yes
+  apt:
+    deb: https://git.tozt.net/rbw/releases/deb/rbw_1.2.0_amd64.deb

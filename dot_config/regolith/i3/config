@@ -117,7 +117,7 @@ bindsym $mod+$i3-wm.binding.launcher.oath exec $i3-wm.program.launcher.oath
 
 ## Launch // Password // <> i ##
 set_from_resource $i3-wm.binding.launcher.password i3-wm.binding.launcher.password i
-set_from_resource $i3-wm.program.launcher.password i3-wm.program.launcher.password rofi-bw
+set_from_resource $i3-wm.program.launcher.password i3-wm.program.launcher.password rofi-rbw
 bindsym $mod+$i3-wm.binding.launcher.password exec $i3-wm.program.launcher.password
 
 ## Launch // Project // <> p ##

@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-export BW_SESSION=$(cat ~/.bwsess)
-
-list=$(bw list items | jq -c '.[] | select(.type | contains(1))')
-names=$(echo "$list" | jq -r '.name')
-passwords=$(echo "$list" | jq -r '.login.password')
-selection=$(echo "$list" | jq -r '"\(.name):\(.login.username)"' | rofi -dmenu -matching fuzzy -i -p "pass" -format i -kb-custom-1 "Ctrl+c")
+list=$(rbw list --fields id,name,user | awk -F'\t' 'length($3)')
+ids=$(echo "$list" | cut -f1)
+names=$(echo "$list"  | cut -f2)
+selection=$(echo "$list" | cut -f2,3 --output-delimiter=: | rofi -dmenu -matching fuzzy -i -p "pass" -format i -kb-custom-1 "Ctrl+c")
 result="$?"
 
+id=$(echo "$ids" | sed -n "$((selection+1))p")
 name=$(echo "$names" | sed -n "$((selection+1))p")
-pass=$(echo "$passwords" | sed -n "$((selection+1))p")
+pass=$(rbw get $id)
 
 auto_clear_clipboard() {
     sleep 30
