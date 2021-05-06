@@ -11,6 +11,18 @@
   args:
     creates: "{{ ansible_env.HOME }}/.fnm/node-versions/v14.15.5"
 
+- name: Increase file watchers limit
+  become: yes
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: fs.inotify.max_user_watches=524288
+  register: file_watchers
+
+- name: Apply sysctl config
+  become: yes
+  shell: sysctl --system
+  when: file_watchers.changed
+
 - name: Install common node tools
   community.general.npm:
     name: "{{ item }}"
