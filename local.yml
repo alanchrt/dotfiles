@@ -2,7 +2,7 @@
 - hosts: all
   roles:
     - core
-    # - gnome
+    - gnome
     # - fonts
     # - terminal
     # - nodejs
