@@ -35,7 +35,7 @@
     key: /org/gnome/shell/app-switcher
     value: "true"
 
-- name: Set keybindings
+- name: Define desktop keybindings
   community.general.dconf:
     key: "/org/gnome/desktop/wm/keybindings/{{ item.key }}"
     value: "{{ item.value }}"
@@ -74,6 +74,11 @@
       value: "['<Super>j']"
     - key: switch-group-backward
       value: "['<Super>k']"
+
+- name: Define lock screen keybinding
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/screensaver"
+    value: "['<Shift><Super>Escape']"
 
 - name: Install ulauncher
   become: yes
