@@ -7,7 +7,7 @@ read -s PASSWORD
 echo "\n"
 
 # install base deps
-echo $PASSWORD | sudo -S dnf install ansible
+echo $PASSWORD | sudo -S dnf install -y ansible
 mkdir -p /tmp/dotfiles
 
 # install chezmoi
@@ -20,14 +20,14 @@ install /tmp/dotfiles/chezmoi $HOME/.local/bin
 
 # init and apply chezmoi
 if [ ! -d $HOME/Projects/dotfiles ] ; then
-    git clone -b regolith git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+    git clone -b fedora git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
 fi
 chezmoi apply --source $HOME/Projects/dotfiles
 
 # install ansible galaxy dependencies
 ansible-galaxy collection install community.general
 if [ ! -f /tmp/dotfiles/requirements.yml ] ; then
-    wget --no-clobber -O /tmp/dotfiles/requirements.yml https://raw.githubusercontent.com/alanchrt/fedora/regolith/requirements.yml
+    wget --no-clobber -O /tmp/dotfiles/requirements.yml https://raw.githubusercontent.com/alanchrt/fedora/requirements.yml
 fi
 ansible-galaxy install -r /tmp/dotfiles/requirements.yml
 
