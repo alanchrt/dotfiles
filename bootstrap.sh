@@ -7,15 +7,16 @@ read -s PASSWORD
 echo "\n"
 
 # install base deps
-echo $PASSWORD | sudo -S apt upgrade --assume-yes
-echo $PASSWORD | sudo -S apt install --assume-yes git curl software-properties-common python-is-python3 ansible build-essential libssl-dev
+echo $PASSWORD | sudo -S dnf install ansible
 mkdir -p /tmp/dotfiles
 
 # install chezmoi
-if [ ! -f /tmp/dotfiles/chezmoi.deb ] ; then
-    wget --no-clobber https://github.com/twpayne/chezmoi/releases/download/v1.8.11/chezmoi_1.8.11_linux_amd64.deb -O /tmp/dotfiles/chezmoi.deb
+if [ ! -f /tmp/dotfiles/chezmoi.tar.gz ] ; then
+    wget --no-clobber https://github.com/twpayne/chezmoi/releases/download/v2.10.0/chezmoi_2.10.0_linux_amd64.tar.gz -O /tmp/dotfiles/chezmoi.tar.gz
+    (cd /tmp/dotfiles && tar -xzf chezmoi.tar.gz)
 fi
-echo $PASSWORD | sudo -S apt install /tmp/dotfiles/chezmoi.deb
+mkdir -p $HOME/.local/bin
+install /tmp/dotfiles/chezmoi $HOME/.local/bin
 
 # init and apply chezmoi
 if [ ! -d $HOME/Projects/dotfiles ] ; then
@@ -26,12 +27,12 @@ chezmoi apply --source $HOME/Projects/dotfiles
 # install ansible galaxy dependencies
 ansible-galaxy collection install community.general
 if [ ! -f /tmp/dotfiles/requirements.yml ] ; then
-    wget --no-clobber -O /tmp/dotfiles/requirements.yml https://raw.githubusercontent.com/alanchrt/dotfiles/regolith/requirements.yml
+    wget --no-clobber -O /tmp/dotfiles/requirements.yml https://raw.githubusercontent.com/alanchrt/fedora/regolith/requirements.yml
 fi
-#ansible-galaxy install -r /tmp/dotfiles/requirements.yml
+ansible-galaxy install -r /tmp/dotfiles/requirements.yml
 
 # clean up
 rm -r /tmp/dotfiles
 
 # run ansible playbook
-ANSIBLE_FORCE_COLOR=true ansible-pull --checkout regolith --url git@github.com:alanchrt/dotfiles.git -i hosts --extra-vars "ansible_sudo_pass=$PASSWORD"
+ANSIBLE_FORCE_COLOR=true ansible-pull --checkout fedora --url git@github.com:alanchrt/dotfiles.git -i hosts --extra-vars "ansible_sudo_pass=$PASSWORD"

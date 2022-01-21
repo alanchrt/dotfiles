@@ -2,15 +2,14 @@
 - hosts: all
   roles:
     - core
-    - i3
-    - gnome
-    - fonts
-    - terminal
-    - nodejs
-    - python
-    - emacs
-    - vim
-    - yubikey
+    # - gnome
+    # - fonts
+    # - terminal
+    # - nodejs
+    # - python
+    # - emacs
+    # - vim
+    # - yubikey
 
     # keep completions last since they depend on programs to generate
-    - completions
+    # - completions

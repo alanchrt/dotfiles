@@ -1,42 +1,22 @@
 ---
 - name: Install core packages
   become: yes
-  apt:
+  dnf:
     name:
-      - build-essential
-      - software-properties-common
-      - gnome-disk-utility
-      - checkinstall
-      - dconf-editor
       - ansible
-      - curl
-      - git
-      - gnupg
-      - rng-tools
       - diceware
       - byobu
       - flameshot
       - peek
       - ripgrep
       - seahorse
-      - lollypop
       - jq
-      - cmake
-      - imagemagick
+      - lsd
+      - ImageMagick
       - xclip
-      - texlive-latex-base
-      - texlive-fonts-recommended
-      - texlive-fonts-extra
-      - texlive-latex-extra
       - pandoc
       - paperkey
-      - whois
-      - ldnsutils
-      - markdown
       - ncdu
-      - acpi
-      - unzip
-      - tree
     update_cache: yes
 
 - name: Ensure local bin path exists
@@ -44,25 +24,16 @@
     path: "{{ ansible_env.HOME }}/.local/bin"
     state: directory
 
-- name: Install lsd
-  become: yes
-  apt:
-    deb: https://github.com/Peltoche/lsd/releases/download/0.19.0/lsd_0.19.0_amd64.deb
-
 - name: Install lf
   become: yes
   unarchive:
-    src: https://github.com/gokcehan/lf/releases/download/r22/lf-linux-amd64.tar.gz
+    src: https://github.com/gokcehan/lf/releases/download/r26/lf-linux-amd64.tar.gz
     dest: "{{ ansible_env.HOME }}/.local/bin"
     mode: +x
     remote_src: yes
 
-- name: Install bitwarden
-  become: yes
-  apt:
-    deb: https://github.com/bitwarden/desktop/releases/download/v1.25.1/Bitwarden-1.25.1-amd64.deb
-
-- name: Install rbw
-  become: yes
-  apt:
-    deb: https://git.tozt.net/rbw/releases/deb/rbw_1.2.0_amd64.deb
+# TODO use cargo
+# - name: Install rbw
+#   become: yes
+#   apt:
+#     deb: https://git.tozt.net/rbw/releases/deb/rbw_1.2.0_amd64.deb
