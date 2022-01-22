@@ -42,6 +42,18 @@
   with_items:
     - key: minimize
       value: "['<Super>Escape']"
+    - key: maximize
+      value: "['<Shift><Super>k']"
+    - key: unmaximize
+      value: "['<Shift><Super>j']"
+    - key: switch-applications
+      value: "['<Super>l']"
+    - key: switch-applications-backward
+      value: "['<Super>h']"
+    - key: switch-group
+      value: "['<Super>j']"
+    - key: switch-group-backward
+      value: "['<Super>k']"
     - key: switch-to-workspace-left
       value: "['<Super>comma']"
     - key: switch-to-workspace-right
@@ -66,14 +78,14 @@
       value: "['<Shift><Super>numbersign']"
     - key: move-to-workspace-4
       value: "['<Shift><Super>dollar']"
-    - key: switch-applications
-      value: "['<Super>l']"
-    - key: switch-applications-backward
-      value: "['<Super>h']"
-    - key: switch-group
-      value: "['<Super>j']"
-    - key: switch-group-backward
-      value: "['<Super>k']"
+    - key: move-to-monitor-down
+      value: "['<Primary><Super>j']"
+    - key: move-to-monitor-left
+      value: "['<Primary><Super>h']"
+    - key: move-to-monitor-right
+      value: "['<Primary><Super>l']"
+    - key: move-to-monitor-up
+      value: "['<Primary><Super>k']"
 
 - name: Define lock screen keybinding
   community.general.dconf:
@@ -103,16 +115,28 @@
     value: "{{ item.value }}"
   with_items:
     - key: name
-      value: "'Tilix'"
+      value: "'Tilix (dropdown)'"
     - key: binding
       value: "'<Super>m'"
     - key: command
       value: "'sh -c \"GDK_BACKEND=x11 tilix --quake\"'"
 
+- name: Define full screen terminal keybinding
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/{{ item.key }}"
+    value: "{{ item.value }}"
+  with_items:
+    - key: name
+      value: "'Tilix'"
+    - key: binding
+      value: "'<Super>Return'"
+    - key: command
+      value: "'tilix --maximize'"
+
 - name: Show custom keybindings in settings
   community.general.dconf:
     key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
-    value: "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/']"
+    value: "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/']"
 
 - name: Configure system monitor
   community.general.dconf:
