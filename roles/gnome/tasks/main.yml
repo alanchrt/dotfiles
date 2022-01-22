@@ -129,7 +129,7 @@
     - key: binding
       value: "'<Super>m'"
     - key: command
-      value: "'sh -c \"GDK_BACKEND=x11 tilix --quake\"'"
+      value: "'dropterm'"
 
 - name: Define full screen terminal keybinding
   community.general.dconf:

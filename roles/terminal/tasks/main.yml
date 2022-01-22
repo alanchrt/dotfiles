@@ -1,28 +1,21 @@
 ---
-- name: Symlink vte script
-  become: yes
-  file:
-    src: /etc/profile.d/vte-2.91.sh
-    dest: /etc/profile.d/vte.sh
-    state: link
-
 - name: Install tilix
   become: yes
-  apt:
+  dnf:
     name: tilix
 
 - name: Configure tilix
   shell: "dconf load /com/gexperts/Tilix/ < {{ role_path }}/files/tilix.conf"
 
-- name: Set tilix as default terminal
-  become: yes
-  alternatives:
-    name: x-terminal-emulator
-    path: /usr/bin/tilix.wrapper
+- name: Add dropterm command
+  copy:
+    src: files/dropterm
+    dest: "{{ ansible_env.HOME }}/.local/bin/dropterm"
+    mode: +x
 
 - name: Install zsh
   become: yes
-  apt:
+  dnf:
     name: zsh
 
 - name: Configure default shell

@@ -4,7 +4,7 @@
     - core
     - gnome
     - fonts
-    # - terminal
+    - terminal
     # - nodejs
     # - python
     # - emacs
