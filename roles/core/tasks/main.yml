@@ -17,6 +17,7 @@
       - pandoc
       - paperkey
       - ncdu
+      - xprop # used by pixel saver in gnome
     update_cache: yes
 
 - name: Ensure local bin path exists
