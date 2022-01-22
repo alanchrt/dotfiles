@@ -138,18 +138,6 @@
     - key: command
       value: "'ulauncher-toggle'"
 
-- name: Define dropdown terminal keybinding
-  community.general.dconf:
-    key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/{{ item.key }}"
-    value: "{{ item.value }}"
-  with_items:
-    - key: name
-      value: "'Tilix (dropdown)'"
-    - key: binding
-      value: "'<Super>m'"
-    - key: command
-      value: "'dropterm'"
-
 - name: Define full screen terminal keybinding
   community.general.dconf:
     key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/{{ item.key }}"

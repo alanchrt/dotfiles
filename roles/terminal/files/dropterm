@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-GDK_BACKEND=x11 tilix --profile Dropterm --quake --command "byobu new-session -As dropterm"

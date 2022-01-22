@@ -7,11 +7,8 @@
 - name: Configure tilix
   shell: "dconf load /com/gexperts/Tilix/ < {{ role_path }}/files/tilix.conf"
 
-- name: Add dropterm command
-  copy:
-    src: files/dropterm
-    dest: "{{ ansible_env.HOME }}/.local/bin/dropterm"
-    mode: +x
+- name: Configure ddterm
+  shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
 
 - name: Install zsh
   become: yes
