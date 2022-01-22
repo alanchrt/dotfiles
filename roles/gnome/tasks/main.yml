@@ -1,8 +1,11 @@
 ---
-- name: Create backgrounds directory
+- name: Create backgrounds and themes directories
   file:
-    path: "{{ ansible_env.HOME }}/.local/share/backgrounds"
+    path: "{{ item }}"
     state: directory
+  with_items:
+    - "{{ ansible_env.HOME }}/.local/share/backgrounds"
+    - "{{ ansible_env.HOME }}/.themes"
 
 - name: Copy wallpaper graphic
   copy:
@@ -13,6 +16,20 @@
   community.general.dconf:
     key: /org/gnome/desktop/background/picture-uri
     value: "'file://{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png'"
+
+- name: Download Dracula GTK theme
+  unarchive:
+    src: https://github.com/dracula/gtk/releases/download/v3.0/Dracula.tar.xz
+    remote_src: yes
+    dest: "{{ ansible_env.HOME }}/.themes"
+
+- name: Set GTK theme
+  community.general.dconf:
+    key: "{{ item }}"
+    value: "'Dracula'"
+  with_items:
+    - /org/gnome/desktop/interface/gtk-theme
+    - /org/gnome/desktop/wm/preferences/theme
 
 - name: Install papirus icon theme
   become: yes
