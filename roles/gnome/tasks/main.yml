@@ -50,6 +50,8 @@
     key: "/org/gnome/desktop/wm/keybindings/{{ item.key }}"
     value: "{{ item.value }}"
   with_items:
+    - key: close
+      value: "['<Shift><Super>q']"
     - key: minimize
       value: "['<Super>Escape']"
     - key: maximize
