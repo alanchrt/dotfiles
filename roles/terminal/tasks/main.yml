@@ -42,3 +42,13 @@
     - zsh-completions
     - zsh-syntax-highlighting
     - zsh-history-substring-search
+
+- name: Create color schemes directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/tilix/schemes"
+    state: directory
+
+- name: Copy Dracula color scheme
+  copy:
+    src: files/Dracula.json
+    dest: "{{ ansible_env.HOME }}/.config/tilix/schemes/Dracula.json"
