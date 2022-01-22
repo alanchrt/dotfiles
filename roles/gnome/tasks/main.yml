@@ -30,6 +30,16 @@
     key: /org/gnome/desktop/interface/clock-format
     value: "'12h'"
 
+- name: Turn off dynamic workspaces
+  community.general.dconf:
+    key: /org/gnome/mutter/dynamic-workspaces
+    value: "false"
+
+- name: Use 4 workspaces
+  community.general.dconf:
+    key: /org/gnome/desktop/wm/preferences/num-workspaces
+    value: "4"
+
 - name: Show only current workspace windows in app switcher
   community.general.dconf:
     key: /org/gnome/shell/app-switcher
