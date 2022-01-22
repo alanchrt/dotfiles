@@ -1,4 +1,14 @@
 ---
+- name: Add Hack fonts repository
+  become: yes
+  community.general.copr:
+    name: zawertun/hack-fonts
+
+- name: Install Hack fonts
+  become: yes
+  dnf:
+    name: hack-fonts
+
 - name: Create fonts directory
   file:
     path: "{{ ansible_env.HOME }}/.local/share/fonts"
