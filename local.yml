@@ -16,7 +16,7 @@
     - terminal
     - nodejs
     - python
-    # - emacs
+    - emacs
     - vim
 
     # keep completions last since they depend on programs to generate

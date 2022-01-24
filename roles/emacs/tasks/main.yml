@@ -1,13 +1,8 @@
 ---
-- name: Add kelleyk PPA
-  become: yes
-  apt_repository:
-    repo: ppa:kelleyk/emacs
-
 - name: Install emacs
   become: yes
-  apt:
-    name: emacs27
+  dnf:
+    name: emacs
 
 - name: Clone spacemacs distribution
   git:
