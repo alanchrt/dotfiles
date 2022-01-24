@@ -18,6 +18,7 @@
       - paperkey
       - ncdu
       - xprop # used by pixel saver in gnome
+      - yubikey-manager
     update_cache: yes
 
 - name: Ensure local bin path exists

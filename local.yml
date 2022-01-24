@@ -15,10 +15,9 @@
     - fonts
     - terminal
     - nodejs
-    # - python
+    - python
     # - emacs
-    # - vim
-    # - yubikey
+    - vim
 
     # keep completions last since they depend on programs to generate
-    # - completions
+    - completions

@@ -16,7 +16,7 @@
     creates: "{{ ansible_env.HOME }}/.oh-my-zsh/completions/_{{ item.command }}"
   with_items:
     - command: chezmoi
-      generate: chezmoi completions zsh
+      generate: chezmoi completion zsh
     - command: fnm
       generate: fnm completions --shell zsh
   register: install_completions

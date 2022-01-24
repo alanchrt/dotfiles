@@ -1,12 +1,10 @@
 ---
 - name: Install base tools
   become: yes
-  apt:
+  dnf:
     name:
-      - python-is-python3
-      - python3-pip
       - pipenv
-      - ipython3
+      - python3-ipython
 
 - name: Install common packages
   pip:
@@ -18,4 +16,3 @@
       # used in spacemacs
       - importmagic
       - epc
-    executable: pip3
