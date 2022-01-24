@@ -1,15 +1,8 @@
 ---
-- name: Install fnm
-  unarchive:
-    src: https://github.com/Schniz/fnm/releases/download/v1.22.9/fnm-linux.zip
-    dest: "{{ ansible_env.HOME }}/.local/bin"
-    mode: +x
-    remote_src: yes
-
 - name: Install nodejs
-  shell: fnm install v14.15.5
-  args:
-    creates: "{{ ansible_env.HOME }}/.fnm/node-versions/v14.15.5"
+  become: yes
+  dnf:
+    name: nodejs
 
 - name: Increase file watchers limit
   become: yes
@@ -23,18 +16,25 @@
   shell: sysctl --system
   when: file_watchers.changed
 
+- name: Install fnm
+  unarchive:
+    src: https://github.com/Schniz/fnm/releases/download/v1.29.2/fnm-linux.zip
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
+
 - name: Install common node tools
+  become: yes
   community.general.npm:
     name: "{{ item }}"
     global: yes
-    executable: "{{ ansible_env.HOME }}/.fnm/node-versions/v14.15.5/installation/bin/npm"
   with_items:
     - yarn
     - typescript
+    - typescript-language-server
     - eslint
     - babel-eslint
     - eslint-plugin-react
     - prettier
     - js-beautify
-    - import-js
     - vmd
