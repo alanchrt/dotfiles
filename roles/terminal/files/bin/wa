@@ -12,21 +12,26 @@ from yaspin import yaspin
 HISTORY_FILE = os.path.join(Path.home(), '.wahistory')
 APPID_FILE = os.path.join(Path.home(), '.waid')
 
-with open(APPID_FILE) as f:
-    APPID = f.read().strip()
+try:
+    with open(APPID_FILE) as f:
+        APPID = f.read().strip()
+except FileNotFoundError:
+    print('Please configure a Wolfram Alpha AppID in ~/.waid.')
+    sys.exit(1)
+
 
 style = Style.from_dict({
     # default
-    '':          '#f8f8f2',
+    '': '#f8f8f2',
 
     # prompt
-    'logo':    '#ff79c6',
+    'logo': '#ff79c6',
     'colon': '#ff5555',
 })
 
 prompt_text = [
-    ('class:logo', '𖣔 '),
-    ('class:colon',    ': '),
+    ('class:logo', '🟑 '),
+    ('class:colon', ': '),
 ]
 
 

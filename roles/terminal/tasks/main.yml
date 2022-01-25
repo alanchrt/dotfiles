@@ -49,3 +49,9 @@
   copy:
     src: files/Dracula.json
     dest: "{{ ansible_env.HOME }}/.config/tilix/schemes/Dracula.json"
+
+- name: Add wa prompt to local bin
+  copy:
+    src: "files/bin/wa"
+    dest: "{{ ansible_env.HOME }}/.local/bin/wa"
+    mode: +x
