@@ -1,0 +1,2 @@
+set previewer ~/.local/bin/pv
+map i $pv $f | less -Rc

@@ -27,14 +27,6 @@
     path: "{{ ansible_env.HOME }}/.local/bin"
     state: directory
 
-- name: Install lf
-  become: yes
-  unarchive:
-    src: https://github.com/gokcehan/lf/releases/download/r26/lf-linux-amd64.tar.gz
-    dest: "{{ ansible_env.HOME }}/.local/bin"
-    mode: +x
-    remote_src: yes
-
 # TODO use cargo
 # - name: Install rbw
 #   become: yes

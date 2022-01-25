@@ -55,3 +55,22 @@
     src: "files/bin/wa"
     dest: "{{ ansible_env.HOME }}/.local/bin/wa"
     mode: +x
+
+- name: Install lf
+  become: yes
+  unarchive:
+    src: https://github.com/gokcehan/lf/releases/download/r26/lf-linux-amd64.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
+
+- name: Make lf config directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/lf"
+    state: directory
+
+- name: Create pv binary
+  copy:
+    src: "files/bin/pv"
+    dest: "{{ ansible_env.HOME }}/.local/bin/pv"
+    mode: +x
