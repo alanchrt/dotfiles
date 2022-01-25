@@ -121,6 +121,11 @@
     key: "/org/gnome/settings-daemon/plugins/media-keys/screensaver"
     value: "['<Shift><Super>Escape']"
 
+- name: Remove default screenshot keybinding
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/screenshot"
+    value: "@as []"
+
 - name: Install ulauncher
   become: yes
   dnf:
@@ -150,10 +155,22 @@
     - key: command
       value: "'tilix --maximize'"
 
+- name: Define flameshot keybinding
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/{{ item.key }}"
+    value: "{{ item.value }}"
+  with_items:
+    - key: name
+      value: "'Flameshot'"
+    - key: binding
+      value: "'Print'"
+    - key: command
+      value: "'flameshot gui'"
+
 - name: Show custom keybindings in settings
   community.general.dconf:
     key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
-    value: "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/']"
+    value: "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/']"
 
 - name: Configure system monitor
   community.general.dconf:
