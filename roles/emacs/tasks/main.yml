@@ -33,3 +33,14 @@
     scope: user
     state: started
     enabled: yes
+
+- name: Create user applications directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/applications"
+    state: directory
+
+- name: Create desktop file
+  copy:
+    src: files/emacs.desktop
+    dest: "{{ ansible_env.HOME }}/.local/share/applications/emacs.desktop"
+  register: emacs_unit_file
