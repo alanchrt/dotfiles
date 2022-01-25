@@ -12,6 +12,7 @@
       - seahorse
       - jq
       - lsd
+      - bat
       - ImageMagick
       - xclip
       - pandoc
