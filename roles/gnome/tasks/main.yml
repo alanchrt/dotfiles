@@ -1,4 +1,9 @@
 ---
+- name: Disable extension version validation
+  community.general.dconf:
+    key: "/org/gnome/shell/disable-extension-version-validation"
+    value: "true"
+
 - name: Create backgrounds and themes directories
   file:
     path: "{{ item }}"

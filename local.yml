@@ -3,7 +3,8 @@
   roles:
     - core
     - gnome
-    - ulauncher
+
+    # gnome shell extensions
     - role: petermosmans.customize-gnome
       vars:
         gnome_extensions:
@@ -13,6 +14,10 @@
             enabled: yes
           - id: 3780 # ddterm
             enabled: yes
+          - id: 4099 # no-overview
+            enabled: yes
+
+    - ulauncher
     - fonts
     - terminal
     - nodejs
