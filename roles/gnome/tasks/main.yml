@@ -163,7 +163,7 @@
     - key: name
       value: "'Flameshot'"
     - key: binding
-      value: "'Print'"
+      value: "'<Super>Print'"
     - key: command
       value: "'flameshot gui'"
 
