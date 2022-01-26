@@ -4,7 +4,6 @@ set -e
 
 echo -n "[sudo] password for $USER: "
 read -s PASSWORD
-echo "\n"
 
 # install base deps
 echo $PASSWORD | sudo -S dnf install -y ansible
@@ -36,3 +35,5 @@ rm -r /tmp/dotfiles
 
 # run ansible playbook
 ANSIBLE_FORCE_COLOR=true ansible-pull --checkout fedora --url git@github.com:alanchrt/dotfiles.git -i hosts --extra-vars "ansible_sudo_pass=$PASSWORD"
+
+echo "Please restart this machine to make sure all groups and services reload properly."
