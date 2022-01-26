@@ -3,6 +3,7 @@
   roles:
     - core
     - gnome
+    - ulauncher
     - role: petermosmans.customize-gnome
       vars:
         gnome_extensions:

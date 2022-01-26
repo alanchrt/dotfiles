@@ -1,0 +1,46 @@
+---
+- name: Install ulauncher and ydotool
+  become: yes
+  dnf:
+    name:
+      - ulauncher
+      - ydotool
+
+- name: Disable ydotoold systemd service
+  systemd:
+    name: ydotool
+    scope: system
+    state: stopped
+    enabled: no
+
+- name: Create autostart directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/autostart"
+    state: directory
+
+- name: Create uinput-users group
+  become: yes
+  group:
+    name: uinput-users
+    state: present
+
+- name: Add user to uinput-users group
+  become: yes
+  user:
+    name: "{{ ansible_env.USER }}"
+    groups:
+      - uinput-users
+    append: yes
+
+- name: Add udev rule for /dev/uinput access
+  become: yes
+  lineinfile:
+    path: /etc/udev/rules.d/80-uinput.rules
+    line: "KERNEL==\"uinput\", GROUP=\"uinput-users\", MODE=\"0660\", OPTIONS+=\"static_node=uinput\""
+    create: yes
+  register: uinput_udev_rule
+
+- name: Add autostart desktop file for ydotoold
+  copy:
+    src: files/ydotoold.desktop
+    dest: "{{ ansible_env.HOME }}/.config/autostart/ydotoold.desktop"

@@ -126,11 +126,6 @@
     key: "/org/gnome/settings-daemon/plugins/media-keys/screenshot"
     value: "@as []"
 
-- name: Install ulauncher
-  become: yes
-  dnf:
-    name: ulauncher
-
 - name: Define ulauncher keybinding
   community.general.dconf:
     key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/{{ item.key }}"
