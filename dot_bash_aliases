@@ -34,6 +34,9 @@ alias ipy="ipython"
 # emacs
 alias e="emacsclient -c"
 
+# clipboard
+alias clip="xclip -selection clipboard"
+
 # new named tmux session
 function to {
     if (( $# == 1 ))
