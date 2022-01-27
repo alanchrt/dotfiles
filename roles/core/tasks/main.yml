@@ -18,6 +18,7 @@
       - ncdu
       - xprop # used by pixel saver in gnome
       - yubikey-manager
+      - cargo
     update_cache: yes
 
 - name: Ensure local bin path exists
@@ -25,8 +26,7 @@
     path: "{{ ansible_env.HOME }}/.local/bin"
     state: directory
 
-# TODO use cargo
-# - name: Install rbw
-#   become: yes
-#   apt:
-#     deb: https://git.tozt.net/rbw/releases/deb/rbw_1.2.0_amd64.deb
+- name: Install rbw
+  shell: cargo install rbw
+  args:
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/rbw"

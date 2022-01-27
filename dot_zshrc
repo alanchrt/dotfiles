@@ -3,8 +3,8 @@ setopt histignorealldups sharehistory
 # Use emacs keybindings
 bindkey -e
 
-# Add local bin path to PATH
-export PATH="$PATH:$HOME/.local/bin"
+# Add local bin and cargo bin to PATH
+export PATH="$PATH:$HOME/.local/bin:$HOME/.cargo/bin"
 
 # Enable powerlevel10k
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
