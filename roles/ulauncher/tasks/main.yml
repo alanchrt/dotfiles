@@ -6,6 +6,16 @@
       - ulauncher
       - ydotool
 
+- name: Make sure extensions directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
+    state: directory
+
+- name: Install rbw extension
+  copy:
+    src: files/ulauncher-rbw
+    dest: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
+
 - name: Disable ydotoold systemd service
   systemd:
     name: ydotool
