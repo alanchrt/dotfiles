@@ -41,7 +41,7 @@ alias clip="xclip -selection clipboard"
 function to {
     if (( $# == 1 ))
     then
-        tmux new-session -s $1
+        byobu new-session -s $1
     elif (( $# == 0 ))
     then
         to $(basename $(pwd))
