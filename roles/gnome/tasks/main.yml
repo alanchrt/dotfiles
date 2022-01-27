@@ -203,3 +203,15 @@
       value: "false"
     - key: show-tooltip
       value: "false"
+
+- name: Install shell extensions
+  import_role:
+    name: petermosmans.customize-gnome
+  vars:
+    gnome_extensions:
+      - id: 120 # system-monitor
+        enabled: yes
+      - id: 723 # pixel-saver
+        enabled: yes
+      - id: 3780 # ddterm
+        enabled: yes

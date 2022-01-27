@@ -3,18 +3,6 @@
   roles:
     - core
     - gnome
-
-    # gnome shell extensions
-    - role: petermosmans.customize-gnome
-      vars:
-        gnome_extensions:
-          - id: 120 # system-monitor
-            enabled: yes
-          - id: 723 # pixel-saver
-            enabled: yes
-          - id: 3780 # ddterm
-            enabled: yes
-
     - ulauncher
     - fonts
     - terminal
