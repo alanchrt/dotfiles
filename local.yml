@@ -17,7 +17,7 @@
           - id: 4099 # no-overview
             enabled: yes
 
-    - ulauncher
+    - rofi
     - fonts
     - terminal
     - nodejs

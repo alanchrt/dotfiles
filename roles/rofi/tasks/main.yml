@@ -1,10 +1,18 @@
 ---
-- name: Install ulauncher and ydotool
+- name: Install rofi
+  become: yes
+  community.general.copr:
+    name: alebastr/sway-extras
+
+- name: Add dracula rofi theme
+  copy:
+    src: files/dracula.rasi
+    dest: "{{ ansible_env.HOME }}/.local/share/rofi/themes/dracula.rasi"
+
+- name: Install ydotool
   become: yes
   dnf:
-    name:
-      - ulauncher
-      - ydotool
+    name: ydotool
 
 - name: Disable ydotoold systemd service
   systemd:

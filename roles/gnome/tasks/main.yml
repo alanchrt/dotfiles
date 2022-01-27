@@ -131,17 +131,17 @@
     key: "/org/gnome/settings-daemon/plugins/media-keys/screenshot"
     value: "@as []"
 
-- name: Define ulauncher keybinding
+- name: Define rofi keybinding
   community.general.dconf:
     key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/{{ item.key }}"
     value: "{{ item.value }}"
   with_items:
     - key: name
-      value: "'Ulauncher'"
+      value: "'Rofi'"
     - key: binding
       value: "'<Super>space'"
     - key: command
-      value: "'ulauncher-toggle'"
+      value: "'rofi -modi drun -show drun -sort -show-icons  -matching fuzzy'"
 
 - name: Define full screen terminal keybinding
   community.general.dconf:
