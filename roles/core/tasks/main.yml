@@ -19,6 +19,7 @@
       - xprop # used by pixel saver in gnome
       - yubikey-manager
       - cargo
+      - gcc-c++
     update_cache: yes
 
 - name: Ensure local bin path exists
@@ -30,3 +31,25 @@
   shell: cargo install rbw
   args:
     creates: "{{ ansible_env.HOME }}/.cargo/bin/rbw"
+
+- name: Make sure local src dir exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/src"
+    state: directory
+
+- name: Get ugrep
+  unarchive:
+    src: https://github.com/Genivia/ugrep/archive/refs/tags/v3.7.0.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/src"
+    remote_src: yes
+
+- name: Build ugrep
+  shell: "cd {{ ansible_env.HOME }}/.local/src/ugrep-3.7.0 && ./build.sh --enable-pager --enable-pretty"
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/src/ugrep-3.7.0/bin/ugrep"
+  register: build_ugrep
+
+- name: Install ugrep
+  become: yes
+  shell: "cd {{ ansible_env.HOME }}/.local/src/ugrep-3.7.0 && make install"
+  when: build_ugrep.changed
