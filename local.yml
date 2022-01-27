@@ -14,8 +14,6 @@
             enabled: yes
           - id: 3780 # ddterm
             enabled: yes
-          - id: 4099 # no-overview
-            enabled: yes
 
     - ulauncher
     - fonts
