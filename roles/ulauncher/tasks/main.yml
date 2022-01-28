@@ -11,14 +11,19 @@
     path: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
     state: directory
 
+- name: Install projects extension
+  copy:
+    src: files/ulauncher-projects
+    dest: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
+
 - name: Install rbw extension
   copy:
     src: files/ulauncher-rbw
     dest: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
 
-- name: Install projects extension
+- name: Install ykman extension
   copy:
-    src: files/ulauncher-projects
+    src: files/ulauncher-ykman
     dest: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
 
 - name: Disable ydotoold systemd service
