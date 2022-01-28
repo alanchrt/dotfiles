@@ -1,8 +1,10 @@
 ---
-- name: Install tilix
+- name: Install tilix and fzf
   become: yes
   dnf:
-    name: tilix
+    name:
+      - tilix
+      - fzf
 
 - name: Configure tilix
   shell: "dconf load /com/gexperts/Tilix/ < {{ role_path }}/files/tilix.conf"
