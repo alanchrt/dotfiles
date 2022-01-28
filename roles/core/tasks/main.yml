@@ -21,6 +21,7 @@
       - yubikey-manager
       - cargo
       - gcc-c++
+      - rubygem-gist
     update_cache: yes
 
 - name: Install rbw

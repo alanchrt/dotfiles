@@ -26,3 +26,32 @@ The following command will configure the base software on Fedora and copy dotfil
 ```shell
 wget -qO- https://raw.githubusercontent.com/alanchrt/dotfiles/master/bootstrap.sh | bash
 ```
+### Configure credentials
+
+There are a few local settings and credentials that might be worth setting up right off the bat if needed.
+
+##### Bitwarden
+
+```
+$ rbw register
+$ rbw login
+```
+
+##### Git user
+
+```
+$ git config --file ~/.gitconfig_local user.name "<your name>"
+$ git config --file ~/.gitconfig_local user.email "<your email>"
+```
+
+##### Gist
+
+```
+$ gist --login
+```
+
+##### YubiKey
+
+```
+$ secret-tool store --label 'YubiKey' ykman oath
+```
