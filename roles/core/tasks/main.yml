@@ -15,6 +15,7 @@
       - xclip
       - pandoc
       - paperkey
+      - htop
       - ncdu
       - xprop # used by pixel saver in gnome
       - yubikey-manager
