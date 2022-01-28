@@ -23,15 +23,22 @@
       - gcc-c++
     update_cache: yes
 
-- name: Ensure local bin path exists
-  file:
-    path: "{{ ansible_env.HOME }}/.local/bin"
-    state: directory
-
 - name: Install rbw
   shell: cargo install rbw
   args:
     creates: "{{ ansible_env.HOME }}/.cargo/bin/rbw"
+
+- name: Copy rbw to bin on PATH
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: +x
+  with_items:
+    - src: "{{ ansible_env.HOME }}/.cargo/bin/rbw"
+      dest: /usr/local/bin/rbw
+    - src: "{{ ansible_env.HOME }}/.cargo/bin/rbw-agent"
+      dest: /usr/local/bin/rbw-agent
 
 - name: Make sure local src dir exists
   file:

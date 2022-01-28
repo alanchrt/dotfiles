@@ -4,7 +4,7 @@ setopt histignorealldups sharehistory
 bindkey -e
 
 # Add local bin and cargo bin to PATH
-export PATH="$PATH:$HOME/.local/bin:$HOME/.cargo/bin"
+export PATH="$PATH:$HOME/.local/bin"
 
 # Enable powerlevel10k
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
