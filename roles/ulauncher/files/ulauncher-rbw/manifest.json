@@ -7,10 +7,10 @@
   "options": {},
   "preferences": [
     {
-      "id": "demo_kw",
+      "id": "bw_kw",
       "type": "keyword",
-      "name": "Keywords",
-      "default_value": "bw"
+      "name": "Bitwarden",
+      "default_value": "p"
     }
   ]
 }
