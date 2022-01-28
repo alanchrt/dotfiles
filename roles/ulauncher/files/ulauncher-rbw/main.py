@@ -20,7 +20,7 @@ class RbwExtension(Extension):
 
 class KeywordQueryEventListener(EventListener):
 
-    def on_event(self, event):
+    def on_event(self, event, _):
         query = event.get_argument()
 
         proc = subprocess.run(
@@ -60,7 +60,7 @@ class KeywordQueryEventListener(EventListener):
 
 class ItemEnterEventListener(EventListener):
 
-    def on_event(self, event):
+    def on_event(self, event, _):
         data = event.get_data()
 
         action = data.pop('action')
