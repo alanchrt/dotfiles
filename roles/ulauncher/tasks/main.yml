@@ -16,6 +16,11 @@
     src: files/ulauncher-rbw
     dest: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
 
+- name: Install projects extension
+  copy:
+    src: files/ulauncher-projects
+    dest: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
+
 - name: Disable ydotoold systemd service
   systemd:
     name: ydotool

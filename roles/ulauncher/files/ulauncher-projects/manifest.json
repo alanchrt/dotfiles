@@ -1,0 +1,16 @@
+{
+  "required_api_version": "^2.0.0",
+  "name": "Projects",
+  "description": "Open project paths in a tmux session",
+  "developer_name": "Alan Christopher Thomas",
+  "icon": "images/icon.png",
+  "options": {},
+  "preferences": [
+    {
+      "id": "projects_kw",
+      "type": "keyword",
+      "name": "Projects",
+      "default_value": "p"
+    }
+  ]
+}
