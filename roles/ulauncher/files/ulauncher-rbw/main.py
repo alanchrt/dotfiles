@@ -1,7 +1,5 @@
 import re
-import json
 import subprocess
-from time import sleep
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
 from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
@@ -22,7 +20,7 @@ class RbwExtension(Extension):
 
 class KeywordQueryEventListener(EventListener):
 
-    def on_event(self, event, extension):
+    def on_event(self, event):
         query = event.get_argument()
 
         proc = subprocess.run(
@@ -62,7 +60,7 @@ class KeywordQueryEventListener(EventListener):
 
 class ItemEnterEventListener(EventListener):
 
-    def on_event(self, event, extension):
+    def on_event(self, event):
         data = event.get_data()
 
         action = data.pop('action')

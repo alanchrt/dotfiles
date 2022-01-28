@@ -10,7 +10,7 @@
       "id": "bw_kw",
       "type": "keyword",
       "name": "Bitwarden",
-      "default_value": "p"
+      "default_value": "i"
     }
   ]
 }
