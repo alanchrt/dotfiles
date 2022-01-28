@@ -26,7 +26,7 @@ class KeywordQueryEventListener(EventListener):
         proc = subprocess.run(
             (
                 "rbw list --fields id,name,user,folder | " +
-                "ugrep --fuzzy --ignore-case --sort=best '{}' | "
+                "fzf --filter '{}' | "
                 "head -n 10"
             ).format(query),
             shell=True,

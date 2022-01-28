@@ -26,7 +26,7 @@ class KeywordQueryEventListener(EventListener):
             (
                 "printf '%s\n' ~/Projects/* | " +
                 "cut -d '/' -f 5,7 |"
-                "ugrep --fuzzy --ignore-case --sort=best '{}' | "
+                "fzf --filter '{}' | "
                 "head -n 10"
             ).format(query),
             shell=True,

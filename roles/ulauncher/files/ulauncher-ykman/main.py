@@ -24,7 +24,7 @@ class KeywordQueryEventListener(EventListener):
         proc = subprocess.run(
             (
                 "ykman oath accounts code --password $(secret-tool lookup ykman oath) | "
-                "ugrep --fuzzy --ignore-case --sort=best '{}' | "
+                "fzf --filter '{}' | "
                 "head -n 10"
             ).format(query),
             shell=True,
