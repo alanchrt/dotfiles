@@ -41,8 +41,8 @@ $ rbw login
 ##### Git user
 
 ```
-$ git config --file ~/.gitconfig_local user.name "<your name>"
-$ git config --file ~/.gitconfig_local user.email "<your email>"
+$ git config --global user.name "<your name>"
+$ git config --global user.email "<your email>"
 ```
 
 ##### Gist
