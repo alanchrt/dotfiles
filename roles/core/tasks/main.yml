@@ -24,6 +24,7 @@
       - rubygem-gist
       - dconf-editor
       - gnome-extensions-app
+      - gnome-tweaks
     update_cache: yes
 
 - name: Install rbw
