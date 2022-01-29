@@ -1,6 +1,6 @@
 ## Overview
 
-This is my Fedora, GNOME, Spacemacs, byobu, and oh-my-zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
+This is my Fedora, GNOME, Spacemacs, byobu, and Oh My Zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
 Here are some references for getting around the system:
 
