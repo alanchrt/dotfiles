@@ -1,0 +1,51 @@
+# dotfiles
+alias dm="chezmoi update --verbose && ansible-pull --checkout regolith --url git@github.com:alanchrt/dotfiles.git --ask-become-pass -i hosts"
+alias dml="chezmoi apply --verbose && ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts"
+
+# chezmoi
+alias cz="chezmoi"
+alias czd="chezmoi diff"
+alias cza="chezmoi apply -v"
+
+# lsd
+alias ls="lsd"
+alias ll="lsd -l"
+alias la="lsd -A"
+alias lla="lsd -lA"
+
+# bat
+alias bat="bat --color=always --theme Dracula"
+
+# git
+alias gst="git status"
+alias gad="git add"
+alias gbr="git branch"
+alias gcm="git commit"
+alias gdi="git diff --color"
+alias gdt="git difftool"
+alias gco="git checkout"
+alias glo='git log --graph --pretty=format:"%Cred%h%Creset -%C(yellow)%d%Creset %s %C(cyan)(%cr) %C(bold blue)<%an>%Creset" --abbrev-commit'
+alias gp="gist -p"
+
+# python
+alias py="python"
+alias ipy="ipython"
+
+# emacs
+alias e="emacsclient -c"
+
+# clipboard
+alias clip="xclip -selection clipboard"
+
+# new named tmux session
+function to {
+    if (( $# == 1 ))
+    then
+        byobu new-session -s $1
+    elif (( $# == 0 ))
+    then
+        to $(basename $(pwd))
+    else
+        echo "to takes only one argument: to [sessionname]"
+    fi
+}

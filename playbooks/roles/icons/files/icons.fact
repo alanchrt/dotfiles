@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-icon_theme=$(gsettings get org.gnome.desktop.interface icon-theme | awk -F "'" '{print $2}')
-
-echo "{\"icon_theme\": \"${icon_theme}\"}"

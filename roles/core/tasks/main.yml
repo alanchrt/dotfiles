@@ -1,0 +1,47 @@
+---
+- name: Install core packages
+  become: yes
+  dnf:
+    name:
+      - ansible
+      - diceware
+      - byobu
+      - flameshot
+      - ripgrep
+      - jq
+      - lsd
+      - bat
+      - ImageMagick
+      - xclip
+      - pandoc
+      - paperkey
+      - htop
+      - ncdu
+      - xprop # used by pixel saver in gnome
+      - yubikey-manager
+      - cargo
+      - gcc-c++
+      - rubygem-gist
+    update_cache: yes
+
+- name: Install rbw
+  shell: cargo install rbw
+  args:
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/rbw"
+
+- name: Copy rbw to bin on PATH
+  become: yes
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: +x
+  with_items:
+    - src: "{{ ansible_env.HOME }}/.cargo/bin/rbw"
+      dest: /usr/local/bin/rbw
+    - src: "{{ ansible_env.HOME }}/.cargo/bin/rbw-agent"
+      dest: /usr/local/bin/rbw-agent
+
+- name: Make sure local src dir exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/src"
+    state: directory

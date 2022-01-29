@@ -1,0 +1,77 @@
+---
+- name: Install tilix and fzf
+  become: yes
+  dnf:
+    name:
+      - tilix
+      - fzf
+
+- name: Configure tilix
+  shell: "dconf load /com/gexperts/Tilix/ < {{ role_path }}/files/tilix.conf"
+
+- name: Configure ddterm
+  shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
+
+- name: Install zsh
+  become: yes
+  dnf:
+    name: zsh
+
+- name: Configure default shell
+  become: yes
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: /usr/bin/zsh
+
+- name: Set up oh-my-zsh
+  git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh"
+
+- name: Clone powerlevel10k theme
+  git:
+    repo: https://github.com/romkatv/powerlevel10k.git
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/powerlevel10k"
+
+- name: Clone zsh-users plugins
+  git:
+    repo: "https://github.com/zsh-users/{{ item }}.git"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/{{ item }}"
+  with_items:
+    - zsh-completions
+    - zsh-syntax-highlighting
+    - zsh-history-substring-search
+
+- name: Create color schemes directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/tilix/schemes"
+    state: directory
+
+- name: Copy Dracula color scheme
+  copy:
+    src: files/Dracula.json
+    dest: "{{ ansible_env.HOME }}/.config/tilix/schemes/Dracula.json"
+
+- name: Add wa prompt to local bin
+  copy:
+    src: "files/bin/wa"
+    dest: "{{ ansible_env.HOME }}/.local/bin/wa"
+    mode: +x
+
+- name: Install lf
+  unarchive:
+    src: https://github.com/gokcehan/lf/releases/download/r26/lf-linux-amd64.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
+
+- name: Make lf config directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/lf"
+    state: directory
+
+- name: Create pv binary
+  copy:
+    src: "files/bin/pv"
+    dest: "{{ ansible_env.HOME }}/.local/bin/pv"
+    mode: +x

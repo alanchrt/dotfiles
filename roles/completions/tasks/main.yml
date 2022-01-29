@@ -1,0 +1,29 @@
+---
+- name: Create completions directory
+  file:
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh/completions"
+    state: directory
+
+- name: Ignore completions directory in git
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.oh-my-zsh/.git/info/exclude"
+    line: completions/
+    create: yes
+
+- name: Install completions
+  shell: "{{ item.generate }} > {{ ansible_env.HOME }}/.oh-my-zsh/completions/_{{ item.command }}"
+  args:
+    creates: "{{ ansible_env.HOME }}/.oh-my-zsh/completions/_{{ item.command }}"
+  with_items:
+    - command: chezmoi
+      generate: chezmoi completion zsh
+    - command: fnm
+      generate: fnm completions --shell zsh
+  register: install_completions
+
+- name: Remove compinit dump file
+  file:
+    path: "{{ ansible_env.HOME }}/.zcompdump_completion"
+    state: absent
+  # when: zsh_completions.changed or completions_plugin.changed
+  when: install_completions.changed

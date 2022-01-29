@@ -1,5 +1,0 @@
----
-- name: Install ardour
-  become: yes
-  pacman: name=ardour
-          state=present

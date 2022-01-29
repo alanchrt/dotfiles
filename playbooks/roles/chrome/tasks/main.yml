@@ -1,4 +1,0 @@
----
-- name: Install Chrome
-  yaourt: name=google-chrome
-          state=present

@@ -1,0 +1,40 @@
+---
+- name: Install nodejs
+  become: yes
+  dnf:
+    name: nodejs
+
+- name: Increase file watchers limit
+  become: yes
+  lineinfile:
+    path: /etc/sysctl.conf
+    line: fs.inotify.max_user_watches=524288
+  register: file_watchers
+
+- name: Apply sysctl config
+  become: yes
+  shell: sysctl --system
+  when: file_watchers.changed
+
+- name: Install fnm
+  unarchive:
+    src: https://github.com/Schniz/fnm/releases/download/v1.29.2/fnm-linux.zip
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
+
+- name: Install common node tools
+  become: yes
+  community.general.npm:
+    name: "{{ item }}"
+    global: yes
+  with_items:
+    - yarn
+    - typescript
+    - typescript-language-server
+    - eslint
+    - babel-eslint
+    - eslint-plugin-react
+    - prettier
+    - js-beautify
+    - vmd

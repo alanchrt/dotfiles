@@ -1,5 +1,0 @@
----
-- name: Install Dropbox
-  become: yes
-  pacman: name=dropbox
-       state=present

@@ -1,5 +1,0 @@
----
-- name: Install wavebox
-  yaourt:
-    name: wavebox-bin
-    state: present

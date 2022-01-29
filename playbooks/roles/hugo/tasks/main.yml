@@ -1,6 +1,0 @@
----
-- name: Insall hugo
-  become: yes
-  pacman:
-    name: hugo
-    state: present

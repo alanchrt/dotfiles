@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Name=ydotool deamon
+Exec=/usr/bin/ydotoold
+Comment=Generic Linux command-line automation tool (no X!).
+Categories=GNOME;GTK;System;

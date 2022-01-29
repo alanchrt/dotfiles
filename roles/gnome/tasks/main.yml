@@ -1,0 +1,88 @@
+---
+- name: Disable extension version validation
+  community.general.dconf:
+    key: "/org/gnome/shell/disable-extension-version-validation"
+    value: "true"
+
+- name: Create backgrounds and themes directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ ansible_env.HOME }}/.local/share/backgrounds"
+    - "{{ ansible_env.HOME }}/.themes"
+
+- name: Copy wallpaper graphic
+  copy:
+    src: files/dracula-arab-tile.png
+    dest: "{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png"
+
+- name: Set wallpaper
+  community.general.dconf:
+    key: /org/gnome/desktop/background/picture-uri
+    value: "'file://{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png'"
+
+- name: Download Dracula GTK theme
+  unarchive:
+    src: https://github.com/dracula/gtk/releases/download/v3.0/Dracula.tar.xz
+    remote_src: yes
+    dest: "{{ ansible_env.HOME }}/.themes"
+
+- name: Set GTK theme
+  community.general.dconf:
+    key: "{{ item }}"
+    value: "'Dracula'"
+  with_items:
+    - /org/gnome/desktop/interface/gtk-theme
+    - /org/gnome/desktop/wm/preferences/theme
+
+- name: Install papirus icon theme
+  become: yes
+  dnf:
+    name: papirus-icon-theme
+  register: papirus_icons
+
+- name: Set icon theme
+  community.general.dconf:
+    key: /org/gnome/desktop/interface/icon-theme
+    value: "'Papirus'"
+
+- name: Set 12h clock format
+  community.general.dconf:
+    key: /org/gnome/desktop/interface/clock-format
+    value: "'12h'"
+
+- name: Turn off dynamic workspaces
+  community.general.dconf:
+    key: /org/gnome/mutter/dynamic-workspaces
+    value: "false"
+
+- name: Use 4 workspaces
+  community.general.dconf:
+    key: /org/gnome/desktop/wm/preferences/num-workspaces
+    value: "4"
+
+- name: Show only current workspace windows in app switcher
+  community.general.dconf:
+    key: /org/gnome/shell/app-switcher
+    value: "true"
+
+- name: Load keybinding configuration
+  shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
+
+- name: Install shell extensions
+  import_role:
+    name: petermosmans.customize-gnome
+  vars:
+    gnome_extensions:
+      - id: 120 # system-monitor
+        enabled: yes
+      - id: 723 # pixel-saver
+        enabled: yes
+      - id: 3780 # ddterm
+        enabled: yes
+      - id: 4099 # no-overview
+        enabled: yes
+
+- name: Load system-monitor configuration
+  shell: "dconf load /org/gnome/shell/extensions/system-monitor/ < {{ role_path }}/files/system-monitor.conf"

@@ -1,5 +1,0 @@
----
-- name: Install OpenVPN plugin for Network Manager
-  become: yes
-  pacman: name=networkmanager-openvpn
-          state=present

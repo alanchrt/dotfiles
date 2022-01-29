@@ -1,0 +1,16 @@
+---
+- hosts: all
+  roles:
+    - core
+    - gnome
+    - ulauncher
+    - fonts
+    - terminal
+    - kubernetes
+    - nodejs
+    - python
+    - emacs
+    - vim
+
+    # keep completions last since they depend on programs to generate
+    - completions

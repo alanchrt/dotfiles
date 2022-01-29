@@ -1,0 +1,39 @@
+#!/bin/bash -i
+
+set -e
+
+echo -n "[sudo] password for $USER: "
+read -s PASSWORD
+
+# install base deps
+echo $PASSWORD | sudo -S dnf install -y ansible
+mkdir -p /tmp/dotfiles
+
+# install chezmoi
+if [ ! -f /tmp/dotfiles/chezmoi.tar.gz ] ; then
+    wget --no-clobber https://github.com/twpayne/chezmoi/releases/download/v2.10.0/chezmoi_2.10.0_linux_amd64.tar.gz -O /tmp/dotfiles/chezmoi.tar.gz
+    (cd /tmp/dotfiles && tar -xzf chezmoi.tar.gz)
+fi
+mkdir -p $HOME/.local/bin
+install /tmp/dotfiles/chezmoi $HOME/.local/bin
+
+# init and apply chezmoi
+if [ ! -d $HOME/Projects/dotfiles ] ; then
+    git clone -b fedora git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+fi
+chezmoi apply --source $HOME/Projects/dotfiles
+
+# install ansible galaxy dependencies
+ansible-galaxy collection install community.general
+if [ ! -f /tmp/dotfiles/requirements.yml ] ; then
+    wget --no-clobber -O /tmp/dotfiles/requirements.yml https://raw.githubusercontent.com/alanchrt/dotfiles/fedora/requirements.yml
+fi
+ansible-galaxy install -r /tmp/dotfiles/requirements.yml
+
+# clean up
+rm -r /tmp/dotfiles
+
+# run ansible playbook
+ANSIBLE_FORCE_COLOR=true ansible-pull --checkout fedora --url git@github.com:alanchrt/dotfiles.git -i hosts --extra-vars "ansible_sudo_pass=$PASSWORD"
+
+echo "Please restart this machine to make sure all groups, extensions, and services reload properly."

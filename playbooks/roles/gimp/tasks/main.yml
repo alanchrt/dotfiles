@@ -1,5 +1,0 @@
----
-- name: Install GIMP
-  become: yes
-  pacman: name=gimp
-          state=present

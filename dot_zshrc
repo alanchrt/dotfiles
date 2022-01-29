@@ -1,0 +1,53 @@
+setopt histignorealldups sharehistory
+
+# Use emacs keybindings
+bindkey -e
+
+# Add local bin and cargo bin to PATH
+export PATH="$PATH:$HOME/.local/bin"
+
+# Enable powerlevel10k
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Dracula theme for fzf
+export FZF_DEFAULT_OPTS='--color=fg:#f8f8f2,bg:#282a36,hl:#bd93f9 --color=fg+:#f8f8f2,bg+:#44475a,hl+:#bd93f9 --color=info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6 --color=marker:#ff79c6,spinner:#ffb86c,header:#6272a4'
+
+setopt histignorealldups sharehistory
+# Use oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
+export ZSH_THEME="powerlevel10k/powerlevel10k"
+plugins=(zsh-syntax-highlighting zsh-completions fzf)
+source $ZSH/oh-my-zsh.sh
+
+# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
+HISTSIZE=1000
+SAVEHIST=1000
+HISTFILE=~/.zsh_history
+
+# Use emacs as default editor
+export EDITOR="emacsclient -c"
+
+# Use modern completion system
+skip_global_compinit=1
+autoload -Uz compinit
+# for some reason, specifying a different zcompdump makes this faster
+compinit -d ~/.zcompdump_completion
+zstyle ':completion:*' menu select=2
+
+# Set up fnm
+eval "$(fnm env)"
+
+# Set up vte for tilix
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+    source /etc/profile.d/vte.sh
+fi
+
+# Configure powerlevel10k
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Include bash aliases
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi

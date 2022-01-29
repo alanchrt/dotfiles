@@ -1,0 +1,38 @@
+---
+- name: Add Hack fonts repository
+  become: yes
+  community.general.copr:
+    name: zawertun/hack-fonts
+
+- name: Install Hack fonts
+  become: yes
+  dnf:
+    name: hack-fonts
+
+- name: Create fonts directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/fonts"
+    state: directory
+
+- name: Install miscellaneous fonts
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ item.name }}.ttf"
+  with_items:
+    # spacemacs
+    - name: Quivira
+      url: http://www.quivira-font.com/files/Quivira.ttf
+    # powerlevel10k
+    - name: MesloLGS NF Regular
+      url: https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
+    - name: MesloLGS NF Bold
+      url: https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
+    - name: MesloLGS NF Italic
+      url: https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
+    - name: MesloLGS NF Bold Italic
+      url: https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+  register: install_fonts
+
+- name: Refresh font cache
+  shell: fc-cache --force
+  when: install_fonts.changed

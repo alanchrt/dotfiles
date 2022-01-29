@@ -1,0 +1,46 @@
+---
+- name: Install emacs
+  become: yes
+  dnf:
+    name: emacs
+
+- name: Clone spacemacs distribution
+  git:
+    repo: https://github.com/syl20bnr/spacemacs
+    dest: "{{ ansible_env.HOME }}/.emacs.d"
+    version: develop
+
+- name: Create user systemd directory
+  file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+
+- name: Set up systemd unit file
+  copy:
+    src: files/emacs.service
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/emacs.service"
+  register: emacs_unit_file
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+    scope: user
+  when: emacs_unit_file.changed
+
+- name: Enable and start emacs server
+  systemd:
+    name: emacs
+    scope: user
+    state: started
+    enabled: yes
+
+- name: Create user applications directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/applications"
+    state: directory
+
+- name: Create desktop file
+  copy:
+    src: files/emacs.desktop
+    dest: "{{ ansible_env.HOME }}/.local/share/applications/emacs.desktop"
+  register: emacs_unit_file

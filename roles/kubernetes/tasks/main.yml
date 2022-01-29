@@ -1,0 +1,24 @@
+---
+- name: Make sure local bin dir exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+
+- name: Download k9s
+  unarchive:
+    src: https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz
+    dest: "{{ ansible_env.HOME}}/.local/bin"
+    remote_src: yes
+    mode: +x
+    extra_opts:
+      - k9s
+
+- name: Make sure k9s config dir exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/k9s"
+    state: directory
+
+- name: Configure k9s dracula theme
+  get_url:
+    url: https://raw.githubusercontent.com/derailed/k9s/master/skins/dracula.yml
+    dest: "{{ ansible_env.HOME }}/.config/k9s/skin.yml"
