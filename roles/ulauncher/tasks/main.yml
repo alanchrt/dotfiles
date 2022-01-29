@@ -84,7 +84,10 @@
     create: yes
   register: uinput_udev_rule
 
-- name: Add autostart desktop file for ydotoold
+- name: Add autostart desktop files for ulauncher and ydotoold
   copy:
-    src: files/ydotoold.desktop
-    dest: "{{ ansible_env.HOME }}/.config/autostart/ydotoold.desktop"
+    src: "files/{{ item }}.desktop"
+    dest: "{{ ansible_env.HOME }}/.config/autostart/{{ item }}.desktop"
+  with_items:
+    - ulauncher
+    - ydotoold
