@@ -23,6 +23,7 @@
       - gcc-c++
       - rubygem-gist
       - dconf-editor
+      - gnome-extensions-app
     update_cache: yes
 
 - name: Install rbw
