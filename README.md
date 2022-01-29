@@ -33,6 +33,7 @@ There are a few local settings and credentials that might be worth setting up ri
 ##### Bitwarden
 
 ```
+$ rbw config set email <your email>
 $ rbw register
 $ rbw login
 ```
