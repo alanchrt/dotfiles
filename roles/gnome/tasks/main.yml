@@ -81,6 +81,8 @@
         enabled: yes
       - id: 3780 # ddterm
         enabled: yes
+      - id: 4099 # no-overview
+        enabled: yes
 
 - name: Load system-monitor configuration
   shell: "dconf load /org/gnome/shell/extensions/system-monitor/ < {{ role_path }}/files/system-monitor.conf"
