@@ -22,6 +22,7 @@
       - cargo
       - gcc-c++
       - rubygem-gist
+      - dconf-editor
     update_cache: yes
 
 - name: Install rbw
