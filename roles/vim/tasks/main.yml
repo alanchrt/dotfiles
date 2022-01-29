@@ -1,4 +1,9 @@
 ---
+- name: Install vim
+  become: yes
+  dnf:
+    name: vim-enhanced
+
 - name: Create themes
   file:
     path: "{{ ansible_env.HOME }}/.vim/pack/themes/start"
