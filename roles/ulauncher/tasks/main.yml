@@ -20,6 +20,16 @@
     xpath: //*[@id="name_wrapper"]/property[@name="width-request"]
     value: "810"
 
+- name: Make sure themes directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config/ulauncher/user-themes"
+    state: directory
+
+- name: Clone dracula theme
+  git:
+    repo: https://github.com/dracula/ulauncher.git
+    dest: "{{ ansible_env.HOME }}/.config/ulauncher/user-themes/dracula-ulauncher"
+
 - name: Make sure extensions directory exists
   file:
     path: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
