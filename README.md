@@ -4,7 +4,7 @@ This is my Fedora, GNOME, Spacemacs, byobu, and Oh My Zsh setup, tailored toward
 
 Here are some references for getting around the system:
 
-- **[GNOME configuration](roles/gnome/tasks/main.yml) -** Desktop keybindings
+- **[GNOME configuration](roles/gnome/files/keybindings.conf) -** Vim-like desktop keybindings
 - **[Spacemacs documentation](http://develop.spacemacs.org/doc/DOCUMENTATION.html) -** IDE experience
 - **[Byobu man page](http://manpages.ubuntu.com/manpages/zesty/en/man1/byobu.1.html#contenttoc8) -** Tmux keybindings
 - **[Shell aliases](home/dot_bash_aliases) -** Terminal aliases for zsh and bash
