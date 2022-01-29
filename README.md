@@ -24,7 +24,7 @@ You may prefer to test out this setup in a virtual machine (on [VirtualBox](http
 The following command will configure the base software on Fedora and copy dotfiles from this repo for your user. Make sure you have an SSH key for this machine configured on GitHub (bootstrap will clone this repo over SSH).
 
 ```shell
-wget -qO- https://raw.githubusercontent.com/alanchrt/dotfiles/master/bootstrap.sh | bash
+bash <(curl -s https://raw.githubusercontent.com/alanchrt/dotfiles/master/bootstrap.sh)
 ```
 ### Configure credentials
 
