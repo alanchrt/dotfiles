@@ -6,6 +6,20 @@
       - ulauncher
       - ydotool
 
+- name: Widen ulauncher window
+  become: yes
+  community.general.xml:
+    path: /usr/share/ulauncher/ui/UlauncherWindow.ui
+    xpath: //*[@id="ulauncher_window"]/property[@name="width_request"]
+    value: "1004"
+
+- name: Widen ulauncher names
+  become: yes
+  community.general.xml:
+    path: /usr/share/ulauncher/ui/result_item.ui
+    xpath: //*[@id="name_wrapper"]/property[@name="width-request"]
+    value: "810"
+
 - name: Make sure extensions directory exists
   file:
     path: "{{ ansible_env.HOME }}/.local/share/ulauncher/extensions"
