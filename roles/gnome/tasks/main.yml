@@ -64,7 +64,7 @@
 
 - name: Show only current workspace windows in app switcher
   community.general.dconf:
-    key: /org/gnome/shell/app-switcher
+    key: /org/gnome/shell/app-switcher/current-workspace-only
     value: "true"
 
 - name: Load keybinding configuration
