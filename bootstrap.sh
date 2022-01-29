@@ -6,7 +6,7 @@ echo -n "[sudo] password for $USER: "
 read -s PASSWORD
 
 # install base deps
-echo $PASSWORD | sudo -S dnf install -y ansible
+echo $PASSWORD | sudo -S dnf install -y ansible python3-psutil
 mkdir -p /tmp/dotfiles
 
 # install chezmoi
