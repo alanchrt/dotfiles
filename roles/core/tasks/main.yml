@@ -44,7 +44,9 @@
     - src: "{{ ansible_env.HOME }}/.cargo/bin/rbw-agent"
       dest: /usr/local/bin/rbw-agent
 
-- name: Make sure local src dir exists
-  file:
-    path: "{{ ansible_env.HOME }}/.local/src"
-    state: directory
+- name: Configure flathub
+  become: yes
+  community.general.flatpak_remote:
+      name: flathub
+      state: present
+      flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
