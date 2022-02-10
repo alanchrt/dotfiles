@@ -37,6 +37,7 @@
       - tk-devel
       - libffi-devel
       - xz-devel
+      - libpq-devel
 
     update_cache: yes
 
