@@ -3,7 +3,7 @@ setopt histignorealldups sharehistory
 # Use emacs keybindings
 bindkey -e
 
-# Add local bin and cargo bin to PATH
+# Add local bin to PATH
 export PATH="$PATH:$HOME/.local/bin"
 
 # Enable powerlevel10k

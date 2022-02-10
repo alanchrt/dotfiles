@@ -16,3 +16,14 @@
       # used in spacemacs
       - importmagic
       - epc
+
+- name: Install pyenv
+  shell: "curl https://pyenv.run | bash"
+  args:
+    creates: "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+
+- name: Symlink pyenv
+  file:
+    src: "{{ ansible_env.HOME }}/.pyenv/bin/pyenv"
+    dest: "{{ ansible_env.HOME }}/.local/bin/pyenv"
+    state: link
