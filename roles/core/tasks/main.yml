@@ -38,6 +38,8 @@
       - libffi-devel
       - xz-devel
       - libpq-devel
+      - postgresql
+      - fd-find
 
     update_cache: yes
 
