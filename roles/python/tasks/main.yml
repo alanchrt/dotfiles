@@ -13,9 +13,13 @@
       - prompt-toolkit
       - yaspin
       - python3-pip-autoremove
-      # used in spacemacs
+      - python-lsp-server[all]
+      - black
       - importmagic
       - epc
+      - flake8
+      - autoflake
+      - ptvsd>=4.2
 
 - name: Install pyenv
   shell: "curl https://pyenv.run | bash"
