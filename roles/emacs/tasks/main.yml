@@ -1,5 +1,5 @@
 ---
-- name: Add emacs repository
+- name: Add emacs native compilation repository
   become: yes
   community.general.copr:
     name: deathwish/emacs-pgtk-nativecomp
@@ -9,11 +9,18 @@
   dnf:
     name: emacs
 
-- name: Clone spacemacs distribution
+- name: Clone doom emacs
   git:
-    repo: https://github.com/syl20bnr/spacemacs
+    repo: https://github.com/hlissner/doom-emacs
     dest: "{{ ansible_env.HOME }}/.emacs.d"
-    version: develop
+
+- name: Install doom emacs
+  expect:
+    command: "{{ ansible_env.HOME }}/.emacs.d/bin/doom install --no-env"
+    timeout: null
+    responses:
+      (?i)fonts\?: y
+    #creates: "{{ ansible_env.HOME }}/.emacs.d/.local"
 
 - name: Create user systemd directory
   file:

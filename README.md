@@ -1,11 +1,11 @@
 ## Overview
 
-This is my Fedora, GNOME, Spacemacs, byobu, and Oh My Zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
+This is my Fedora, GNOME, Doom Emacs, byobu, and Oh My Zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
 Here are some references for getting around the system:
 
 - **[GNOME configuration](roles/gnome/files/keybindings.conf) -** Vim-like desktop keybindings
-- **[Spacemacs documentation](http://develop.spacemacs.org/doc/DOCUMENTATION.html) -** IDE experience
+- **[Doom Emacs documentation](https://docs.doomemacs.org/latest/) -** IDE experience
 - **[Byobu man page](http://manpages.ubuntu.com/manpages/zesty/en/man1/byobu.1.html#contenttoc8) -** Tmux keybindings
 - **[Shell aliases](home/dot_bash_aliases) -** Terminal aliases for zsh and bash
 
@@ -26,6 +26,7 @@ The following command will configure the base software on Fedora and copy dotfil
 ```shell
 bash <(curl -s https://raw.githubusercontent.com/alanchrt/dotfiles/master/bootstrap.sh)
 ```
+
 ### Configure credentials
 
 There are a few local settings and credentials that might be worth setting up right off the bat if needed.
