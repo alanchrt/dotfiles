@@ -20,31 +20,17 @@
     timeout: null
     responses:
       (?i)fonts\?: y
-    #creates: "{{ ansible_env.HOME }}/.emacs.d/.local"
+    creates: "{{ ansible_env.HOME }}/.emacs.d/.local"
 
-- name: Create user systemd directory
+- name: Create autostart directory
   file:
-    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    path: "{{ ansible_env.HOME }}/.config/autostart"
     state: directory
 
-- name: Set up systemd unit file
+- name: Set up daemon autostart file
   copy:
-    src: files/emacs.service
-    dest: "{{ ansible_env.HOME }}/.config/systemd/user/emacs.service"
-  register: emacs_unit_file
-
-- name: Reload systemd
-  systemd:
-    daemon_reload: yes
-    scope: user
-  when: emacs_unit_file.changed
-
-- name: Enable and start emacs server
-  systemd:
-    name: emacs
-    scope: user
-    state: started
-    enabled: yes
+    src: files/emacsd.desktop
+    dest: "{{ ansible_env.HOME }}/.config/autostart/emacsd.desktop"
 
 - name: Create user applications directory
   file:
@@ -56,3 +42,9 @@
     src: files/emacs.desktop
     dest: "{{ ansible_env.HOME }}/.local/share/applications/emacs.desktop"
   register: emacs_unit_file
+
+- name: Remove emacs client desktop file from rpm
+  become: yes
+  file:
+    path: /usr/share/applications/emacsclient.desktop
+    state: absent

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Terminal=false
+Name=emacs deamon
+Exec=/usr/bin/emacs --daemon
+Comment=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+Categories=Utility;Development;TextEditor;
