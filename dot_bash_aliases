@@ -37,6 +37,9 @@ alias e="emacsclient -c"
 # clipboard
 alias clip="xclip -selection clipboard"
 
+# diceware
+alias dw="diceware -d ' ' --no-caps"
+
 # new named tmux session
 function to {
     if (( $# == 1 ))
