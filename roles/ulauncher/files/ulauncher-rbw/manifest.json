@@ -1,6 +1,6 @@
 {
   "required_api_version": "^2.0.0",
-  "name": "Bitwarden",
+  "name": "Passwords",
   "description": "Auto-typing passwords using rbw as Bitwarden client",
   "developer_name": "Alan Christopher Thomas",
   "icon": "images/icon.png",
@@ -9,7 +9,7 @@
     {
       "id": "bw_kw",
       "type": "keyword",
-      "name": "Bitwarden",
+      "name": "Passwords",
       "default_value": "i"
     }
   ]

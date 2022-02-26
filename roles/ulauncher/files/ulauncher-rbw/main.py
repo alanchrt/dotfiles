@@ -44,7 +44,7 @@ class KeywordQueryEventListener(EventListener):
                 'folder': folder,
             }
 
-            items.append(ExtensionResultItem(icon='images/pass.png',
+            items.append(ExtensionResultItem(icon='images/icon.png',
                                              name='{} ({})'.format(
                                                  name, folder) if folder else name,
                                              description=user,
