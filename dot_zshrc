@@ -39,11 +39,6 @@ zstyle ':completion:*' menu select=2
 # Set up fnm
 eval "$(fnm env)"
 
-# Set up vte for tilix
-if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-    source /etc/profile.d/vte.sh
-fi
-
 # Configure powerlevel10k
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 

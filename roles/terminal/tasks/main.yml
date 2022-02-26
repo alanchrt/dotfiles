@@ -1,13 +1,10 @@
 ---
-- name: Install tilix and fzf
+- name: Install kitty and fzf
   become: yes
   dnf:
     name:
-      - tilix
+      - kitty
       - fzf
-
-- name: Configure tilix
-  shell: "dconf load /com/gexperts/Tilix/ < {{ role_path }}/files/tilix.conf"
 
 - name: Configure ddterm
   shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
@@ -41,16 +38,6 @@
     - zsh-completions
     - zsh-syntax-highlighting
     - zsh-history-substring-search
-
-- name: Create color schemes directory
-  file:
-    path: "{{ ansible_env.HOME }}/.config/tilix/schemes"
-    state: directory
-
-- name: Copy Dracula color scheme
-  copy:
-    src: files/Dracula.json
-    dest: "{{ ansible_env.HOME }}/.config/tilix/schemes/Dracula.json"
 
 - name: Add wa prompt to local bin
   copy:
