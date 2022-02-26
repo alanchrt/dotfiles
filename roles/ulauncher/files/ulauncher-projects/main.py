@@ -49,11 +49,9 @@ class ItemEnterEventListener(EventListener):
         project = event.get_data()
         home = os.getenv('HOME')
 
-        subprocess.run([
-            'tilix',
-            '--maximize',
-            '--title', project,
-            '--command', 'byobu new-session -c {}/Projects/{} -s {}'.format(home, project, project)])
+        subprocess.run(
+            'alacritty --title {} --command byobu new-session -c {}/Projects/{} -s {}'.format(
+                project, home, project, project), shell=True)
 
         return DoNothingAction()
 
