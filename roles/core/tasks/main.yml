@@ -40,6 +40,9 @@
       - libpq-devel
       - postgresql
       - fd-find
+      - oniguruma-devel
+      - libacl-devel
+      - libcap-devel
 
     update_cache: yes
 
@@ -63,6 +66,6 @@
 - name: Configure flathub
   become: yes
   community.general.flatpak_remote:
-      name: flathub
-      state: present
-      flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo

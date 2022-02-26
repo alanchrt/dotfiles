@@ -62,3 +62,26 @@
     src: "files/bin/pv"
     dest: "{{ ansible_env.HOME }}/.local/bin/pv"
     mode: +x
+
+- name: Make local src directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/src"
+    state: directory
+
+- name: Download bfs
+  unarchive:
+    src: https://github.com/tavianator/bfs/archive/refs/tags/2.4.1.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/src"
+    remote_src: yes
+
+- name: Build bfs
+  shell: "make release"
+  args:
+    chdir: "{{ ansible_env.HOME }}/.local/src/bfs-2.4.1"
+    creates: "{{ ansible_env.HOME }}/.local/src/bfs-2.4.1/bfs"
+
+- name: Install bfs
+  copy:
+    src: "{{ ansible_env.HOME }}/.local/src/bfs-2.4.1/bfs"
+    dest: "{{ ansible_env.HOME }}/.local/bin/bfs"
+    mode: +x
