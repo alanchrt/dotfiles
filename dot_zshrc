@@ -18,7 +18,7 @@ setopt histignorealldups sharehistory
 # Use oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 export ZSH_THEME="powerlevel10k/powerlevel10k"
-plugins=(zsh-syntax-highlighting zsh-completions fzf)
+plugins=(zsh-syntax-highlighting zsh-completions history-substring-search fzf)
 source $ZSH/oh-my-zsh.sh
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
@@ -35,6 +35,10 @@ autoload -Uz compinit
 # for some reason, specifying a different zcompdump makes this faster
 compinit -d ~/.zcompdump_completion
 zstyle ':completion:*' menu select=2
+
+# Bind history substring search
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
 
 # Set up fnm
 eval "$(fnm env)"
