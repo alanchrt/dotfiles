@@ -4,6 +4,7 @@
   dnf:
     name:
       - alacritty
+      - tmux
       - fzf
 
 - name: Configure ddterm
@@ -38,6 +39,16 @@
     - zsh-completions
     - zsh-syntax-highlighting
     - zsh-history-substring-search
+
+- name: Make tmux plugins dir
+  file:
+    path: "{{ ansible_env.HOME }}/.tmux/plugins"
+    state: directory
+
+- name: Install tpm for tmux plugins
+  git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
 
 - name: Add wa prompt to local bin
   copy:

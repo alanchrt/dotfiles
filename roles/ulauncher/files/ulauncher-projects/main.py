@@ -50,7 +50,7 @@ class ItemEnterEventListener(EventListener):
         home = os.getenv('HOME')
 
         subprocess.run(
-            'alacritty --title {} --command byobu new-session -c {}/Projects/{} -s {}'.format(
+            'alacritty --title {} --command tmux new-session -c {}/Projects/{} -s {}'.format(
                 project, home, project, project), shell=True)
 
         return DoNothingAction()

@@ -5,7 +5,6 @@
     name:
       - ansible
       - diceware
-      - byobu
       - flameshot
       - ripgrep
       - jq

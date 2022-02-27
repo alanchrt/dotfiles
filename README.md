@@ -1,13 +1,13 @@
 ## Overview
 
-This is my Fedora, GNOME, Doom Emacs, byobu, and Oh My Zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
+This is my Fedora, GNOME, Doom Emacs, tmux, and Zsh setup, tailored toward mnemonic vim-like keybindings, tools with smart defaults that Just Work&trade;, and an integrated desktop and development experience.
 
 Here are some references for getting around the system:
 
 - **[GNOME configuration](roles/gnome/files/keybindings.conf) -** Vim-like desktop keybindings
 - **[Doom Emacs documentation](https://docs.doomemacs.org/latest/) -** IDE experience
-- **[Byobu man page](http://manpages.ubuntu.com/manpages/zesty/en/man1/byobu.1.html#contenttoc8) -** Tmux keybindings
-- **[Shell aliases](home/dot_bash_aliases) -** Terminal aliases for zsh and bash
+- **[Tmux config](dot_tmux.conf) -** Keybindings for terminal multiplexing
+- **[Shell aliases](dot_bash_aliases) -** Terminal aliases for zsh and bash
 
 ## Installation
 
