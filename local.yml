@@ -1,16 +1,27 @@
 ---
 - hosts: all
   roles:
-    - core
-    - gnome
-    - ulauncher
-    - fonts
-    - terminal
-    - kubernetes
-    - nodejs
-    - python
-    - emacs
-    - vim
+    - name: core
+      tags: [core, dev, desktop]
+    - name: gnome
+      tags: [gnome, desktop]
+    - name: ulauncher
+      tags: [ulauncher, desktop]
+    - name: fonts
+      tags: [fonts, desktop]
+    - name: terminal
+      tags: [terminal, dev]
+    - name: kubernetes
+      tags: [kubernetes, dev]
+    - name: nodejs
+      tags: [nodejs, dev]
+    - name: python
+      tags: [python, dev]
+    - name: emacs
+      tags: [emacs, dev]
+    - name: vim
+      tags: [vim, dev]
 
     # keep completions last since they depend on programs to generate
-    - completions
+    - name: completions
+      tags: [completions, dev]
