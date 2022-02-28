@@ -42,6 +42,11 @@
       - oniguruma-devel
       - libacl-devel
       - libcap-devel
+      - libjpeg-turbo-devel
+      - libjpeg-turbo-utils
+      - python3-devel
+      - libxslt-devel
+      - dbus-devel
 
     update_cache: yes
 
