@@ -21,6 +21,8 @@
       tags: [emacs, dev]
     - name: vim
       tags: [vim, dev]
+    - name: heroku
+      tags: [heroku, dev]
 
     # keep completions last since they depend on programs to generate
     - name: completions

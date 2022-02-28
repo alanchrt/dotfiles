@@ -1,0 +1,6 @@
+---
+- name: Install heroku CLI
+  become: yes
+  shell: "curl https://cli-assets.heroku.com/install.sh | sh"
+  args:
+    creates: /usr/local/bin/heroku
