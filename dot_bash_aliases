@@ -38,7 +38,7 @@ alias e="emacsclient -c"
 alias clip="xclip -selection clipboard"
 
 # diceware
-alias dw="diceware -d ' ' --no-caps"
+alias dw="diceware"
 
 # new named tmux session
 function to {
