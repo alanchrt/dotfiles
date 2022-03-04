@@ -50,22 +50,26 @@
 
     update_cache: yes
 
-- name: Install rbw
-  shell: cargo install rbw
+- name: Install rbw and dust
+  shell: "cargo install {{ item.crate }}"
   args:
-    creates: "{{ ansible_env.HOME }}/.cargo/bin/rbw"
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.bin }}"
+  with_items:
+    - crate: rbw
+      bin: rbw
+    - crate: du-dust
+      bin: dust
 
-- name: Copy rbw to bin on PATH
+- name: Copy rbw and dust to bin on PATH
   become: yes
   copy:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
+    src: "{{ ansible_env.HOME }}/.cargo/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
     mode: +x
   with_items:
-    - src: "{{ ansible_env.HOME }}/.cargo/bin/rbw"
-      dest: /usr/local/bin/rbw
-    - src: "{{ ansible_env.HOME }}/.cargo/bin/rbw-agent"
-      dest: /usr/local/bin/rbw-agent
+    - rbw
+    - rbw-agent
+    - dust
 
 - name: Configure flathub
   become: yes
