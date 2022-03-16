@@ -52,10 +52,20 @@
     key: /org/gnome/desktop/interface/clock-format
     value: "'12h'"
 
+- name: Make workspaces span displays
+  community.general.dconf:
+    key: /org/gnome/mutter/workspaces-only-on-primary
+    value: "false"
+
 - name: Show only current workspace windows in app switcher
   community.general.dconf:
     key: /org/gnome/shell/app-switcher/current-workspace-only
     value: "true"
+
+- name: Don't show notifications in lock screen
+  community.general.dconf:
+    key: /org/gnome/desktop/notifications/show-in-lock-screen
+    value: "false"
 
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
