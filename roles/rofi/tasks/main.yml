@@ -1,0 +1,18 @@
+---
+- name: Install rofi
+  become: yes
+  dnf:
+    name:
+      - rofi
+      - xdotool
+
+- name: Add helper scripts to local bin
+  copy:
+    src: "files/{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.local/bin/{{ item }}"
+    mode: +x
+  with_items:
+    - rofi-apps
+    - rofi-rbw
+    - rofi-ykman
+    - rofi-projects

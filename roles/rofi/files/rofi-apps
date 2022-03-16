@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+rofi -modi drun -show drun -matching fuzzy -sorting-method fzf -display-drun open

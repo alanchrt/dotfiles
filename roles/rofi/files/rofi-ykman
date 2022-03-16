@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+credential=$(ykman oath accounts code --password $(secret-tool lookup ykman oath) | rofi -dmenu -matching fuzzy -sorting-method fzf -i -p "oath" -kb-custom-1 "Ctrl+c" $@)
+result="$?"
+
+if [[ ! -z "${credential// }" ]]; then
+    service=$(echo $credential | cut -d: -f 1)
+    token=$(echo $credential | awk '{print $NF}')
+fi
+
+if [ "$result" = "0" ]; then
+    xdotool type --clearmodifiers $token
+elif [ "$result" = "10" ]; then
+    printf $token | xclip -selection clipboard
+    notify-send "Token copied" "$service token copied to clipboard"
+fi
