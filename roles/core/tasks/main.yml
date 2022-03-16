@@ -71,7 +71,13 @@
     - rbw-agent
     - dust
 
-- name: Configure flathub
+- name: Remove flathub remote
+  become: yes
+  community.general.flatpak_remote:
+    name: flathub
+    state: absent
+
+- name: Re-configure flathub
   become: yes
   community.general.flatpak_remote:
     name: flathub
