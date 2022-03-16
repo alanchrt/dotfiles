@@ -5,8 +5,8 @@
       tags: [core, dev, desktop]
     - name: gnome
       tags: [gnome, desktop]
-    - name: ulauncher
-      tags: [ulauncher, desktop]
+    # - name: ulauncher
+    #   tags: [ulauncher, desktop]
     - name: fonts
       tags: [fonts, desktop]
     - name: terminal
