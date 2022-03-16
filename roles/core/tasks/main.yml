@@ -50,6 +50,19 @@
 
     update_cache: yes
 
+- name: Remove flathub remote
+  become: yes
+  community.general.flatpak_remote:
+    name: flathub
+    state: absent
+
+- name: Re-configure flathub
+  become: yes
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+
 - name: Install rbw and dust
   shell: "cargo install {{ item.crate }}"
   args:
@@ -70,16 +83,3 @@
     - rbw
     - rbw-agent
     - dust
-
-- name: Remove flathub remote
-  become: yes
-  community.general.flatpak_remote:
-    name: flathub
-    state: absent
-
-- name: Re-configure flathub
-  become: yes
-  community.general.flatpak_remote:
-    name: flathub
-    state: present
-    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
