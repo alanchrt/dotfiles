@@ -62,6 +62,7 @@
       - python3-devel
       - libxslt-devel
       - dbus-devel
+      - ffmpeg
 
     update_cache: yes
 
