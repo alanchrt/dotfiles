@@ -17,13 +17,10 @@
   with_items:
     - command: chezmoi
       generate: chezmoi completion zsh
-    - command: fnm
-      generate: fnm completions --shell zsh
   register: install_completions
 
 - name: Remove compinit dump file
   file:
     path: "{{ ansible_env.HOME }}/.zcompdump_completion"
     state: absent
-  # when: zsh_completions.changed or completions_plugin.changed
   when: install_completions.changed
