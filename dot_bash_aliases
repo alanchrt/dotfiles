@@ -1,5 +1,8 @@
 # dotfiles (ansible + chezmoi update)
-alias dots="ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts && chezmoi apply --force --verbose"
+function dots {
+    ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts $@
+    chezmoi apply --force --verbose
+}
 
 # chezmoi
 alias cz="chezmoi"
