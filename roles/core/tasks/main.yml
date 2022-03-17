@@ -63,6 +63,7 @@
       - python3-devel
       - libxslt-devel
       - dbus-devel
+      - libxcrypt-compat
       - ffmpeg
 
     update_cache: yes

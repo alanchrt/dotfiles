@@ -27,6 +27,8 @@
       tags: [emacs, dev]
     - name: vim
       tags: [vim, dev]
+    - name: gcloud
+      tags: [gcloud, dev]
     - name: heroku
       tags: [heroku, dev]
 
