@@ -1,18 +1,13 @@
 ---
-- name: Add kubernetes GPG keys
-  become: yes
-  rpm_key:
-    key: "{{ item }}"
-  with_items:
-    - https://packages.cloud.google.com/yum/doc/yum-key.gpg
-    - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-
 - name: Add kubernetes repo
   become: yes
   yum_repository:
     name: kubernetes
     description: Kubernetes YUM repo
     baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgkey:
+      - https://packages.cloud.google.com/yum/doc/yum-key.gpg
+      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
 - name: Install kubectl
   become: yes
