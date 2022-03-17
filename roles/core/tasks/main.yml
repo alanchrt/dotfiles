@@ -89,14 +89,3 @@
       bin: rbw
     - crate: du-dust
       bin: dust
-
-- name: Copy rbw and dust to bin on PATH
-  become: yes
-  copy:
-    src: "{{ ansible_env.HOME }}/.cargo/bin/{{ item }}"
-    dest: "/usr/local/bin/{{ item }}"
-    mode: +x
-  with_items:
-    - rbw
-    - rbw-agent
-    - dust

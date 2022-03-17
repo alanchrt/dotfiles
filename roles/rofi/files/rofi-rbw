@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export PATH="$PATH:$HOME/.cargo/bin"
+
 list=$(rbw list --fields id,name,user | awk -F'\t' 'length($3)')
 ids=$(echo "$list" | cut -f1)
 names=$(echo "$list"  | cut -f2)
