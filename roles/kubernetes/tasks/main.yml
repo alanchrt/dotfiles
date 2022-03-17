@@ -9,10 +9,12 @@
       - https://packages.cloud.google.com/yum/doc/yum-key.gpg
       - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
-- name: Install kubectl
+- name: Install kubectl and helm
   become: yes
   dnf:
-    name: kubectl
+    name:
+      - kubectl
+      - helm
 
 - name: Make sure local bin dir exists
   file:
