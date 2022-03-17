@@ -1,0 +1,29 @@
+---
+- name: Install go
+  become: yes
+  dnf:
+    name: golang
+
+- name: Install go tooling
+  shell: "go install {{ item.url }}"
+  args:
+    creates: "{{ ansible_env.HOME }}/.go/pkg/mod/{{ item.path }}"
+  environment:
+    GOPATH: "{{ ansible_env.HOME }}/.go"
+  with_items:
+    - url: github.com/x-motemen/gore/cmd/gore@latest
+      path: github.com/x-motemen/gore@*
+    - url: github.com/stamblerre/gocode@latest
+      path: github.com/stamblerre/gocode@*
+    - url: golang.org/x/tools/cmd/godoc@latest
+      path: golang.org/x/tools@*/cmd/godoc
+    - url: golang.org/x/tools/cmd/goimports@latest
+      path: golang.org/x/tools@*/cmd/goimports
+    - url: golang.org/x/tools/cmd/gorename@latest
+      path: golang.org/x/tools@*/cmd/gorename
+    - url: golang.org/x/tools/cmd/guru@latest
+      path: golang.org/x/tools@*/cmd/guru
+    - url: github.com/cweill/gotests/gotests@latest
+      path: github.com/cweill/gotests@*
+    - url: github.com/fatih/gomodifytags@latest
+      path: github.com/fatih/gomodifytags@*

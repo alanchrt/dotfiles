@@ -4,7 +4,10 @@ setopt histignorealldups sharehistory
 bindkey -e
 
 # Add local bin to PATH
-export PATH="$PATH:$HOME/.local/bin:$HOME/.cargo/bin"
+export PATH="$PATH:$HOME/.local/bin:$HOME/.go/bin:$HOME/.cargo/bin"
+
+# Set go path
+export GOPATH=$HOME/.go
 
 # Enable powerlevel10k
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then

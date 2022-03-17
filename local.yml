@@ -21,6 +21,8 @@
       tags: [nodejs, dev]
     - name: python
       tags: [python, dev]
+    - name: go
+      tags: [go, dev]
     - name: emacs
       tags: [emacs, dev]
     - name: vim
