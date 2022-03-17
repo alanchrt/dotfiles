@@ -15,6 +15,8 @@
       tags: [docker, dev]
     - name: kubernetes
       tags: [kubernetes, dev]
+    - name: terraform
+      tags: [terraform, dev]
     - name: nodejs
       tags: [nodejs, dev]
     - name: python

@@ -1,0 +1,12 @@
+---
+- name: Add hashicorp repo
+  become: yes
+  shell: dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+  args:
+    creates: /etc/yum.repos.d/hashicorp.repo
+    warn: false
+
+- name: Install terraform
+  become: yes
+  dnf:
+    name: terraform
