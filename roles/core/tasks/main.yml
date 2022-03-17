@@ -18,6 +18,7 @@
   become: yes
   dnf:
     name:
+      - dnf-plugins-core
       - ansible
       - diceware
       - flameshot

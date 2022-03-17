@@ -11,6 +11,8 @@
       tags: [rofi, desktop]
     - name: terminal
       tags: [terminal, dev]
+    - name: docker
+      tags: [docker, dev]
     - name: kubernetes
       tags: [kubernetes, dev]
     - name: nodejs
