@@ -11,12 +11,6 @@
       tags: [rofi, desktop]
     - name: terminal
       tags: [terminal, dev]
-    - name: docker
-      tags: [docker, dev]
-    - name: kubernetes
-      tags: [kubernetes, dev]
-    - name: terraform
-      tags: [terraform, dev]
     - name: nodejs
       tags: [nodejs, dev]
     - name: python
@@ -27,6 +21,12 @@
       tags: [emacs, dev]
     - name: vim
       tags: [vim, dev]
+    - name: docker
+      tags: [docker, dev]
+    - name: kubernetes
+      tags: [kubernetes, dev]
+    - name: terraform
+      tags: [terraform, dev]
     - name: gcloud
       tags: [gcloud, dev]
     - name: heroku
