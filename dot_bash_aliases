@@ -1,7 +1,11 @@
 # dotfiles (ansible + chezmoi update)
 function dots {
-    ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts $@
-    chezmoi apply --force --verbose
+    if [ "$1" = "sync" ]; then
+        git -C $HOME/Projects/dotfiles pull origin master
+    else
+        ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts $@
+        chezmoi apply --force --verbose
+    fi
 }
 
 # chezmoi
