@@ -1,8 +1,10 @@
 ---
-- name: Install go
+- name: Download go
   become: yes
-  dnf:
-    name: golang
+  unarchive:
+    src: https://go.dev/dl/go1.18.linux-amd64.tar.gz
+    dest: "/usr/local"
+    remote_src: yes
 
 - name: Install go tooling
   shell: "go install {{ item.url }}"

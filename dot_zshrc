@@ -3,11 +3,8 @@ setopt histignorealldups sharehistory
 # Use emacs keybindings
 bindkey -e
 
-# Add local bin to PATH
-export PATH="$PATH:$HOME/.local/bin:$HOME/.go/bin:$HOME/.cargo/bin"
-
-# Set go path
-export GOPATH=$HOME/.go
+# Include bashrc config
+source $HOME/.bashrc
 
 # Enable powerlevel10k
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
@@ -28,9 +25,6 @@ source $ZSH/oh-my-zsh.sh
 HISTSIZE=1000
 SAVEHIST=1000
 HISTFILE=~/.zsh_history
-
-# Use emacs as default editor
-export EDITOR="emacsclient -c"
 
 # Use modern completion system
 skip_global_compinit=1

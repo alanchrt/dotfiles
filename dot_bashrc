@@ -1,0 +1,8 @@
+# Add extra bin dirs to path
+export PATH="$PATH:$HOME/.local/bin:/usr/local/go/bin:$HOME/.go/bin:$HOME/.cargo/bin"
+
+# Set go path
+export GOPATH=$HOME/.go
+
+# Use emacs as default editor
+export EDITOR="emacsclient -c"
