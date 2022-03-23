@@ -47,3 +47,6 @@ eval "$(fnm env)"
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
+
+# Include local operations
+[[ ! -f ~/.sh_local ]] || source ~/.sh_local
