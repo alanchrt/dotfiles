@@ -1,5 +1,5 @@
 ---
-- name: Install alacritty and fzf
+- name: Install terminal tooling
   become: yes
   dnf:
     name:
