@@ -5,6 +5,7 @@
     name:
       - pipenv
       - python3-ipython
+      - python2
 
 - name: Install common packages
   pip:
