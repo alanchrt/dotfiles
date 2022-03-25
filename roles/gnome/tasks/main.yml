@@ -86,5 +86,8 @@
       - id: 517 # caffeine
         enabled: yes
 
-- name: Load system-monitor configuration
+- name: Configure system-monitor
   shell: "dconf load /org/gnome/shell/extensions/system-monitor/ < {{ role_path }}/files/system-monitor.conf"
+
+- name: Configure caffeine
+  shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
