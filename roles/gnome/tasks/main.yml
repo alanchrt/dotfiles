@@ -67,6 +67,11 @@
     key: /org/gnome/desktop/notifications/show-in-lock-screen
     value: "false"
 
+- name: Disable super key activities binding
+  community.general.dconf:
+    key: /org/gnome/mutter/overlay-key
+    value: "''"
+
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
 
