@@ -27,6 +27,15 @@ The following command will configure the base software on Fedora and copy dotfil
 bash <(curl -s https://raw.githubusercontent.com/alanchrt/dotfiles/master/bootstrap.sh)
 ```
 
+### Configure user-specific settings
+
+Chezmoi templates in some items. Add a `.chezmoidata.toml` file to the root of this repo:
+
+```toml
+name = "John Doe"
+email = "john@company.com"
+```
+
 ### Configure credentials
 
 There are a few local settings and credentials that might be worth setting up right off the bat if needed.
