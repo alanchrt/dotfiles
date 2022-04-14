@@ -75,6 +75,7 @@
 ;; they are implemented.
 
 ;; Use format-all formatter for javascript (prettier) and python (black)
-(add-hook 'python-mode-hook #'format-all-mode)
-(add-hook 'js2-mode-hook #'format-all-mode)
-(add-hook 'rjsx-mode-hook #'format-all-mode)
+(setq-hook! 'rjsx-mode-hook +format-with-lsp nil)
+(setq-hook! 'typescript-mode-hook +format-with-lsp nil)
+(setq-hook! 'js2-mode-hook +format-with-lsp nil)
+(setq-hook! 'python-mode-hook +format-with-lsp nil)
