@@ -90,6 +90,8 @@
         enabled: yes
       - id: 517 # caffeine
         enabled: yes
+      - id: 1125 # github-notifications
+        enabled: yes
 
 - name: Configure system-monitor
   shell: "dconf load /org/gnome/shell/extensions/system-monitor/ < {{ role_path }}/files/system-monitor.conf"
