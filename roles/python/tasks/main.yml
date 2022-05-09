@@ -4,6 +4,7 @@
   dnf:
     name:
       - pipenv
+      - poetry
       - python3-ipython
       - python2
 
