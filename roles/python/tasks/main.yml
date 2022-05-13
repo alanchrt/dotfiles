@@ -10,7 +10,7 @@
   pip:
     name:
       - pipenv
-      - poetry==1.2.0b1
+      - poetry
       - requests
       - prompt-toolkit
       - yaspin
