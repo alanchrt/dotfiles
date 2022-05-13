@@ -3,14 +3,14 @@
   become: yes
   dnf:
     name:
-      - pipenv
-      - poetry
       - python3-ipython
       - python2
 
 - name: Install common packages
   pip:
     name:
+      - pipenv
+      - poetry==1.2.0b1
       - requests
       - prompt-toolkit
       - yaspin
