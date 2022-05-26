@@ -5,6 +5,7 @@
     name:
       - rofi
       - xdotool
+      - rofimoji
 
 - name: Add helper scripts to local bin
   copy:
