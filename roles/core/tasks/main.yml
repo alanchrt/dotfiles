@@ -27,6 +27,7 @@
       - lsd
       - bat
       - age
+      - powertop
       - ImageMagick
       - xclip
       - pandoc
