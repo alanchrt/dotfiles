@@ -21,6 +21,15 @@
     path: "{{ ansible_env.HOME }}/.local/bin"
     state: directory
 
+- name: Download kustomize
+  unarchive:
+    src: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.5.7/kustomize_v4.5.7_linux_amd64.tar.gz
+    dest: "{{ ansible_env.HOME}}/.local/bin"
+    remote_src: yes
+    mode: +x
+    extra_opts:
+      - kustomize
+
 - name: Download k9s
   unarchive:
     src: https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz
