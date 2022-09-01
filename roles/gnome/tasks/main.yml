@@ -19,8 +19,12 @@
 
 - name: Set wallpaper
   community.general.dconf:
-    key: /org/gnome/desktop/background/picture-uri
+    key: "{{ item }}"
     value: "'file://{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png'"
+  with_items:
+    - /org/gnome/desktop/background/picture-uri
+    - /org/gnome/desktop/background/picture-uri-dark
+    - /org/gnome/desktop/screensaver/picture-uri
 
 - name: Set color scheme
   community.general.dconf:
