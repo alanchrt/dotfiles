@@ -22,6 +22,11 @@
     key: /org/gnome/desktop/background/picture-uri
     value: "'file://{{ ansible_env.HOME }}/.local/share/backgrounds/dracula-arab-tile.png'"
 
+- name: Set color scheme
+  community.general.dconf:
+    key: /org/gnome/desktop/interface/color-scheme
+    value: "'prefer-dark'"
+
 - name: Download Dracula GTK theme
   unarchive:
     src: https://github.com/dracula/gtk/releases/download/v3.0/Dracula.tar.xz
