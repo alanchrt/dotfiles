@@ -17,6 +17,8 @@
   with_items:
     - command: chezmoi
       generate: chezmoi completion zsh
+    - command: step
+      generate: step completion zsh
   register: install_completions
 
 - name: Remove compinit dump file

@@ -83,6 +83,12 @@
     state: present
     flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
 
+- name: Install step cli
+  become: yes
+  dnf:
+    name: https://dl.step.sm/gh-release/cli/gh-release-header/v0.19.0/step-cli_0.19.0_amd64.rpm
+    disable_gpg_check: yes
+
 - name: Install rbw and dust
   shell: "cargo install {{ item.crate }}"
   args:
