@@ -1,5 +1,5 @@
 # Add extra bin dirs to path
-export PATH="$PATH:$HOME/.local/bin:/usr/local/go/bin:$HOME/.go/bin:$HOME/.cargo/bin"
+export PATH="$PATH:$HOME/.local/bin:$HOME/.pyenv/bin:/usr/local/go/bin:$HOME/.go/bin:$HOME/.cargo/bin"
 
 # Set go path
 export GOPATH=$HOME/.go

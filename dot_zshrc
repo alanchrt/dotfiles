@@ -36,6 +36,10 @@ bindkey -M emacs '^N' history-substring-search-down
 # Set up fnm
 eval "$(fnm env)"
 
+# Set up pyenv
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+
 # Configure powerlevel10k
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
