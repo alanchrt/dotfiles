@@ -66,6 +66,7 @@
       - libxslt-devel
       - dbus-devel
       - libxcrypt-compat
+      - patch
       - ffmpeg
 
     update_cache: yes
