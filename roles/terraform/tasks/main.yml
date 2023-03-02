@@ -1,12 +1,14 @@
 ---
-- name: Add hashicorp repo
-  become: yes
-  shell: dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
-  args:
-    creates: /etc/yum.repos.d/hashicorp.repo
-    warn: false
+- name: Clone tfenv
+  git:
+    repo: https://github.com/tfutils/tfenv.git
+    dest: "{{ ansible_env.HOME }}/.tfenv"
 
-- name: Install terraform
-  become: yes
-  dnf:
-    name: terraform
+- name: Symlink tfenv binary
+  file:
+    state: link
+    src: "{{ ansible_env.HOME }}/.tfenv/bin/{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.local/bin/{{ item }}"
+  with_items:
+    - terraform
+    - tfenv
