@@ -1,0 +1,10 @@
+import = ["/home/alan/.config/alacritty/dracula.toml"]
+
+[font]
+size = 12.0
+
+[font.normal]
+family = "MesloLGS NF"
+
+[window]
+startup_mode = "Maximized"
