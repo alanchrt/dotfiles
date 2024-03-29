@@ -2,7 +2,7 @@
 - name: Download go
   become: yes
   unarchive:
-    src: https://go.dev/dl/go1.21.4.linux-amd64.tar.gz
+    src: https://go.dev/dl/go1.22.1.linux-amd64.tar.gz
     dest: "/usr/local"
     remote_src: yes
 
