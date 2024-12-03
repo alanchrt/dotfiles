@@ -5,9 +5,7 @@ set -e
 echo -n "[sudo] password for $USER: "
 read -s PASSWORD
 
-printf "\n\n"
-
-echo -n "Your name: "
+echo -ne "\nYour name: "
 read NAME
 echo -n "Your email: "
 read EMAIL
