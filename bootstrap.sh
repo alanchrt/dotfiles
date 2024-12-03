@@ -5,6 +5,11 @@ set -e
 echo -n "[sudo] password for $USER: "
 read -s PASSWORD
 
+echo -n "Your name: "
+read NAME
+echo -n "Your email: "
+read EMAIL
+
 # install base deps
 echo $PASSWORD | sudo -S dnf install -y ansible python3-psutil
 mkdir -p /tmp/dotfiles
@@ -18,10 +23,11 @@ mkdir -p $HOME/.local/bin
 install /tmp/dotfiles/chezmoi $HOME/.local/bin
 
 # init and apply chezmoi
-if [ ! -d $HOME/Projects/dotfiles ] ; then
-    git clone git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+if [ ! -d $HOME/.config/dotfiles ] ; then
+    git clone git@github.com:alanchrt/dotfiles.git $HOME/.config/dotfiles
 fi
-chezmoi apply --source $HOME/Projects/dotfiles
+printf "name = \"$NAME\"\nemail = \"$EMAIL\"\n" > $HOME/.config/dotfiles
+chezmoi apply --source $HOME/.config/dotfiles
 
 # install ansible galaxy dependencies
 ansible-galaxy collection install community.general
