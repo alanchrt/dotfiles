@@ -5,6 +5,8 @@ set -e
 echo -n "[sudo] password for $USER: "
 read -s PASSWORD
 
+printf "\n\n"
+
 echo -n "Your name: "
 read NAME
 echo -n "Your email: "
@@ -26,7 +28,7 @@ install /tmp/dotfiles/chezmoi $HOME/.local/bin
 if [ ! -d $HOME/.config/dotfiles ] ; then
     git clone git@github.com:alanchrt/dotfiles.git $HOME/.config/dotfiles
 fi
-printf "name = \"$NAME\"\nemail = \"$EMAIL\"\n" > $HOME/.config/dotfiles
+printf "name = \"$NAME\"\nemail = \"$EMAIL\"\n" > $HOME/.config/dotfiles/.chezmoidata.toml
 chezmoi apply --source $HOME/.config/dotfiles
 
 # install ansible galaxy dependencies
