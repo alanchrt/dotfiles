@@ -67,8 +67,6 @@
       - dbus-devel
       - libxcrypt-compat
       - patch
-      - ffmpeg
-
     update_cache: yes
 
 - name: Install ffmpeg from RPM Fusion
