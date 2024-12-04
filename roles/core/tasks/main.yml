@@ -14,12 +14,12 @@
       - "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_distribution_major_version }}.noarch.rpm"
       - "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_distribution_major_version }}.noarch.rpm"
 
-- name: Remove conflicting packages
+- name: Swap free packages with nonfree counterparts
   become: yes
   dnf:
-    state: absent
+    allowerasing: true
     name:
-      - libwscale-free
+      - libswscale-free
 
 - name: Install core packages
   become: yes
