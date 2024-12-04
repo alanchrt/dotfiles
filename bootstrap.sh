@@ -23,11 +23,12 @@ mkdir -p $HOME/.local/bin
 install /tmp/dotfiles/chezmoi $HOME/.local/bin
 
 # init and apply chezmoi
-if [ ! -d $HOME/.config/dotfiles ] ; then
-    git clone git@github.com:alanchrt/dotfiles.git $HOME/.config/dotfiles
+mkdir -p $HOME/Projects
+if [ ! -d $HOME/Projects/dotfiles ] ; then
+    git clone git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
 fi
-printf "name = \"$NAME\"\nemail = \"$EMAIL\"\n" > $HOME/.config/dotfiles/.chezmoidata.toml
-chezmoi apply --source $HOME/.config/dotfiles
+printf "name = \"$NAME\"\nemail = \"$EMAIL\"\n" > $HOME/Projects/dotfiles/.chezmoidata.toml
+chezmoi apply --source $HOME/Projects/dotfiles
 
 # install ansible galaxy dependencies
 ansible-galaxy collection install community.general
