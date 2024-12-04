@@ -14,13 +14,6 @@
       - "https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{{ ansible_distribution_major_version }}.noarch.rpm"
       - "https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{{ ansible_distribution_major_version }}.noarch.rpm"
 
-- name: Swap free packages with nonfree counterparts
-  become: yes
-  dnf:
-    allowerasing: true
-    name:
-      - libswscale-free
-
 - name: Install core packages
   become: yes
   dnf:
@@ -77,6 +70,12 @@
       - ffmpeg
 
     update_cache: yes
+
+- name: Install ffmpeg from RPM Fusion
+  become: yes
+  dnf:
+    allowerasing: true
+    name: ffmpeg
 
 - name: Remove flathub remote
   become: yes
