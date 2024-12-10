@@ -3,9 +3,8 @@
   become: yes
   dnf:
     name:
-      - rofi
+      - rofi-wayland
       - xdotool
-      - rofimoji
 
 - name: Add helper scripts to local bin
   copy:
