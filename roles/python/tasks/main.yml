@@ -4,7 +4,6 @@
   dnf:
     name:
       - python3-ipython
-      - python2
 
 - name: Install common packages
   pip:
@@ -15,7 +14,6 @@
       - requests
       - prompt-toolkit
       - yaspin
-      - python3-pip-autoremove
       - python-lsp-server[all]
       - black
       - importmagic
