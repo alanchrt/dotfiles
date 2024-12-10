@@ -1,9 +1,4 @@
 ---
-- name: Add emacs native compilation repository
-  become: yes
-  community.general.copr:
-    name: deathwish/emacs-pgtk-nativecomp
-
 - name: Install emacs
   become: yes
   dnf:
