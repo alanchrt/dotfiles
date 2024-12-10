@@ -1,3 +1,4 @@
+[general]
 import = ["/home/alan/.config/alacritty/dracula.toml"]
 
 [font]
