@@ -89,21 +89,12 @@
     name: petermosmans.customize-gnome
   vars:
     gnome_extensions:
-      - id: 120 # system-monitor
-        enabled: yes
-      - id: 723 # pixel-saver
-        enabled: yes
       - id: 3780 # ddterm
         enabled: yes
       - id: 4099 # no-overview
         enabled: yes
       - id: 517 # caffeine
         enabled: yes
-      - id: 1125 # github-notifications
-        enabled: yes
-
-- name: Configure system-monitor
-  shell: "dconf load /org/gnome/shell/extensions/system-monitor/ < {{ role_path }}/files/system-monitor.conf"
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
