@@ -4,17 +4,21 @@
   yum_repository:
     name: kubernetes
     description: Kubernetes YUM repo
-    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    baseurl: https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
     gpgkey:
-      - https://packages.cloud.google.com/yum/doc/yum-key.gpg
-      - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      - https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
+    exclude:
+      - kubelet
+      - kubeadm
+      - kubectl
+      - cri-tools
+      - kubernetes-cni
 
 - name: Install kubectl and helm
   become: yes
   dnf:
     name:
       - kubectl
-      - helm
 
 - name: Make sure local bin dir exists
   file:
@@ -23,21 +27,18 @@
 
 - name: Download kustomize
   unarchive:
-    src: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.5.7/kustomize_v4.5.7_linux_amd64.tar.gz
+    src: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.5.0/kustomize_v5.5.0_linux_amd64.tar.gz
     dest: "{{ ansible_env.HOME}}/.local/bin"
     remote_src: yes
     mode: +x
     extra_opts:
       - kustomize
 
-- name: Download k9s
-  unarchive:
-    src: https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz
-    dest: "{{ ansible_env.HOME}}/.local/bin"
-    remote_src: yes
-    mode: +x
-    extra_opts:
-      - k9s
+- name: Install k9s
+  become: yes
+  dnf:
+    name: https://github.com/derailed/k9s/releases/download/v0.32.7/k9s_linux_amd64.rpm
+    disable_gpg_check: yes
 
 - name: Make sure k9s config dir exists
   file:
