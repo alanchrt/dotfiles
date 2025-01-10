@@ -25,7 +25,7 @@ install /tmp/dotfiles/chezmoi $HOME/.local/bin
 # init and apply chezmoi
 mkdir -p $HOME/Projects
 if [ ! -d $HOME/Projects/dotfiles ] ; then
-    git clone git@github.com:alanchrt/dotfiles.git $HOME/Projects/dotfiles
+    git clone https://github.com/alanchrt/dotfiles.git $HOME/Projects/dotfiles
 fi
 printf "name = \"$NAME\"\nemail = \"$EMAIL\"\n" > $HOME/Projects/dotfiles/.chezmoidata.toml
 chezmoi apply --source $HOME/Projects/dotfiles
