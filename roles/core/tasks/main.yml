@@ -27,6 +27,7 @@
       - lsd
       - bat
       - age
+      - fastfetch
       - powertop
       - ImageMagick
       - xclip
