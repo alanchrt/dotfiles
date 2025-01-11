@@ -84,17 +84,7 @@
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
 
-- name: Install shell extensions
-  import_role:
-    name: petermosmans.customize-gnome
-  vars:
-    gnome_extensions:
-      - id: 3780 # ddterm
-        enabled: yes
-      - id: 4099 # no-overview
-        enabled: yes
-      - id: 517 # caffeine
-        enabled: yes
+# TODO install ddterm (3780), caffeine (517), and no-overview (4099)
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
