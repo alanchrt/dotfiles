@@ -6,6 +6,17 @@
       - alacritty
       - tmux
       - fzf
+      - jq
+      - lsd
+      - bat
+      - age
+      - fastfetch
+      - powertop
+      - xclip
+      - htop
+      - ncdu
+      - fd-find
+      - diceware
 
 - name: Configure ddterm
   shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
@@ -68,31 +79,18 @@
     path: "{{ ansible_env.HOME }}/.config/lf"
     state: directory
 
-- name: Create pv binary
+- name: Create pv binary (for bat file previews)
   copy:
     src: "files/bin/pv"
     dest: "{{ ansible_env.HOME }}/.local/bin/pv"
     mode: +x
 
-- name: Make local src directory
-  file:
-    path: "{{ ansible_env.HOME }}/.local/src"
-    state: directory
-
-- name: Download bfs
+- name: Install doggo
   unarchive:
-    src: https://github.com/tavianator/bfs/archive/refs/tags/2.4.1.tar.gz
-    dest: "{{ ansible_env.HOME }}/.local/src"
+    src: https://github.com/mr-karan/doggo/releases/download/v1.0.5/doggo_1.0.5_Linux_x86_64.tar.gz
+    dest: "{{ ansible_env.HOME}}/.local/bin"
     remote_src: yes
-
-- name: Build bfs
-  shell: "make release"
-  args:
-    chdir: "{{ ansible_env.HOME }}/.local/src/bfs-2.4.1"
-    creates: "{{ ansible_env.HOME }}/.local/src/bfs-2.4.1/bfs"
-
-- name: Install bfs
-  copy:
-    src: "{{ ansible_env.HOME }}/.local/src/bfs-2.4.1/bfs"
-    dest: "{{ ansible_env.HOME }}/.local/bin/bfs"
     mode: +x
+    extra_opts:
+      - --strip-components=1
+      - doggo_1.0.5_Linux_x86_64/doggo
