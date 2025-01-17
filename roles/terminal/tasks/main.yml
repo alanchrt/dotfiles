@@ -16,6 +16,7 @@
       - htop
       - ncdu
       - fd-find
+      - difftastic
       - diceware
 
 - name: Configure ddterm
