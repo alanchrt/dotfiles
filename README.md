@@ -57,9 +57,3 @@ $ gist --login
 ```
 $ secret-tool store --label 'YubiKey' ykman oath
 ```
-
-##### Wolfram Alpha
-
-```
-$ echo "<app id>" > ~/.waid
-```
