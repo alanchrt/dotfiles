@@ -28,6 +28,7 @@
       - yubikey-manager
       - cargo
       - gcc-c++
+      - cmake
       - rubygem-gist
       - dconf-editor
       - gnome-extensions-app
