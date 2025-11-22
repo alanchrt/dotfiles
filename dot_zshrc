@@ -21,7 +21,7 @@ setopt histignorealldups sharehistory
 # Use oh-my-zsh
 export ZSH=$HOME/.oh-my-zsh
 export ZSH_THEME="powerlevel10k/powerlevel10k"
-plugins=(zsh-syntax-highlighting history-substring-search fzf fnm docker kubectl helm terraform gcloud)
+plugins=(zsh-syntax-highlighting history-substring-search fzf fnm docker docker-compose kubectl helm terraform gcloud)
 source $ZSH/oh-my-zsh.sh
 
 # Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
