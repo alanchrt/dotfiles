@@ -17,6 +17,8 @@
       tags: [python, dev]
     - name: go
       tags: [go, dev]
+    - name: android
+      tags: [android, dev]
     - name: emacs
       tags: [emacs, dev]
     - name: vim

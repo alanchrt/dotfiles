@@ -1,0 +1,6 @@
+---
+- name: Install Android tools
+  become: yes
+  dnf:
+    name:
+      - android-tools
