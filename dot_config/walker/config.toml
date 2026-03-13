@@ -1,0 +1,44 @@
+theme = "dracula"
+as_window = true
+force_keyboard_focus = false
+close_when_open = false
+
+[keys]
+accept_typeahead = ["tab"]
+trigger_labels = "lalt"
+next = ["down"]
+prev = ["up"]
+close = ["esc"]
+remove_from_history = ["shift backspace"]
+resume_query = ["ctrl r"]
+toggle_exact_search = ["ctrl m"]
+
+[keys.activation_modifiers]
+keep_open = "shift"
+alternate = "alt"
+
+[list]
+dynamic_sub = true
+keyboard_scroll_style = "emacs"
+max_entries = 50
+show_initial_entries = true
+single_click = true
+placeholder = "No Results"
+
+[search]
+placeholder = "Search..."
+delay = 0
+resume_last_query = false
+
+[builtins.switcher]
+weight = 5
+name = "switcher"
+placeholder = "Switcher"
+prefix = "/"
+
+[builtins.dmenu]
+hidden = true
+weight = 5
+name = "dmenu"
+placeholder = "Dmenu"
+switcher_only = true

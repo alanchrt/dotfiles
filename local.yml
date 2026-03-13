@@ -7,8 +7,8 @@
       tags: [gnome, desktop]
     - name: fonts
       tags: [fonts, desktop]
-    - name: rofi
-      tags: [rofi, desktop]
+    - name: walker
+      tags: [walker, desktop]
     - name: terminal
       tags: [terminal, dev]
     - name: nodejs

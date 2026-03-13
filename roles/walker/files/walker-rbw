@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export PATH="$PATH:$HOME/.cargo/bin"
+
+list=$(rbw list --fields id,name,user | awk -F'\t' 'length($3)')
+ids=$(echo "$list" | cut -f1)
+names=$(echo "$list" | cut -f2)
+
+selection=$(echo "$list" | cut -f2,3 --output-delimiter=: | walker -d -t dracula -p "pass" -i)
+[ -z "$selection" ] && exit
+
+id=$(echo "$ids" | sed -n "$((selection+1))p")
+name=$(echo "$names" | sed -n "$((selection+1))p")
+pass=$(rbw get "$id")
+
+if [ "${1:-}" = "--copy" ]; then
+    echo -n "$pass" | wl-copy
+    notify-send "Password copied" "$name password copied to clipboard for 30 seconds"
+    (sleep 30 && echo -n "" | wl-copy) &
+    disown
+else
+    echo -n "$pass" | wtype -
+fi

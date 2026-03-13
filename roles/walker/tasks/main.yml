@@ -1,0 +1,85 @@
+---
+- name: Add walker repository
+  become: yes
+  community.general.copr:
+    name: errornointernet/walker
+
+- name: Install walker and dependencies
+  become: yes
+  dnf:
+    name:
+      - elephant
+      - gtk4-layer-shell
+      - walker
+      - ydotool
+      - wl-clipboard
+
+- name: Disable system-level ydotool service
+  become: yes
+  systemd:
+    name: ydotool
+    enabled: no
+    state: stopped
+  ignore_errors: yes
+
+- name: Create uinput udev rule for ydotool
+  become: yes
+  copy:
+    dest: /etc/udev/rules.d/80-uinput.rules
+    content: |
+      KERNEL=="uinput", MODE="0660", GROUP="input"
+    mode: "0644"
+
+- name: Add user to input group
+  become: yes
+  user:
+    name: "{{ ansible_user_id }}"
+    groups: input
+    append: yes
+
+- name: Create ydotoold user service
+  copy:
+    dest: ~/.config/systemd/user/ydotoold.service
+    content: |
+      [Unit]
+      Description=ydotoold - ydotool daemon (user)
+
+      [Service]
+      Type=simple
+      Restart=always
+      ExecStart=/usr/bin/ydotoold
+
+      [Install]
+      WantedBy=default.target
+    mode: "0644"
+
+- name: Enable ydotoold user service
+  systemd:
+    name: ydotoold
+    scope: user
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: Deploy walker-projects
+  copy:
+    src: walker-projects
+    dest: ~/.local/bin/walker-projects
+    mode: "0755"
+
+- name: Deploy walker-rbw
+  copy:
+    src: walker-rbw
+    dest: ~/.local/bin/walker-rbw
+    mode: "0755"
+
+- name: Create elephant autostart entry
+  copy:
+    dest: ~/.config/autostart/elephant.desktop
+    content: |
+      [Desktop Entry]
+      Type=Application
+      Name=Elephant
+      Exec=elephant
+      X-GNOME-Autostart-enabled=true
+    mode: "0644"

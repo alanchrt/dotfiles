@@ -17,6 +17,8 @@
       (?i)fonts\?: y
     creates: "{{ ansible_env.HOME }}/.emacs.d/.local"
 
+# TODO run doom sync
+
 - name: Create autostart directory
   file:
     path: "{{ ansible_env.HOME }}/.config/autostart"

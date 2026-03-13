@@ -81,10 +81,19 @@
     key: /org/gnome/mutter/overlay-key
     value: "''"
 
+# TODO don't allow windows to steal focus
+# set org.gnome.desktop.wm.preferences focus-new-windows 'strict' instead of 'smart'
+
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
 
 # TODO install ddterm (3780), caffeine (517), and no-overview (4099)
+# TODO install Unite from here (https://github.com/hardpixel/unite-shell)
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
+
+- name: Install GNOME chrome connector
+  become: yes
+  dnf:
+    name: gnome-browser-connector

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [ "${1:-}" = "--kill" ]; then
+    shorthand=$(printf '%s\n' ~/Projects/* | cut -d '/' -f 5 | walker -d -t dracula -p "kill session")
+    [ -z "$shorthand" ] && exit
+    session=$(echo "$shorthand" | sed -r 's/\./_/g')
+    tmux kill-session -t "$session"
+    notify-send "Session killed" "Killed session $session"
+    exit
+fi
+
+shorthand=$(printf '%s\n' ~/Projects/* | cut -d '/' -f 5 | walker -d -t dracula -p "project")
+[ -z "$shorthand" ] && exit
+
+path=~/Projects/$shorthand
+session=$(basename "$path" | sed -r 's/\./_/g')
+
+if tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -q "^${session}$"; then
+    alacritty --title "$session" --command tmux attach-session -t "$session" &
+    notify-send "Existing session" "Opening existing session $session"
+else
+    alacritty --title "$session" --command tmux new-session -c "$path" -s "$session" &
+fi

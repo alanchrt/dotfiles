@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-rofi -modi drun -show drun -show-icons -matching fuzzy -sorting-method fzf -display-drun app
