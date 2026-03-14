@@ -40,6 +40,15 @@ is_readonly() {
       esac
       ;;
 
+    vercel)
+      local sub
+      sub=$(echo "$cmd" | awk '{print $2}')
+      case "$sub" in
+        list|ls|inspect|logs|whoami|project|env|dns|certs|domains)
+          return 0 ;;
+      esac
+      ;;
+
     gcloud)
       # Allow subcommands containing list, describe, get-iam-policy, info
       if echo "$cmd" | grep -qE '\b(list|describe|get-iam-policy|info)\b'; then
