@@ -37,6 +37,12 @@
     groups: input
     append: yes
 
+- name: Create systemd user directory
+  file:
+    path: ~/.config/systemd/user
+    state: directory
+    mode: "0755"
+
 - name: Create ydotoold user service
   copy:
     dest: ~/.config/systemd/user/ydotoold.service
@@ -56,6 +62,32 @@
 - name: Enable ydotoold user service
   systemd:
     name: ydotoold
+    scope: user
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: Create walker user service
+  copy:
+    dest: ~/.config/systemd/user/walker.service
+    content: |
+      [Unit]
+      Description=Walker Application Launcher
+      After=graphical-session.target
+
+      [Service]
+      Type=simple
+      Restart=on-failure
+      RestartSec=2
+      ExecStart=/usr/bin/walker --gapplication-service
+
+      [Install]
+      WantedBy=graphical-session.target
+    mode: "0644"
+
+- name: Enable walker user service
+  systemd:
+    name: walker
     scope: user
     daemon_reload: yes
     enabled: yes

@@ -1,6 +1,6 @@
 theme = "dracula"
 as_window = true
-force_keyboard_focus = false
+force_keyboard_focus = true
 close_when_open = false
 
 [keys]
