@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# PreToolUse hook: block Bash commands that reference sensitive directories.
-# Exit 0 = allow, exit 2 = block.
+# PreToolUse hook: prompt before Bash commands that reference sensitive directories.
+# Exit 0 = allow, JSON ask = prompt.
 
 set -euo pipefail
 
@@ -26,8 +26,14 @@ SENSITIVE_DIRS=(
 
 for dir in "${SENSITIVE_DIRS[@]}"; do
   if echo "$COMMAND" | grep -qF "$dir"; then
-    echo "BLOCKED: '$COMMAND' accesses sensitive path '$dir'." >&2
-    exit 2
+    jq -n --arg reason "'$COMMAND' accesses sensitive path '$dir'." '{
+      hookSpecificOutput: {
+        hookEventName: "PreToolUse",
+        permissionDecision: "ask",
+        permissionDecisionReason: $reason
+      }
+    }'
+    exit 0
   fi
 done
 

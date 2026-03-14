@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# PreToolUse hook: block production-modifying commands unless they match
-# known read-only subcommand patterns. Exit 0 = allow, exit 2 = block.
+# PreToolUse hook: prompt before production-modifying commands unless they
+# match known read-only subcommand patterns. Exit 0 = allow, JSON ask = prompt.
 
 set -euo pipefail
 
@@ -148,6 +148,12 @@ is_readonly() {
 if is_readonly; then
   exit 0
 else
-  echo "BLOCKED: '$COMMAND' may modify production state. Use a read-only subcommand or get explicit confirmation." >&2
-  exit 2
+  jq -n --arg reason "'$COMMAND' may modify production state." '{
+    hookSpecificOutput: {
+      hookEventName: "PreToolUse",
+      permissionDecision: "ask",
+      permissionDecisionReason: $reason
+    }
+  }'
+  exit 0
 fi
