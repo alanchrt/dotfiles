@@ -76,7 +76,7 @@ scrollbar {
 .item-quick-activation {
   background: alpha(@accent_bg_color, 0.25);
   border-radius: 5px;
-  padding: 10px;
+  padding: 2px 8px;
 }
 
 child:selected .item-box,
