@@ -31,6 +31,8 @@
       tags: [terraform, dev]
     - name: gcloud
       tags: [gcloud, dev]
+    - name: github
+      tags: [github, dev]
     - name: heroku
       tags: [heroku, dev]
     - name: claude-code
