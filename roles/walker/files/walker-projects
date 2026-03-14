@@ -18,8 +18,8 @@ path=~/Projects/$shorthand
 session=$(basename "$path" | sed -r 's/\./_/g')
 
 if tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -q "^${session}$"; then
-    alacritty --title "$session" --command tmux attach-session -t "$session" &
+    alacritty --title "$session" --command tmux attach-session -t "$session"
     notify-send "Existing session" "Opening existing session $session"
 else
-    alacritty --title "$session" --command tmux new-session -c "$path" -s "$session" &
+    alacritty --title "$session" --command tmux new-session -c "$path" -s "$session"
 fi

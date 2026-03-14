@@ -81,9 +81,6 @@
     key: /org/gnome/mutter/overlay-key
     value: "''"
 
-# TODO don't allow windows to steal focus
-# set org.gnome.desktop.wm.preferences focus-new-windows 'strict' instead of 'smart'
-
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
 
