@@ -33,6 +33,8 @@
       tags: [gcloud, dev]
     - name: heroku
       tags: [heroku, dev]
+    - name: claude-code
+      tags: [claude-code, dev]
 
     # keep completions last since they depend on programs to generate
     - name: completions
