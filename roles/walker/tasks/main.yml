@@ -49,10 +49,12 @@
     content: |
       [Unit]
       Description=ydotoold - ydotool daemon (user)
+      After=default.target
 
       [Service]
       Type=simple
       Restart=always
+      RestartSec=3
       ExecStart=/usr/bin/ydotoold
 
       [Install]
