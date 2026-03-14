@@ -1,0 +1,6 @@
+---
+- name: Install Claude Code
+  become: yes
+  community.general.npm:
+    name: "@anthropic-ai/claude-code"
+    global: yes
