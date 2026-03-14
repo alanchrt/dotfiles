@@ -34,7 +34,7 @@ bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
 
 # Set up fnm
-eval "$(fnm env --use-on-cd)"
+eval "$(fnm env --use-on-cd --log-level=quiet)"
 
 # Set up pyenv
 eval "$(pyenv init --path)"
