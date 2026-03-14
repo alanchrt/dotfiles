@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Read",
+      "Read(//**)",
+      "Glob(//**)",
+      "Grep(//**)",
       "Edit",
       "Write",
       "WebFetch",
@@ -44,7 +46,51 @@
       "Bash(ansible-playbook *)",
       "Bash(chezmoi *)"
     ],
-    "deny": []
+    "deny": [
+      "Read(~/.ssh/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.gpg/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gcloud/**)",
+      "Read(~/.kube/**)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/credentials*)",
+      "Read(**/secret*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(~/.mozilla/**)",
+      "Read(~/.config/google-chrome/**)",
+      "Read(~/.config/chromium/**)",
+      "Read(~/.config/BraveSoftware/**)",
+      "Glob(~/.ssh/**)",
+      "Glob(~/.gnupg/**)",
+      "Glob(~/.aws/**)",
+      "Glob(~/.mozilla/**)",
+      "Glob(~/.config/google-chrome/**)",
+      "Glob(~/.config/chromium/**)",
+      "Glob(~/.config/BraveSoftware/**)",
+      "Grep(~/.ssh/**)",
+      "Grep(~/.gnupg/**)",
+      "Grep(~/.aws/**)",
+      "Grep(~/.mozilla/**)",
+      "Grep(~/.config/google-chrome/**)",
+      "Grep(~/.config/chromium/**)",
+      "Grep(~/.config/BraveSoftware/**)",
+      "Bash(git reset --hard*)",
+      "Bash(git push --force*)",
+      "Bash(git push * --force*)",
+      "Bash(git push -f *)",
+      "Bash(git push * -f *)",
+      "Bash(git clean -f*)",
+      "Bash(git clean * -f*)",
+      "Bash(git checkout -- *)",
+      "Bash(git checkout .*)",
+      "Bash(git restore .*)",
+      "Bash(git stash drop*)",
+      "Bash(git stash clear*)",
+      "Bash(git branch -D*)"
+    ]
   },
   "hooks": {
     "PreToolUse": [

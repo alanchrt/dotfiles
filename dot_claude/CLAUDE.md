@@ -13,3 +13,9 @@ The following commands interact with production systems: heroku, railway, gcloud
 - You may use these tools for read-only operations (viewing logs, listing resources, checking status).
 - Never run commands that could modify production state without explicit confirmation.
 - If you are unsure whether a command is read-only, ask first.
+
+# Git Safety
+
+- Avoid destructive git commands (reset --hard, clean -f, stash drop/clear, push --force, branch -D, checkout -- .).
+- If a destructive git command is truly necessary, explain why and ask for confirmation first.
+- Prefer safe alternatives: create a backup branch before resetting, use git stash instead of discarding changes.
