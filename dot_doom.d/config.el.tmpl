@@ -75,6 +75,7 @@
 ;; they are implemented.
 
 (map! :leader :desc "Autoformat" "t a" #'apheleia-mode)
+(add-to-list 'safe-local-eval-forms '(apheleia-mode -1))
 
 ;; Use format-all formatter for javascript (prettier) and python (ruff)
 (setq-hook! 'rjsx-mode-hook +format-with-lsp nil)
