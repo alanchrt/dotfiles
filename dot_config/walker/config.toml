@@ -3,19 +3,12 @@ as_window = true
 force_keyboard_focus = true
 close_when_open = false
 
-[keys]
-accept_typeahead = ["tab"]
-trigger_labels = "lalt"
-next = ["down"]
-prev = ["up"]
-close = ["esc"]
-remove_from_history = ["shift backspace"]
-resume_query = ["ctrl r"]
-toggle_exact_search = ["ctrl m"]
-
-[keys.activation_modifiers]
-keep_open = "shift"
-alternate = "alt"
+[keybinds]
+next = ["Down", "ctrl n", "ctrl j"]
+previous = ["Up", "ctrl p", "ctrl k"]
+close = ["Escape"]
+resume_last_query = ["ctrl r"]
+toggle_exact = ["ctrl m"]
 
 [list]
 dynamic_sub = true
@@ -29,6 +22,31 @@ placeholder = "No Results"
 placeholder = "Search..."
 delay = 0
 resume_last_query = false
+
+[providers.actions]
+desktopapplications = [
+  { action = "start", default = true, bind = "Return" },
+  { action = "start:keep", label = "open+next", bind = "shift Return", after = "KeepOpen" },
+  { action = "new_instance", label = "new instance", bind = "ctrl Return" },
+  { action = "new_instance:keep", label = "new+next", bind = "ctrl alt Return", after = "KeepOpen" },
+  { action = "pin", bind = "alt p", after = "AsyncReload" },
+  { action = "unpin", bind = "alt p", after = "AsyncReload" },
+  { action = "pinup", bind = "alt n", after = "AsyncReload" },
+  { action = "pindown", bind = "alt m", after = "AsyncReload" },
+]
+
+clipboard = [
+  { action = "start", default = true, bind = "Return" },
+  { action = "show_images_only", label = "only images", bind = "ctrl i", after = "AsyncClearReload" },
+  { action = "show_text_only", label = "only text", bind = "ctrl i", after = "AsyncClearReload" },
+  { action = "show_combined", label = "show all", bind = "ctrl i", after = "AsyncClearReload" },
+  { action = "pause", bind = "ctrl shift p" },
+  { action = "unpause", bind = "ctrl shift p" },
+  { action = "unpin", bind = "alt p", after = "AsyncClearReload" },
+  { action = "pin", bind = "alt p", after = "AsyncClearReload" },
+  { action = "edit", bind = "ctrl o" },
+  { action = "localsend", bind = "ctrl l" },
+]
 
 [builtins.switcher]
 weight = 5
