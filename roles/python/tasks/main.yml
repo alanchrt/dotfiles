@@ -15,12 +15,11 @@
       - prompt-toolkit
       - yaspin
       - python-lsp-server[all]
-      - black
+      - ruff
+      - ruff-lsp
+      - pyright
       - importmagic
       - epc
-      - flake8
-      - autoflake
-      - ptvsd>=4.2
 
 - name: Install pyenv
   shell: "curl https://pyenv.run | bash"

@@ -18,7 +18,7 @@
 
 - name: Install fnm
   unarchive:
-    src: https://github.com/Schniz/fnm/releases/download/v1.29.2/fnm-linux.zip
+    src: https://github.com/Schniz/fnm/releases/latest/download/fnm-linux.zip
     dest: "{{ ansible_env.HOME }}/.local/bin"
     mode: +x
     remote_src: yes
@@ -33,8 +33,7 @@
     - typescript
     - typescript-language-server
     - eslint
-    - babel-eslint
+    - "@babel/eslint-parser"
     - eslint-plugin-react
     - prettier
-    - js-beautify
-    - vmd
+    - "@tailwindcss/language-server"

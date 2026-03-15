@@ -1,23 +1,28 @@
 ---
-- name: Install emacs
+- name: Install emacs and tree-sitter
   become: yes
   dnf:
-    name: emacs
+    name:
+      - emacs-pgtk
+      - libtree-sitter
+      - libtree-sitter-devel
 
 - name: Clone doom emacs
   git:
-    repo: https://github.com/hlissner/doom-emacs
-    dest: "{{ ansible_env.HOME }}/.emacs.d"
+    repo: https://github.com/doomemacs/doomemacs
+    dest: "{{ ansible_env.HOME }}/.config/emacs"
 
 - name: Install doom emacs
   expect:
-    command: "{{ ansible_env.HOME }}/.emacs.d/bin/doom install --no-env"
+    command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom install --no-env"
     timeout: null
     responses:
       (?i)fonts\?: y
-    creates: "{{ ansible_env.HOME }}/.emacs.d/.local"
+    creates: "{{ ansible_env.HOME }}/.config/emacs/.local"
 
-# TODO run doom sync
+- name: Sync doom packages
+  command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom sync"
+  changed_when: false
 
 - name: Create autostart directory
   file:

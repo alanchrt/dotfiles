@@ -50,3 +50,5 @@
 ;(unpin! t)
 
 (package! protobuf-mode)
+(package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
+(package! k8s-mode)

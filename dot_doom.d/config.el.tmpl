@@ -74,8 +74,33 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;; Use format-all formatter for javascript (prettier) and python (black)
+;; Use format-all formatter for javascript (prettier) and python (ruff)
 (setq-hook! 'rjsx-mode-hook +format-with-lsp nil)
 (setq-hook! 'typescript-mode-hook +format-with-lsp nil)
+(setq-hook! 'typescript-ts-mode-hook +format-with-lsp nil)
+(setq-hook! 'typescript-tsx-mode-hook +format-with-lsp nil)
+(setq-hook! 'tsx-ts-mode-hook +format-with-lsp nil)
 (setq-hook! 'js2-mode-hook +format-with-lsp nil)
+(setq-hook! 'js-ts-mode-hook +format-with-lsp nil)
 (setq-hook! 'python-mode-hook +format-with-lsp nil)
+(setq-hook! 'python-ts-mode-hook +format-with-lsp nil)
+(setq-hook! 'web-mode-hook +format-with-lsp nil)
+
+;; TSX file association
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-tsx-mode))
+
+;; Docker-compose file association
+(add-to-list 'auto-mode-alist '("docker-compose[^/]*\\.ya?ml\\'" . yaml-mode))
+
+;; Tailwind CSS LSP — runs as add-on alongside existing LSP servers
+(use-package! lsp-tailwindcss
+  :when (modulep! :tools lsp)
+  :init
+  (setq lsp-tailwindcss-add-on-mode t)
+  :config
+  (dolist (mode '(rjsx-mode typescript-mode typescript-tsx-mode tsx-ts-mode web-mode))
+    (add-to-list 'lsp-tailwindcss-major-modes mode)))
+
+;; Ruff formatter for Python (replaces black)
+(after! python
+  (set-formatter! 'ruff-format "ruff format -" :modes '(python-mode python-ts-mode)))
