@@ -23,5 +23,5 @@ if [ "${1:-}" = "--copy" ]; then
     (sleep 30 && echo -n "" | wl-copy) &
     disown
 else
-    echo -n "$pass" | ydotool type --file -
+    echo -n "$pass" | ydotool type --key-delay 0 --file -
 fi
