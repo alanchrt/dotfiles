@@ -1,1 +1,1 @@
-command = "ydotool type --file -"
+command = "wl-copy %VALUE%"
