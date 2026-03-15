@@ -3,6 +3,7 @@
 - Always draft a plan before starting implementation work.
 - Once you begin working, be independent until finished. Do not ask unnecessary questions mid-task.
 - Make small, focused commits as you work unless explicitly told not to commit.
+- Before committing, make a small effort to verify changes work when reasonable (e.g., run a linter, execute a relevant command, check syntax). Don't skip this just to move faster.
 - Before committing to the main/master branch, always ask for confirmation first.
 - When finished, summarize what was done so the work can be reviewed in a pull request.
 
