@@ -31,6 +31,9 @@
       url: https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
     - name: MesloLGS NF Bold Italic
       url: https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+    # Doom Emacs nerd-icons
+    - name: SymbolsNerdFontMono-Regular
+      url: https://github.com/ryanoasis/nerd-fonts/raw/master/patched-fonts/NerdFontsSymbolsOnly/SymbolsNerdFontMono-Regular.ttf
   register: install_fonts
 
 - name: Refresh font cache

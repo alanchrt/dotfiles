@@ -20,6 +20,7 @@
       - pyright
       - importmagic
       - epc
+      - pytest
 
 - name: Install pyenv
   shell: "curl https://pyenv.run | bash"

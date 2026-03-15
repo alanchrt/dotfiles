@@ -6,6 +6,10 @@
       - emacs-pgtk
       - libtree-sitter
       - libtree-sitter-devel
+      - direnv
+      - ShellCheck
+      - shfmt
+      - tidy
 
 - name: Clone doom emacs
   git:

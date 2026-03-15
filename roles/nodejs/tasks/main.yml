@@ -37,3 +37,4 @@
     - eslint-plugin-react
     - prettier
     - "@tailwindcss/language-server"
+    - stylelint

@@ -29,3 +29,5 @@
       path: github.com/cweill/gotests@*
     - url: github.com/fatih/gomodifytags@latest
       path: github.com/fatih/gomodifytags@*
+    - url: golang.org/x/tools/gopls@latest
+      path: golang.org/x/tools@*/cmd/gopls
