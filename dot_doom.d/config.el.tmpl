@@ -95,7 +95,15 @@
   (setq lsp-tailwindcss-add-on-mode t)
   :config
   (dolist (mode '(rjsx-mode typescript-mode typescript-tsx-mode tsx-ts-mode web-mode))
-    (add-to-list 'lsp-tailwindcss-major-modes mode)))
+    (add-to-list 'lsp-tailwindcss-major-modes mode))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection '("tailwindcss-language-server" "--stdio"))
+    :activation-fn #'lsp-tailwindcss--activate-p
+    :server-id 'tailwindcss
+    :priority -1
+    :add-on? lsp-tailwindcss-add-on-mode
+    :initialization-options #'lsp-tailwindcss--initialization-options)))
 
 ;; Enable fuzzy matching in vertico (orderless)
 (after! orderless
