@@ -78,16 +78,12 @@
 (setq-hook! 'rjsx-mode-hook +format-with-lsp nil)
 (setq-hook! 'typescript-mode-hook +format-with-lsp nil)
 (setq-hook! 'typescript-ts-mode-hook +format-with-lsp nil)
-(setq-hook! 'typescript-tsx-mode-hook +format-with-lsp nil)
 (setq-hook! 'tsx-ts-mode-hook +format-with-lsp nil)
 (setq-hook! 'js2-mode-hook +format-with-lsp nil)
 (setq-hook! 'js-ts-mode-hook +format-with-lsp nil)
 (setq-hook! 'python-mode-hook +format-with-lsp nil)
 (setq-hook! 'python-ts-mode-hook +format-with-lsp nil)
 (setq-hook! 'web-mode-hook +format-with-lsp nil)
-
-;; TSX file association
-(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-tsx-mode))
 
 ;; Docker-compose file association
 (add-to-list 'auto-mode-alist '("docker-compose[^/]*\\.ya?ml\\'" . yaml-mode))
@@ -100,6 +96,10 @@
   :config
   (dolist (mode '(rjsx-mode typescript-mode typescript-tsx-mode tsx-ts-mode web-mode))
     (add-to-list 'lsp-tailwindcss-major-modes mode)))
+
+;; Enable fuzzy matching in vertico (orderless)
+(after! orderless
+  (setq orderless-matching-styles '(orderless-flex)))
 
 ;; Ruff formatter for Python (replaces black)
 (after! python
