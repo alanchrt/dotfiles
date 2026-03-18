@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+# Global post-merge hook: runs after git pull (fast-forward or merge).
+
+# Chain to repo-local hook if it exists (core.hooksPath shadows per-repo hooks)
+local_hook="$(git rev-parse --git-dir)/hooks/post-merge"
+if [[ -x "$local_hook" ]]; then
+    "$local_hook" "$@"
+fi
+
+# Clean up merged worktree branches
+"$(dirname "$0")/cleanup-merged-worktrees"

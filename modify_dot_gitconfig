@@ -1,0 +1,14 @@
+#!/bin/bash
+set -euo pipefail
+
+# Merge managed keys into the existing gitconfig without clobbering manual additions.
+# chezmoi pipes the current deployed file content via stdin; we modify and output it.
+
+tmp=$(mktemp)
+cat > "$tmp"
+
+git config --file "$tmp" core.hooksPath "~/.config/git/hooks"
+git config --file "$tmp" fetch.prune true
+
+cat "$tmp"
+rm -f "$tmp"
