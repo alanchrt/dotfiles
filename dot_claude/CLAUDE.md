@@ -25,15 +25,15 @@ During planning, assess whether the task warrants its own branch and worktree.
   - Examples: `fix-auth-timeout`, `chore-update-deps`, `add-search-api`
 - Commit freely on the worktree branch (no main-branch confirmation needed)
 - **Pushing**: Before creating a PR, push with a mapped remote branch name:
-  - Strip `worktree-` prefix, extract known prefix (`fix`, `chore`, `docs`, `refactor`) or default to `feat`, strip prefix from remainder, replace `-` with `_`
-  - `git push -u origin worktree-NAME:refs/heads/{prefix}/underscore_name`
+  - Strip `worktree-` prefix, extract known prefix (`fix`, `chore`, `docs`, `refactor`) or default to `feat`, keep hyphens
+  - `git push -u origin worktree-NAME:refs/heads/{prefix}/hyphenated-name`
   - Examples:
-    - `worktree-fix-auth-timeout` → `git push -u origin worktree-fix-auth-timeout:refs/heads/fix/auth_timeout`
-    - `worktree-add-search-api` → `git push -u origin worktree-add-search-api:refs/heads/feat/add_search_api`
-    - `worktree-chore-update-deps` → `git push -u origin worktree-chore-update-deps:refs/heads/chore/update_deps`
+    - `worktree-fix-auth-timeout` → `git push -u origin worktree-fix-auth-timeout:refs/heads/fix/auth-timeout`
+    - `worktree-add-search-api` → `git push -u origin worktree-add-search-api:refs/heads/feat/add-search-api`
+    - `worktree-chore-update-deps` → `git push -u origin worktree-chore-update-deps:refs/heads/chore/update-deps`
 - **PR creation**: `gh pr create` as usual, report PR URL
 - **After merge**: Clean up fully:
-  1. Delete remote branch: `git push origin --delete {prefix}/underscore_name` (skip if GitHub already auto-deleted it)
+  1. Delete remote branch: `git push origin --delete {prefix}/hyphenated-name` (skip if GitHub already auto-deleted it)
   2. `ExitWorktree` with `action: "remove"` to delete the local worktree and branch
 
 # Production Safety

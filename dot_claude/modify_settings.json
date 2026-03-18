@@ -62,7 +62,7 @@ managed=$(cat <<'MANAGED'
     "PostCompact": [
       {
         "hooks": [
-          {"type": "command", "command": "echo 'CONTEXT REMINDER: Edit chezmoi source files (dot_ prefix in repo), not deployed files. Use worktrees for non-trivial work on main. Ask before committing to main. Worktree remote push: git push -u origin worktree-NAME:refs/heads/{prefix}/underscore_name (fix/chore/docs/refactor prefix, default feat/). After PR merge: delete remote branch, then ExitWorktree action:remove.'"}
+          {"type": "command", "command": "echo 'CONTEXT REMINDER: Edit chezmoi source files (dot_ prefix in repo), not deployed files. Use worktrees for non-trivial work on main. Ask before committing to main. Worktree remote push: git push -u origin worktree-NAME:refs/heads/{prefix}/hyphenated-name (fix/chore/docs/refactor prefix, default feat/). After PR merge: delete remote branch, then ExitWorktree action:remove.'"}
         ]
       }
     ]
