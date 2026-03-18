@@ -1,0 +1,7 @@
+[Unit]
+Description=Scan for in-flight Claude Code work and notify
+
+[Service]
+Type=oneshot
+ExecStart=%h/.claude/hooks/daily-inflight-reminder.sh
+Environment=DISPLAY=:0
