@@ -1,0 +1,24 @@
+---
+- name: Install MCP filesystem server
+  become: yes
+  community.general.npm:
+    name: "@anthropic-ai/mcp-server-filesystem"
+    global: yes
+
+- name: Install MCP PostgreSQL server
+  become: yes
+  community.general.npm:
+    name: "@anthropic-ai/mcp-server-postgres"
+    global: yes
+
+- name: Install MCP Slack server
+  become: yes
+  community.general.npm:
+    name: "@anthropic-ai/mcp-server-slack"
+    global: yes
+
+- name: Install Context7 MCP server
+  become: yes
+  community.general.npm:
+    name: "@upstash/context7-mcp"
+    global: yes
