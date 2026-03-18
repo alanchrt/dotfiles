@@ -2,19 +2,19 @@
 - name: Install MCP filesystem server
   become: yes
   community.general.npm:
-    name: "@anthropic-ai/mcp-server-filesystem"
+    name: "@modelcontextprotocol/server-filesystem"
     global: yes
 
 - name: Install MCP PostgreSQL server
   become: yes
   community.general.npm:
-    name: "@anthropic-ai/mcp-server-postgres"
+    name: "@modelcontextprotocol/server-postgres"
     global: yes
 
 - name: Install MCP Slack server
   become: yes
   community.general.npm:
-    name: "@anthropic-ai/mcp-server-slack"
+    name: "@modelcontextprotocol/server-slack"
     global: yes
 
 - name: Install Context7 MCP server
