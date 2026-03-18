@@ -1,0 +1,62 @@
+#!/bin/bash
+set -euo pipefail
+
+# Clean up worktree-* branches that have been fully merged into HEAD.
+# Called by post-merge and post-rewrite hooks after git pull lands new commits.
+
+# Only run on main/master
+current_branch=$(git symbolic-ref --short HEAD 2>/dev/null || true)
+if [[ "$current_branch" != "main" && "$current_branch" != "master" ]]; then
+    exit 0
+fi
+
+# Find worktree-* branches that are fully merged into HEAD
+merged_branches=$(git branch --merged HEAD --format='%(refname:short)' | grep '^worktree-' || true)
+if [[ -z "$merged_branches" ]]; then
+    exit 0
+fi
+
+cleaned=()
+skipped=()
+
+while IFS= read -r branch; do
+    # Check if this branch has a worktree attached
+    wt_path=$(git worktree list --porcelain | awk -v b="$branch" '
+        /^worktree / { path = substr($0, 10) }
+        /^branch /   { if (substr($0, 8) == "refs/heads/" b) print path }
+    ')
+
+    if [[ -n "$wt_path" ]]; then
+        # Check for uncommitted changes in the worktree
+        if ! git -C "$wt_path" diff --quiet 2>/dev/null || \
+           ! git -C "$wt_path" diff --cached --quiet 2>/dev/null; then
+            skipped+=("$branch (dirty worktree: $wt_path)")
+            continue
+        fi
+
+        # Remove the worktree (--force needed since we're not inside it, but
+        # we've already confirmed it's clean)
+        if ! git worktree remove "$wt_path" 2>/dev/null; then
+            skipped+=("$branch (worktree remove failed: $wt_path)")
+            continue
+        fi
+    fi
+
+    # Delete the branch (safe -d refuses if not fully merged)
+    if git branch -d "$branch" 2>/dev/null; then
+        cleaned+=("$branch")
+    else
+        skipped+=("$branch (branch delete failed)")
+    fi
+done <<< "$merged_branches"
+
+# Notify user of results
+if [[ ${#cleaned[@]} -gt 0 ]]; then
+    msg="Cleaned up merged worktree branches:\n$(printf '  • %s\n' "${cleaned[@]}")"
+    notify-send -i dialog-information "Git Worktree Cleanup" "$msg" 2>/dev/null || true
+fi
+
+if [[ ${#skipped[@]} -gt 0 ]]; then
+    msg="Skipped worktree branches:\n$(printf '  • %s\n' "${skipped[@]}")"
+    notify-send -i dialog-warning "Git Worktree Cleanup" "$msg" 2>/dev/null || true
+fi
