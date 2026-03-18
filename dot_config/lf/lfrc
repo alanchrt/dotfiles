@@ -1,3 +1,7 @@
 set icons true
 set previewer ~/.local/bin/pv
 map i $pv $f | less -Rc
+
+# Dracula prompt colors
+set promptfmt "\033[38;2;189;147;249m%d\033[0m\033[38;2;255;121;198m%f\033[0m"
+set cursorpreviewfmt "\033[4m"
