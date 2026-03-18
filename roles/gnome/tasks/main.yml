@@ -51,10 +51,12 @@
     name: papirus-icon-theme
   register: papirus_icons
 
-- name: Install papirus-folders
+- name: Install papirus-folders script
   become: yes
-  dnf:
-    name: papirus-folders
+  get_url:
+    url: https://raw.githubusercontent.com/PapirusDevelopmentTeam/papirus-folders/master/papirus-folders
+    dest: /usr/local/bin/papirus-folders
+    mode: "0755"
 
 - name: Set Papirus folder color to violet (Dracula)
   command: papirus-folders -C violet --theme Papirus
