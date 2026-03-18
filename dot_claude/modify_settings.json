@@ -43,10 +43,35 @@ managed=$(cat <<'MANAGED'
           {"type": "command", "command": "~/.claude/hooks/block-sensitive-paths.sh"}
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {"type": "command", "command": "~/.claude/hooks/auto-format.sh"}
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {"type": "command", "command": "notify-send -i dialog-information 'Claude Code' 'Waiting for your input'"}
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {"type": "command", "command": "echo 'CONTEXT REMINDER: Edit chezmoi source files (dot_ prefix in repo), not deployed files. Use worktrees for non-trivial work on main. Ask before committing to main.'"}
+        ]
+      }
     ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }
 MANAGED
 )
 
-printf '%s' "$current" | jq --argjson m "$managed" '. + {permissions: $m.permissions, hooks: $m.hooks}'
+printf '%s' "$current" | jq --argjson m "$managed" '. + {permissions: $m.permissions, hooks: $m.hooks, env: $m.env}'
