@@ -119,12 +119,22 @@
     path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions"
     state: directory
 
+- name: Create ddterm extension directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
+    state: directory
+
 - name: Install ddterm extension
   unarchive:
     src: https://extensions.gnome.org/extension-data/ddtermamezin.github.com.v64.shell-extension.zip
     remote_src: yes
     dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
     creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/metadata.json"
+
+- name: Create NordVPN Quick Toggle extension directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/nordvpnquicktoggle@wedaxi.com"
+    state: directory
 
 - name: Install NordVPN Quick Toggle extension
   unarchive:
