@@ -36,6 +36,6 @@ chezmoi apply --source $HOME/Projects/dotfiles
 rm -r /tmp/dotfiles
 
 # run ansible playbook
-ANSIBLE_FORCE_COLOR=true ansible-pull --checkout master --url https://github.com/alanchrt/dotfiles.git -i hosts --extra-vars "ansible_sudo_pass=$PASSWORD"
+ANSIBLE_FORCE_COLOR=true ansible-pull -v --checkout master --url https://github.com/alanchrt/dotfiles.git -i hosts --extra-vars "ansible_sudo_pass=$PASSWORD"
 
 echo "Please restart this machine to make sure all groups, extensions, and services reload properly."
