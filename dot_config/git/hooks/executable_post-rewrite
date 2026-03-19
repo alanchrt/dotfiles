@@ -3,10 +3,14 @@ set -euo pipefail
 
 # Global post-rewrite hook: runs after git rebase or git commit --amend.
 
-# Chain to repo-local hook if it exists (core.hooksPath shadows per-repo hooks)
-local_hook="$(git rev-parse --git-dir)/hooks/post-rewrite"
-if [[ -x "$local_hook" ]]; then
-    "$local_hook" "$@"
+# Chain to repo-local hook if it exists (core.hooksPath shadows per-repo hooks).
+# Skip if we were already called FROM a local hook (template chaining) to avoid loops.
+if [[ -z "${_CHAINED_FROM_LOCAL:-}" ]]; then
+    local_hook="$(git rev-parse --git-dir)/hooks/post-rewrite"
+    if [[ -x "$local_hook" ]]; then
+        export _CHAINED_FROM_GLOBAL=1
+        "$local_hook" "$@"
+    fi
 fi
 
 # Only clean up after rebase (covers git pull --rebase), not amend
