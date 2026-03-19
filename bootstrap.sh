@@ -9,6 +9,8 @@ echo -ne "\nYour name: "
 read NAME
 echo -n "Your email: "
 read EMAIL
+echo -n "Your rbw (Bitwarden) email: "
+read RBW_EMAIL
 
 # install base deps
 echo $PASSWORD | sudo -S dnf install -y ansible python3-psutil
@@ -27,7 +29,7 @@ mkdir -p $HOME/Projects
 if [ ! -d $HOME/Projects/dotfiles ] ; then
     git clone https://github.com/alanchrt/dotfiles.git $HOME/Projects/dotfiles
 fi
-printf "name = \"$NAME\"\nemail = \"$EMAIL\"\n" > $HOME/Projects/dotfiles/.chezmoidata.toml
+printf "name = \"$NAME\"\nemail = \"$EMAIL\"\nrbw_email = \"$RBW_EMAIL\"\n" > $HOME/Projects/dotfiles/.chezmoidata.toml
 chezmoi apply --source $HOME/Projects/dotfiles
 
 # install ansible galaxy dependencies
