@@ -32,13 +32,6 @@ fi
 printf "name = \"$NAME\"\nemail = \"$EMAIL\"\nrbw_email = \"$RBW_EMAIL\"\n" > $HOME/Projects/dotfiles/.chezmoidata.toml
 chezmoi apply --source $HOME/Projects/dotfiles
 
-# install ansible galaxy dependencies
-ansible-galaxy collection install community.general
-if [ ! -f /tmp/dotfiles/requirements.yml ] ; then
-    wget --no-clobber -O /tmp/dotfiles/requirements.yml https://raw.githubusercontent.com/alanchrt/dotfiles/master/requirements.yml
-fi
-ansible-galaxy install -r /tmp/dotfiles/requirements.yml
-
 # clean up
 rm -r /tmp/dotfiles
 
