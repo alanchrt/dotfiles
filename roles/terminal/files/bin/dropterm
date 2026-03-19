@@ -1,0 +1,7 @@
+#!/bin/bash
+if ! tmux has-session -t dropterm 2>/dev/null; then
+    tmux new-session -ds dropterm
+    tmux split-window -h -t dropterm ipython3 --no-banner --nosep --no-confirm-exit
+    tmux select-pane -t dropterm:0.0
+fi
+exec tmux attach-session -t dropterm
