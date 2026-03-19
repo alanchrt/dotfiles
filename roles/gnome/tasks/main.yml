@@ -95,37 +95,57 @@
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
 
-- name: Install gnome-extensions-cli
-  pip:
-    name: gnome-extensions-cli
-    extra_args: --user
+- name: Install GNOME Shell extensions
+  become: yes
+  dnf:
+    name:
+      - gnome-shell-extension-caffeine
+      - gnome-shell-extension-no-overview
+      - gnome-shell-extension-unite
+      - gnome-shell-extension-system-monitor-applet
 
-- name: Install GNOME shell extensions
-  command: "gext install {{ item }}"
+- name: Remove user-installed extensions now managed by DNF
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/{{ item }}"
+    state: absent
   loop:
-    - 3780  # ddterm
-    - 517   # caffeine
-    - 4099  # no-overview
-  register: gext_result
-  changed_when: "'already installed' not in gext_result.stdout"
-
-- name: Clone Unite shell extension
-  git:
-    repo: https://github.com/hardpixel/unite-shell.git
-    dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/unite@hardpixel.eu"
-    version: master
-
-- name: Enable GNOME shell extensions
-  command: "gnome-extensions enable {{ item }}"
-  loop:
-    - com.github.amezin.ddterm
     - caffeine@patapon.info
     - no-overview@fthx
     - unite@hardpixel.eu
-  ignore_errors: yes  # requires active GNOME session
+    - system-monitor-next@paradoxxx.zero.gmail.com
+
+- name: Create user extensions directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions"
+    state: directory
+
+- name: Install ddterm extension
+  unarchive:
+    src: https://extensions.gnome.org/extension-data/ddtermamezin.github.com.v64.shell-extension.zip
+    remote_src: yes
+    dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
+    creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/metadata.json"
+
+- name: Install NordVPN Quick Toggle extension
+  unarchive:
+    src: https://extensions.gnome.org/extension-data/nordvpnquicktogglewedaxi.com.v13.shell-extension.zip
+    remote_src: yes
+    dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/nordvpnquicktoggle@wedaxi.com"
+    creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/nordvpnquicktoggle@wedaxi.com/metadata.json"
+
+- name: Enable GNOME Shell extensions
+  community.general.dconf:
+    key: /org/gnome/shell/enabled-extensions
+    value: "['caffeine@patapon.info', 'ddterm@amezin.github.com', 'no-overview@fthx', 'unite@hardpixel.eu', 'nordvpnquicktoggle@wedaxi.com', 'system-monitor-next@paradoxxx.zero.gmail.com']"
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
+
+- name: Configure system-monitor-next
+  shell: "dconf load /org/gnome/shell/extensions/system-monitor-next-applet/ < {{ role_path }}/files/system-monitor.conf"
+
+- name: Configure unite
+  shell: "dconf load /org/gnome/shell/extensions/unite/ < {{ role_path }}/files/unite.conf"
 
 - name: Install GNOME chrome connector
   become: yes
