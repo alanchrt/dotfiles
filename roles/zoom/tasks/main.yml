@@ -22,3 +22,26 @@
     src: Zoom.desktop
     dest: "{{ ansible_env.HOME }}/.local/share/applications/Zoom.desktop"
     mode: "0644"
+
+- name: Register Zoom URI scheme handlers in mimeapps.list
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.local/share/applications/mimeapps.list"
+    insertafter: "\\[Default Applications\\]"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    create: true
+  loop:
+    - regexp: "^x-scheme-handler/zoommtg="
+      line: "x-scheme-handler/zoommtg=Zoom.desktop"
+    - regexp: "^x-scheme-handler/zoomus="
+      line: "x-scheme-handler/zoomus=Zoom.desktop"
+    - regexp: "^x-scheme-handler/zoomphonecall="
+      line: "x-scheme-handler/zoomphonecall=Zoom.desktop"
+    - regexp: "^x-scheme-handler/zoomphonesms="
+      line: "x-scheme-handler/zoomphonesms=Zoom.desktop"
+    - regexp: "^x-scheme-handler/zoomcontactcentercall="
+      line: "x-scheme-handler/zoomcontactcentercall=Zoom.desktop"
+
+- name: Update desktop MIME database
+  command: update-desktop-database {{ ansible_env.HOME }}/.local/share/applications
+  changed_when: false
