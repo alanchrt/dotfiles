@@ -1,4 +1,11 @@
 ---
+- name: Install Zoom RPM
+  become: true
+  dnf:
+    name: https://zoom.us/client/latest/zoom_x86_64.rpm
+    state: present
+    disable_gpg_check: true
+
 - name: Ensure ~/.local/bin exists
   file:
     path: "{{ ansible_env.HOME }}/.local/bin"
