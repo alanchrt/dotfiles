@@ -21,5 +21,5 @@ if tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -q "^${session}$";
     env -u WAYLAND_DISPLAY alacritty --title "$session" --command tmux attach-session -t "$session"
     notify-send "Existing session" "Opening existing session $session"
 else
-    env -u WAYLAND_DISPLAY alacritty --title "$session" --command tmux new-session -c "$path" -s "$session"
+    env -u WAYLAND_DISPLAY alacritty --title "$session" --command tmux new-session -c "$path" -s "$session" \; split-window -h -c "$path" "claude" \; select-pane -t 0
 fi
