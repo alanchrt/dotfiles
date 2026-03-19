@@ -8,6 +8,7 @@ tmp=$(mktemp)
 cat > "$tmp"
 
 git config --file "$tmp" core.hooksPath "~/.config/git/hooks"
+git config --file "$tmp" init.templateDir "~/.config/git/templates"
 git config --file "$tmp" fetch.prune true
 
 cat "$tmp"
