@@ -1,0 +1,24 @@
+---
+- name: Ensure ~/.local/bin exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
+    mode: "0755"
+
+- name: Install Zoom wrapper script
+  copy:
+    src: zoom
+    dest: "{{ ansible_env.HOME }}/.local/bin/zoom"
+    mode: "0755"
+
+- name: Ensure ~/.local/share/applications exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/applications"
+    state: directory
+    mode: "0755"
+
+- name: Install Zoom desktop file override
+  template:
+    src: Zoom.desktop
+    dest: "{{ ansible_env.HOME }}/.local/share/applications/Zoom.desktop"
+    mode: "0644"

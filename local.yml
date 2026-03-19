@@ -5,6 +5,8 @@
       tags: [core, dev, desktop]
     - name: gnome
       tags: [gnome, desktop]
+    - name: zoom
+      tags: [zoom, desktop]
     - name: fonts
       tags: [fonts, desktop]
     - name: walker

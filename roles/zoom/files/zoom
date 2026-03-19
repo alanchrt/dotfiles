@@ -1,0 +1,20 @@
+#!/bin/bash
+# Launch Zoom and strip _KDE_NET_WM_WINDOW_TYPE_OVERRIDE from its windows.
+# This hint causes Mutter to defer stacking to Zoom, which doesn't handle
+# it correctly on Linux/XWayland — making windows sink behind others on click.
+/usr/bin/zoom "$@" &
+ZOOM_PID=$!
+
+(
+  while kill -0 $ZOOM_PID 2>/dev/null; do
+    for wid in $(xdotool search --classname zoom 2>/dev/null); do
+      if xprop -id "$wid" _NET_WM_WINDOW_TYPE 2>/dev/null | grep -q "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE"; then
+        xprop -id "$wid" -f _NET_WM_WINDOW_TYPE 32a \
+          -set _NET_WM_WINDOW_TYPE "_NET_WM_WINDOW_TYPE_NORMAL" 2>/dev/null
+      fi
+    done
+    sleep 1
+  done
+) &
+
+wait $ZOOM_PID
