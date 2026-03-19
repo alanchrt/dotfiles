@@ -101,7 +101,6 @@
     name:
       - gnome-shell-extension-caffeine
       - gnome-shell-extension-no-overview
-      - gnome-shell-extension-unite
       - gnome-shell-extension-system-monitor-applet
 
 - name: Remove user-installed extensions now managed by DNF
@@ -111,7 +110,6 @@
   loop:
     - caffeine@patapon.info
     - no-overview@fthx
-    - unite@hardpixel.eu
     - system-monitor-next@paradoxxx.zero.gmail.com
 
 - name: Create user extensions directory
@@ -130,6 +128,23 @@
     remote_src: yes
     dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
     creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/metadata.json"
+
+- name: Compile ddterm GSettings schemas
+  command: glib-compile-schemas {{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/schemas/
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/schemas/gschemas.compiled"
+
+- name: Create unite extension directory
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/unite@hardpixel.eu"
+    state: directory
+
+- name: Install unite extension
+  unarchive:
+    src: https://github.com/hardpixel/unite-shell/releases/download/v84/unite-v84.zip
+    remote_src: yes
+    dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/unite@hardpixel.eu"
+    creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/unite@hardpixel.eu/metadata.json"
 
 - name: Create NordVPN Quick Toggle extension directory
   file:
