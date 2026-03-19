@@ -63,6 +63,9 @@
     repo: https://github.com/tmux-plugins/tpm
     dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
 
+- name: Install tmux plugins via tpm
+  shell: "{{ ansible_env.HOME }}/.tmux/plugins/tpm/bin/install_plugins"
+
 - name: Install lf
   unarchive:
     src: https://github.com/gokcehan/lf/releases/download/r26/lf-linux-amd64.tar.gz
