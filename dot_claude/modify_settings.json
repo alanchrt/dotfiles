@@ -55,7 +55,7 @@ managed=$(cat <<'MANAGED'
     "Notification": [
       {
         "hooks": [
-          {"type": "command", "command": "notify-send -i dialog-information 'Claude Code' 'Waiting for your input'"}
+          {"type": "command", "command": "~/.claude/hooks/notify-input.sh"}
         ]
       }
     ],
