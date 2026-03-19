@@ -72,6 +72,22 @@ if command -v tmux >/dev/null 2>&1 && tmux list-panes -a >/dev/null 2>&1; then
   done
 fi
 
+# Extract session name from target (session:window.pane)
+TMUX_SESSION=""
+[[ -n "$TMUX_TARGET" ]] && TMUX_SESSION="${TMUX_TARGET%%:*}"
+
+# --- Skip if pane is already focused ---
+if [[ -n "$TMUX_TARGET" ]]; then
+  PANE_ACTIVE=$(tmux list-panes -a \
+    -F "#{pane_active} #{window_active} #{session_name}:#{window_index}.#{pane_index}" \
+    2>/dev/null | awk -v t="$TMUX_TARGET" '$1=="1" && $2=="1" && $3==t {print "yes"; exit}')
+  if [[ "$PANE_ACTIVE" == "yes" ]]; then
+    CLIENT_FOCUSED=$(tmux list-clients -t "$TMUX_SESSION" -F "#{client_flags}" \
+      2>/dev/null | grep -c "focused" || true)
+    [[ "$CLIENT_FOCUSED" -gt 0 ]] && exit 0
+  fi
+fi
+
 BODY_RENDERED=$(printf '%b' "$BODY")
 
 if [[ -n "$TMUX_TARGET" ]]; then
@@ -84,6 +100,20 @@ if [[ -n "$TMUX_TARGET" ]]; then
     if [[ "$ACTION" == "default" ]]; then
       tmux select-window -t "$TMUX_WINDOW" 2>/dev/null || true
       tmux select-pane -t "$TMUX_TARGET" 2>/dev/null || true
+      # Raise the Alacritty window (requires wmctrl + XWayland mode)
+      if command -v wmctrl >/dev/null 2>&1 && [[ -n "$TMUX_SESSION" ]]; then
+        CLIENT_PID=$(tmux list-clients -t "$TMUX_SESSION" -F "#{client_pid}" \
+          2>/dev/null | head -1)
+        if [[ -n "$CLIENT_PID" ]]; then
+          ALACRITTY_PID=$(ps -o ppid= -p "$CLIENT_PID" 2>/dev/null | tr -d ' ')
+          PNAME=$(ps -o comm= -p "$ALACRITTY_PID" 2>/dev/null | tr -d ' ')
+          if [[ "$PNAME" == "alacritty" ]]; then
+            WIN_ID=$(wmctrl -l -p 2>/dev/null \
+              | awk -v pid="$ALACRITTY_PID" '$3 == pid {print $1; exit}')
+            [[ -n "$WIN_ID" ]] && wmctrl -i -a "$WIN_ID" 2>/dev/null || true
+          fi
+        fi
+      fi
     fi
   ) &>/dev/null &
   disown

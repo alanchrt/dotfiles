@@ -13,6 +13,7 @@
       - fastfetch
       - powertop
       - xclip
+      - wmctrl
       - htop
       - ncdu
       - fd-find
