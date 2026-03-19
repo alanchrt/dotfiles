@@ -95,8 +95,34 @@
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
 
-# TODO install ddterm (3780), caffeine (517), and no-overview (4099)
-# TODO install Unite from here (https://github.com/hardpixel/unite-shell)
+- name: Install gnome-extensions-cli
+  pip:
+    name: gnome-extensions-cli
+    extra_args: --user
+
+- name: Install GNOME shell extensions
+  command: "gext install {{ item }}"
+  loop:
+    - 3780  # ddterm
+    - 517   # caffeine
+    - 4099  # no-overview
+  register: gext_result
+  changed_when: "'already installed' not in gext_result.stdout"
+
+- name: Clone Unite shell extension
+  git:
+    repo: https://github.com/hardpixel/unite-shell.git
+    dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/unite@hardpixel.eu"
+    version: master
+
+- name: Enable GNOME shell extensions
+  command: "gnome-extensions enable {{ item }}"
+  loop:
+    - com.github.amezin.ddterm
+    - caffeine@patapon.info
+    - no-overview@fthx
+    - unite@hardpixel.eu
+  ignore_errors: yes  # requires active GNOME session
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
