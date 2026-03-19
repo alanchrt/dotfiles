@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+# Template hook: chains to global hook when core.hooksPath is overridden to .git/hooks
+# (e.g. by Claude Code). Without this, the global hook would be silently skipped.
+
+GLOBAL_HOOK="$HOME/.config/git/hooks/$(basename "$0")"
+if [[ -x "$GLOBAL_HOOK" && -z "${_CHAINED_FROM_GLOBAL:-}" ]]; then
+    export _CHAINED_FROM_LOCAL=1
+    exec "$GLOBAL_HOOK" "$@"
+fi
