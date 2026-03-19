@@ -199,6 +199,10 @@
 - name: Configure unite
   shell: "dconf load /org/gnome/shell/extensions/unite/ < {{ role_path }}/files/unite.conf"
 
+- name: Remind user to log out and back in
+  debug:
+    msg: "GNOME Shell extensions were updated. Log out and back in to apply changes."
+
 - name: Install GNOME chrome connector
   become: yes
   dnf:
