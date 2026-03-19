@@ -11,6 +11,8 @@ echo -n "Your email: "
 read EMAIL
 echo -n "Your rbw (Bitwarden) email: "
 read RBW_EMAIL
+echo -n "Top bar color override (leave blank for Dracula default, e.g. rgba(20, 20, 30, 0.98)): "
+read PANEL_COLOR
 
 # install base deps
 echo $PASSWORD | sudo -S dnf install -y ansible python3-psutil
@@ -29,7 +31,7 @@ mkdir -p $HOME/Projects
 if [ ! -d $HOME/Projects/dotfiles ] ; then
     git clone https://github.com/alanchrt/dotfiles.git $HOME/Projects/dotfiles
 fi
-printf "name = \"$NAME\"\nemail = \"$EMAIL\"\nrbw_email = \"$RBW_EMAIL\"\n" > $HOME/Projects/dotfiles/.chezmoidata.toml
+printf "name = \"$NAME\"\nemail = \"$EMAIL\"\nrbw_email = \"$RBW_EMAIL\"\npanel_color = \"$PANEL_COLOR\"\n" > $HOME/Projects/dotfiles/.chezmoidata.toml
 chezmoi apply --source $HOME/Projects/dotfiles
 
 # clean up

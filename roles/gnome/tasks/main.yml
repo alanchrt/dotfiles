@@ -37,6 +37,33 @@
     remote_src: yes
     dest: "{{ ansible_env.HOME }}/.themes"
 
+- name: Read panel color override
+  slurp:
+    src: "{{ ansible_env.HOME }}/.config/dotfiles/panel_color"
+  register: panel_color_file
+  ignore_errors: yes
+
+- name: Apply panel color override to GNOME Shell CSS
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.themes/Dracula/gnome-shell/gnome-shell.css"
+    marker: "/* {mark} DOTFILES PANEL COLOR OVERRIDE */"
+    block: |
+      #panel {
+        background-color: {{ panel_color_file.content | b64decode | trim }};
+      }
+  when:
+    - panel_color_file is not failed
+    - (panel_color_file.content | b64decode | trim) != ''
+
+- name: Remove panel color override if not set
+  blockinfile:
+    path: "{{ ansible_env.HOME }}/.themes/Dracula/gnome-shell/gnome-shell.css"
+    marker: "/* {mark} DOTFILES PANEL COLOR OVERRIDE */"
+    state: absent
+  when: >
+    panel_color_file is failed or
+    (panel_color_file.content | b64decode | trim) == ''
+
 - name: Set GTK theme
   community.general.dconf:
     key: "{{ item }}"
