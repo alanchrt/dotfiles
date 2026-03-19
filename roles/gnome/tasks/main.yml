@@ -64,6 +64,27 @@
     panel_color_file is failed or
     (panel_color_file.content | b64decode | trim) == ''
 
+- name: Restore default GNOME popup styles
+  ansible.builtin.blockinfile:
+    path: "{{ ansible_env.HOME }}/.themes/Dracula/gnome-shell/gnome-shell.css"
+    marker: "/* {mark} DOTFILES POPUP STYLE OVERRIDE */"
+    block: |
+      .switcher-list, .workspace-switcher-container {
+        border-radius: 28px;
+        background-color: rgba(40, 42, 54, 0.8);
+        border: none;
+        box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.2);
+      }
+      .modal-dialog {
+        border-radius: 18px;
+        background-color: #36363a;
+        box-shadow: 0 12px 8px 12px rgba(0, 0, 0, 0.03);
+      }
+      .prompt-dialog {
+        width: 28em;
+        border-radius: 0;
+      }
+
 - name: Set GTK theme
   community.general.dconf:
     key: "{{ item }}"
