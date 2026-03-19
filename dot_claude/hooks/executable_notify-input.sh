@@ -56,4 +56,38 @@ if [[ -n "$SUMMARY" ]]; then
 fi
 BODY="${BODY:-Waiting for your input}"
 
-notify-send -i dialog-information "$TITLE" "$(printf '%b' "$BODY")"
+# --- Find tmux pane (if running inside tmux) ---
+TMUX_TARGET=""
+if command -v tmux >/dev/null 2>&1 && tmux list-panes -a >/dev/null 2>&1; then
+  # Walk up the process tree from $$ to find a PID that matches a tmux pane
+  PANE_LIST=$(tmux list-panes -a -F "#{pane_pid} #{session_name}:#{window_index}.#{pane_index}")
+  PID=$$
+  while [[ -n "$PID" && "$PID" != "1" ]]; do
+    MATCH=$(echo "$PANE_LIST" | awk -v pid="$PID" '$1 == pid { print $2; exit }')
+    if [[ -n "$MATCH" ]]; then
+      TMUX_TARGET="$MATCH"
+      break
+    fi
+    PID=$(ps -o ppid= -p "$PID" 2>/dev/null | tr -d ' ') || break
+  done
+fi
+
+BODY_RENDERED=$(printf '%b' "$BODY")
+
+if [[ -n "$TMUX_TARGET" ]]; then
+  # Extract session:window for select-window
+  TMUX_WINDOW="${TMUX_TARGET%.*}"
+
+  # Clickable notification — runs in a detached background subshell
+  (
+    ACTION=$(notify-send -i dialog-information -A "default=Focus" "$TITLE" "$BODY_RENDERED" 2>/dev/null || true)
+    if [[ "$ACTION" == "default" ]]; then
+      tmux select-window -t "$TMUX_WINDOW" 2>/dev/null || true
+      tmux select-pane -t "$TMUX_TARGET" 2>/dev/null || true
+    fi
+  ) &>/dev/null &
+  disown
+else
+  # Fallback: plain notification (no tmux or pane not found)
+  notify-send -i dialog-information "$TITLE" "$BODY_RENDERED"
+fi
