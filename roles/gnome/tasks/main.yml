@@ -72,6 +72,11 @@
     - /org/gnome/desktop/interface/gtk-theme
     - /org/gnome/desktop/wm/preferences/theme
 
+- name: Set GNOME Shell theme
+  community.general.dconf:
+    key: /org/gnome/shell/extensions/user-theme/name
+    value: "'Dracula'"
+
 - name: Install papirus icon theme
   become: yes
   dnf:
@@ -129,6 +134,7 @@
       - gnome-shell-extension-caffeine
       - gnome-shell-extension-no-overview
       - gnome-shell-extension-system-monitor-applet
+      - gnome-shell-extension-user-theme
 
 - name: Remove user-installed extensions now managed by DNF
   file:
@@ -188,7 +194,7 @@
 - name: Enable GNOME Shell extensions
   community.general.dconf:
     key: /org/gnome/shell/enabled-extensions
-    value: "['caffeine@patapon.info', 'ddterm@amezin.github.com', 'no-overview@fthx', 'unite@hardpixel.eu', 'nordvpnquicktoggle@wedaxi.com', 'system-monitor-next@paradoxxx.zero.gmail.com']"
+    value: "['caffeine@patapon.info', 'ddterm@amezin.github.com', 'no-overview@fthx', 'unite@hardpixel.eu', 'nordvpnquicktoggle@wedaxi.com', 'system-monitor-next@paradoxxx.zero.gmail.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']"
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
