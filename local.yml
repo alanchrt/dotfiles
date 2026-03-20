@@ -37,6 +37,8 @@
       tags: [github, dev]
     - name: heroku
       tags: [heroku, dev]
+    - name: azure
+      tags: [azure, dev]
     - name: mcp
       tags: [mcp, dev]
     - name: claude-code
