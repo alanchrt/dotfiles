@@ -12,4 +12,6 @@
 - name: Install gcloud
   become: yes
   dnf:
-    name: google-cloud-cli
+    name:
+      - google-cloud-cli
+      - google-cloud-sdk-gke-gcloud-auth-plugin

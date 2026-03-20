@@ -125,6 +125,13 @@ is_readonly() {
       esac
       ;;
 
+    az)
+      # Allow subcommands containing list, show, get
+      if echo "$cmd" | grep -qE '\b(list|show|get)\b'; then
+        return 0
+      fi
+      ;;
+
     k9s)
       # Always block — interactive TUI
       return 1
