@@ -62,7 +62,7 @@ export PROTO_HOME="$HOME/.proto";
 export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH";
 
 # Dracula theme for zsh-syntax-highlighting
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main cursor)
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
 typeset -gA ZSH_HIGHLIGHT_STYLES
 ## Comments
 ZSH_HIGHLIGHT_STYLES[comment]='fg=#6272A4'
@@ -116,4 +116,3 @@ ZSH_HIGHLIGHT_STYLES[back-quoted-argument-unclosed]='fg=#FF5555'
 ZSH_HIGHLIGHT_STYLES[redirection]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[arg0]='fg=#F8F8F2'
 ZSH_HIGHLIGHT_STYLES[default]='fg=#F8F8F2'
-ZSH_HIGHLIGHT_STYLES[cursor]='standout'
