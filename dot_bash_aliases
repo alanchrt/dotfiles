@@ -46,6 +46,26 @@ alias clip="xclip -selection clipboard"
 # diceware
 alias dw="diceware -d ' ' --no-caps"
 
+# worktree preview
+function wto {
+    git checkout -B "preview/$1" "worktree-$1"
+}
+
+function wtd {
+    local branch
+    branch=$(git rev-parse --abbrev-ref HEAD)
+    git checkout - && git branch -D "$branch"
+}
+
+if [[ -n "$ZSH_VERSION" ]]; then
+    _wto() {
+        local -a suffixes
+        suffixes=(${${(M)${(f)"$(git branch --format='%(refname:short)' 2>/dev/null)"}:#worktree-*}#worktree-})
+        _describe 'worktree suffix' suffixes
+    }
+    compdef _wto wto
+fi
+
 # new named tmux session
 function to {
     if (( $# == 1 ))
