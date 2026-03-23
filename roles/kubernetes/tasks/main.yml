@@ -25,6 +25,17 @@
     path: "{{ ansible_env.HOME }}/.local/bin"
     state: directory
 
+- name: Download helm
+  unarchive:
+    src: https://get.helm.sh/helm-v3.17.0-linux-amd64.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    remote_src: yes
+    mode: +x
+    extra_opts:
+      - --strip-components=1
+      - linux-amd64/helm
+    creates: "{{ ansible_env.HOME }}/.local/bin/helm"
+
 - name: Download kustomize
   unarchive:
     src: https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.5.0/kustomize_v5.5.0_linux_amd64.tar.gz
