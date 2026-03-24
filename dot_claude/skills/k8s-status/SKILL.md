@@ -1,7 +1,7 @@
 ---
 name: k8s-status
 description: Show Kubernetes cluster status overview
-disable-model-invocation: true
+disable-model-invocation: false
 allowed-tools:
   - Bash
   - Read
