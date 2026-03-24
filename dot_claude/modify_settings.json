@@ -10,7 +10,7 @@ managed=$(cat <<'MANAGED'
   "permissions": {
     "defaultMode": "plan",
     "allow": [
-      "Read(*)", "Glob(*)", "Grep(*)", "Edit", "Write", "WebFetch", "WebSearch", "Bash(*)"
+      "Read(*)", "Glob(*)", "Grep(*)", "Edit", "Write", "WebFetch", "WebSearch"
     ],
     "ask": [
       "Bash(git reset --hard*)", "Bash(git push --force*)", "Bash(git push * --force*)",
