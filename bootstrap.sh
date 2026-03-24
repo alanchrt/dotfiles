@@ -12,6 +12,7 @@ read EMAIL
 echo -n "Your rbw (Bitwarden) email: "
 read RBW_EMAIL
 echo -n "Top bar color override (leave blank for Dracula default, e.g. rgba(20, 20, 30, 0.98)): "
+# a nice alternative: rgba(118, 0, 100, 0.95)
 read PANEL_COLOR
 
 # install base deps
