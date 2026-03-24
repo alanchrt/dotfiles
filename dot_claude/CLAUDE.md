@@ -23,14 +23,14 @@ During planning, assess whether the task warrants its own branch and worktree.
 
 **Testing worktree changes in the main project directory:**
 
-Use `wto <suffix>` to create a `preview/<suffix>` branch off the worktree branch and check it out. The dev server sees the changes live. When done, `wtd` returns to the previous branch and cleans up.
+Use `gwo <suffix>` to create a `preview/<suffix>` branch off the worktree branch and check it out. The dev server sees the changes live. When done, `gwd` returns to the previous branch and cleans up.
 
 ```bash
-wto add-search-api   # checks out preview/add-search-api from worktree-add-search-api
-wtd                  # returns to previous branch, deletes preview/add-search-api
+gwo add-search-api   # checks out preview/add-search-api from worktree-add-search-api
+gwd                  # returns to previous branch, deletes preview/add-search-api
 ```
 
-When finishing work in a worktree, mention that the user can run `wto <suffix>` to test the changes in their main project directory.
+When finishing work in a worktree, mention that the user can run `gwo <suffix>` to test the changes in their main project directory.
 
 - Use `EnterWorktree` with a descriptive kebab-case name. Use conventional prefixes: `fix-`, `chore-`, `docs-`, `refactor-`, or no prefix (defaults to `feat/`).
   - Examples: `fix-auth-timeout`, `chore-update-deps`, `add-search-api`
