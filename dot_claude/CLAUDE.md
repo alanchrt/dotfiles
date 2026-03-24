@@ -42,7 +42,7 @@ When finishing work in a worktree, mention that the user can run `wto <suffix>` 
     - `worktree-fix-auth-timeout` → `git push -u origin worktree-fix-auth-timeout:refs/heads/fix/auth-timeout`
     - `worktree-add-search-api` → `git push -u origin worktree-add-search-api:refs/heads/feat/add-search-api`
     - `worktree-chore-update-deps` → `git push -u origin worktree-chore-update-deps:refs/heads/chore/update-deps`
-- **PR creation**: `gh pr create` as usual, report PR URL
+- **PR creation**: `gh pr create --draft` as usual, report PR URL
 - **After merge**: Clean up fully:
   1. Delete remote branch: `git push origin --delete {prefix}/hyphenated-name` (skip if GitHub already auto-deleted it)
   2. `ExitWorktree` with `action: "remove"` to delete the local worktree and branch
