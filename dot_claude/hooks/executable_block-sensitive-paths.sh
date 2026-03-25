@@ -37,4 +37,5 @@ for dir in "${SENSITIVE_DIRS[@]}"; do
   fi
 done
 
+jq -n '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "allow"}}'
 exit 0
