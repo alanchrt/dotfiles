@@ -144,6 +144,7 @@ is_readonly() {
 
     *)
       # Not a production command, allow
+      jq -n '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "allow"}}'
       exit 0
       ;;
   esac
@@ -153,6 +154,7 @@ is_readonly() {
 }
 
 if is_readonly; then
+  jq -n '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "allow"}}'
   exit 0
 else
   jq -n --arg reason "'$COMMAND' may modify production state." '{
