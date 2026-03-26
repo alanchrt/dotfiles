@@ -12,8 +12,15 @@ if [[ -z "$COMMAND" ]]; then
   exit 0
 fi
 
-# Extract the base command (first word)
-BASE=$(echo "$COMMAND" | awk '{print $1}')
+# Skip leading KEY=VALUE env var assignments to find the actual binary
+BASE=$(echo "$COMMAND" | awk '{
+  for (i = 1; i <= NF; i++) {
+    if ($i !~ /^[A-Za-z_][A-Za-z0-9_]*=/) {
+      print $i
+      exit
+    }
+  }
+}')
 
 # Strip any path prefix to get the binary name
 BASE=$(basename "$BASE")
