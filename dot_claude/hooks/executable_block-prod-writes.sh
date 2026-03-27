@@ -70,7 +70,7 @@ is_readonly() {
       case "$sub" in
         pr)
           case "$sub2" in
-            list|view|status|checks|diff)
+            list|view|status|checks|diff|create)
               return 0 ;;
           esac
           ;;
