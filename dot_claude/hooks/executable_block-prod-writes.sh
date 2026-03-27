@@ -12,23 +12,22 @@ if [[ -z "$COMMAND" ]]; then
   exit 0
 fi
 
-# Skip leading KEY=VALUE env var assignments to find the actual binary
-BASE=$(echo "$COMMAND" | awk '{
-  for (i = 1; i <= NF; i++) {
-    if ($i !~ /^[A-Za-z_][A-Za-z0-9_]*=/) {
-      print $i
-      exit
-    }
-  }
-}')
-
-# Strip any path prefix to get the binary name
-BASE=$(basename "$BASE")
-
 is_readonly() {
-  local cmd="$COMMAND"
+  local cmd="${1:-$COMMAND}"
 
-  case "$BASE" in
+  # Skip leading KEY=VALUE env var assignments to find the actual binary
+  local base
+  base=$(echo "$cmd" | awk '{
+    for (i = 1; i <= NF; i++) {
+      if ($i !~ /^[A-Za-z_][A-Za-z0-9_]*=/) {
+        print $i
+        exit
+      }
+    }
+  }')
+  base=$(basename "$base")
+
+  case "$base" in
     heroku)
       local sub
       sub=$(echo "$cmd" | awk '{print $2}')
@@ -151,8 +150,7 @@ is_readonly() {
 
     *)
       # Not a production command, allow
-      jq -n '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "allow"}}'
-      exit 0
+      return 0
       ;;
   esac
 
@@ -160,9 +158,18 @@ is_readonly() {
   return 1
 }
 
-if is_readonly; then
+# Check each line of the command individually; allow only if all are read-only
+all_readonly=true
+while IFS= read -r line; do
+  [[ -z "${line// }" ]] && continue   # skip blank lines
+  if ! is_readonly "$line"; then
+    all_readonly=false
+    break
+  fi
+done <<< "$COMMAND"
+
+if $all_readonly; then
   jq -n '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "allow"}}'
-  exit 0
 else
   jq -n --arg reason "'$COMMAND' may modify production state." '{
     hookSpecificOutput: {
@@ -171,5 +178,5 @@ else
       permissionDecisionReason: $reason
     }
   }'
-  exit 0
 fi
+exit 0
