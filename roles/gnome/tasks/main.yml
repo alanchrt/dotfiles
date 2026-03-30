@@ -231,6 +231,15 @@
   debug:
     msg: "GNOME Shell extensions were updated. Log out and back in to apply changes."
 
+- name: Disable NetworkManager connectivity check (fixes VPN question mark icon)
+  become: yes
+  copy:
+    src: files/no-connectivity-check.conf
+    dest: /etc/NetworkManager/conf.d/no-connectivity-check.conf
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Install GNOME chrome connector
   become: yes
   dnf:
