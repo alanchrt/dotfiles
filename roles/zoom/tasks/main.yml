@@ -1,10 +1,17 @@
 ---
+- name: Check if Zoom is installed
+  command: rpm -q zoom
+  register: zoom_installed
+  changed_when: false
+  failed_when: false
+
 - name: Install Zoom RPM
   become: true
   dnf:
     name: https://zoom.us/client/latest/zoom_x86_64.rpm
     state: present
     disable_gpg_check: true
+  when: zoom_installed.rc != 0
 
 - name: Ensure ~/.local/bin exists
   file:

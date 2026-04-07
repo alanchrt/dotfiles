@@ -100,10 +100,17 @@
     key: /org/gnome/shell/extensions/user-theme/name
     value: "'DotfilesPanelColor'"
 
+- name: Check if papirus icon theme is installed
+  command: rpm -q papirus-icon-theme
+  register: papirus_installed
+  changed_when: false
+  failed_when: false
+
 - name: Install papirus icon theme
   become: yes
   dnf:
     name: papirus-icon-theme
+  when: papirus_installed.rc != 0
   register: papirus_icons
 
 - name: Install papirus-folders script
@@ -115,6 +122,7 @@
 
 - name: Set Papirus folder color to violet (Dracula)
   command: papirus-folders -C violet --theme Papirus
+  when: papirus_icons.changed
   changed_when: false
 
 - name: Set icon theme

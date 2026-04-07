@@ -1,13 +1,21 @@
 ---
+- name: Check if Hack fonts are installed
+  command: rpm -q hack-fonts
+  register: hack_fonts_installed
+  changed_when: false
+  failed_when: false
+
 - name: Add Hack fonts repository
   become: yes
   community.general.copr:
     name: zawertun/hack-fonts
+  when: hack_fonts_installed.rc != 0
 
 - name: Install Hack fonts
   become: yes
   dnf:
     name: hack-fonts
+  when: hack_fonts_installed.rc != 0
 
 - name: Create fonts directory
   file:
