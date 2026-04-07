@@ -1,0 +1,28 @@
+---
+- name: Ensure ~/.local/src exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/src"
+    state: directory
+
+- name: Download Flutter SDK
+  unarchive:
+    src: https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.27.1-stable.tar.xz
+    dest: "{{ ansible_env.HOME }}/.local/src"
+    remote_src: yes
+    creates: "{{ ansible_env.HOME }}/.local/src/flutter/bin/flutter"
+
+- name: Symlink flutter into ~/.local/bin
+  file:
+    state: link
+    src: "{{ ansible_env.HOME }}/.local/src/flutter/bin/flutter"
+    dest: "{{ ansible_env.HOME }}/.local/bin/flutter"
+
+- name: Symlink dart into ~/.local/bin
+  file:
+    state: link
+    src: "{{ ansible_env.HOME }}/.local/src/flutter/bin/dart"
+    dest: "{{ ansible_env.HOME }}/.local/bin/dart"
+
+- name: Disable Flutter analytics
+  shell: "{{ ansible_env.HOME }}/.local/src/flutter/bin/flutter --disable-analytics"
+  changed_when: false

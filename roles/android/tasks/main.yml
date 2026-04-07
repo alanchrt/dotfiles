@@ -1,6 +1,41 @@
 ---
-- name: Install Android tools
+- name: Install Android device tools and JDK
   become: yes
   dnf:
     name:
       - android-tools
+      - java-21-openjdk-devel
+
+- name: Ensure Android SDK dir exists
+  file:
+    path: "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools"
+    state: directory
+
+- name: Download Android commandline-tools
+  unarchive:
+    src: https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+    dest: "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools"
+    remote_src: yes
+    creates: "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/sdkmanager"
+
+- name: Move cmdline-tools into 'latest' subdir (sdkmanager layout requirement)
+  command: mv "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/cmdline-tools" "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest"
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/sdkmanager"
+
+- name: Install Android SDK packages via sdkmanager
+  shell: |
+    yes | "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/sdkmanager" \
+      "platform-tools" "platforms;android-34" "build-tools;34.0.0" "emulator"
+  environment:
+    ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
+    JAVA_HOME: /usr/lib/jvm/java-21-openjdk
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/share/android-sdk/platform-tools/adb"
+
+- name: Accept Android SDK licenses
+  shell: yes | "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/sdkmanager" --licenses
+  environment:
+    ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
+    JAVA_HOME: /usr/lib/jvm/java-21-openjdk
+  changed_when: false
