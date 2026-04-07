@@ -21,6 +21,8 @@
       tags: [go, dev]
     - name: android
       tags: [android, dev]
+    - name: flutter
+      tags: [flutter, dev]
     - name: emacs
       tags: [emacs, dev]
     - name: vim
