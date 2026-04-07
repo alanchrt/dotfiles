@@ -54,17 +54,24 @@
     path: "{{ ansible_env.HOME }}/.themes/DotfilesPanelColor/gnome-shell"
     state: directory
 
+- name: Check for GNOME Shell theme base CSS
+  stat:
+    path: "{{ ansible_env.HOME }}/.themes/DotfilesPanelColor/gnome-shell/gnome-shell.css"
+  register: shell_css_file
+
 - name: Extract default GNOME Shell CSS
   command: >
     gresource extract /usr/share/gnome-shell/gnome-shell-theme.gresource
     /org/gnome/shell/theme/gnome-shell-dark.css
   register: gnome_default_css
   changed_when: false
+  when: not shell_css_file.stat.exists
 
 - name: Write default GNOME Shell CSS as theme base
   copy:
     content: "{{ gnome_default_css.stdout }}"
     dest: "{{ ansible_env.HOME }}/.themes/DotfilesPanelColor/gnome-shell/gnome-shell.css"
+  when: not shell_css_file.stat.exists
 
 - name: Apply panel color override to GNOME Shell CSS
   blockinfile:
@@ -78,14 +85,20 @@
     - panel_color_stat.stat.exists
     - (panel_color_file.content | b64decode | trim) != ''
 
+- name: Check for existing panel color override marker
+  command: grep -q "DOTFILES PANEL COLOR OVERRIDE" {{ ansible_env.HOME }}/.themes/DotfilesPanelColor/gnome-shell/gnome-shell.css
+  register: panel_color_marker
+  changed_when: false
+  failed_when: false
+
 - name: Remove panel color override if not set
   blockinfile:
     path: "{{ ansible_env.HOME }}/.themes/DotfilesPanelColor/gnome-shell/gnome-shell.css"
     marker: "/* {mark} DOTFILES PANEL COLOR OVERRIDE */"
     state: absent
-  when: >
-    not panel_color_stat.stat.exists or
-    (panel_color_file.content | b64decode | trim) == ''
+  when:
+    - panel_color_marker.rc == 0
+    - not panel_color_stat.stat.exists or (panel_color_file.content | b64decode | trim) == ''
 
 - name: Set GTK theme
   community.general.dconf:
