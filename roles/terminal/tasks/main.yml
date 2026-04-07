@@ -22,6 +22,7 @@
 
 - name: Configure ddterm
   shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
+  changed_when: false
 
 - name: Install zsh
   become: yes
@@ -65,6 +66,7 @@
 
 - name: Install tmux plugins via tpm
   shell: "{{ ansible_env.HOME }}/.tmux/plugins/tpm/bin/install_plugins"
+  changed_when: false
 
 - name: Install lf
   unarchive:
@@ -100,11 +102,17 @@
       - --strip-components=1
       - doggo_1.0.5_Linux_x86_64/doggo
 
+- name: Check for overmind binary
+  stat:
+    path: "{{ ansible_env.HOME }}/.local/bin/overmind"
+  register: overmind_bin
+
 - name: Download overmind
   get_url:
     url: https://github.com/DarthSim/overmind/releases/download/v2.5.1/overmind-v2.5.1-linux-amd64.gz
     dest: "{{ ansible_env.HOME }}/.local/bin/overmind.gz"
     mode: '0644'
+  when: not overmind_bin.stat.exists
 
 - name: Extract overmind binary
   shell: gunzip -f "{{ ansible_env.HOME }}/.local/bin/overmind.gz"
@@ -122,6 +130,7 @@
     dest: "{{ ansible_env.HOME }}/.local/src"
     mode: +x
     remote_src: yes
+    creates: "{{ ansible_env.HOME }}/.local/src/bib-1.0.1/bib"
 
 - name: Link bib binary
   file:

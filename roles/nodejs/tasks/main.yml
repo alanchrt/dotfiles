@@ -22,6 +22,7 @@
     dest: "{{ ansible_env.HOME }}/.local/bin"
     mode: +x
     remote_src: yes
+    creates: "{{ ansible_env.HOME }}/.local/bin/fnm"
 
 - name: Install common node tools
   become: yes

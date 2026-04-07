@@ -15,6 +15,7 @@
   git:
     repo: https://github.com/doomemacs/doomemacs
     dest: "{{ ansible_env.HOME }}/.config/emacs"
+  register: doom_clone
 
 - name: Install doom emacs
   expect:
@@ -26,6 +27,7 @@
 
 - name: Sync doom packages
   command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom sync"
+  when: doom_clone.changed
   changed_when: false
 
 - name: Create autostart directory

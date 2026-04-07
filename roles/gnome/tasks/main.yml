@@ -36,12 +36,18 @@
     src: https://github.com/dracula/gtk/releases/download/v3.0/Dracula.tar.xz
     remote_src: yes
     dest: "{{ ansible_env.HOME }}/.themes"
+    creates: "{{ ansible_env.HOME }}/.themes/Dracula/index.theme"
+
+- name: Check for panel color override
+  stat:
+    path: "{{ ansible_env.HOME }}/.config/dotfiles/panel_color"
+  register: panel_color_stat
 
 - name: Read panel color override
   slurp:
     src: "{{ ansible_env.HOME }}/.config/dotfiles/panel_color"
   register: panel_color_file
-  ignore_errors: yes
+  when: panel_color_stat.stat.exists
 
 - name: Create DotfilesPanelColor GNOME Shell theme directory
   file:
@@ -69,7 +75,7 @@
         background-color: {{ panel_color_file.content | b64decode | trim }};
       }
   when:
-    - panel_color_file is not failed
+    - panel_color_stat.stat.exists
     - (panel_color_file.content | b64decode | trim) != ''
 
 - name: Remove panel color override if not set
@@ -78,7 +84,7 @@
     marker: "/* {mark} DOTFILES PANEL COLOR OVERRIDE */"
     state: absent
   when: >
-    panel_color_file is failed or
+    not panel_color_stat.stat.exists or
     (panel_color_file.content | b64decode | trim) == ''
 
 - name: Set GTK theme
@@ -109,7 +115,7 @@
 
 - name: Set Papirus folder color to violet (Dracula)
   command: papirus-folders -C violet --theme Papirus
-  changed_when: true
+  changed_when: false
 
 - name: Set icon theme
   community.general.dconf:
@@ -143,6 +149,7 @@
 
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
+  changed_when: false
 
 - name: Install GNOME Shell extensions
   become: yes
@@ -217,15 +224,19 @@
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
+  changed_when: false
 
 - name: Configure system-monitor-next
   shell: "dconf load /org/gnome/shell/extensions/system-monitor-next-applet/ < {{ role_path }}/files/system-monitor.conf"
+  changed_when: false
 
 - name: Configure unite
   shell: "dconf load /org/gnome/shell/extensions/unite/ < {{ role_path }}/files/unite.conf"
+  changed_when: false
 
 - name: Configure appindicator
   shell: "dconf load /org/gnome/shell/extensions/appindicator/ < {{ role_path }}/files/appindicator.conf"
+  changed_when: false
 
 - name: Remind user to log out and back in
   debug:

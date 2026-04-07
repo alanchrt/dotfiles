@@ -44,12 +44,20 @@
     mode: +x
     extra_opts:
       - kustomize
+    creates: "{{ ansible_env.HOME }}/.local/bin/kustomize"
+
+- name: Check if k9s is installed
+  command: rpm -q k9s
+  register: k9s_installed
+  changed_when: false
+  failed_when: false
 
 - name: Install k9s
   become: yes
   dnf:
     name: https://github.com/derailed/k9s/releases/download/v0.32.7/k9s_linux_amd64.rpm
     disable_gpg_check: yes
+  when: k9s_installed.rc != 0
 
 - name: Make sure k9s config dir exists
   file:

@@ -65,13 +65,7 @@
     allowerasing: true
     name: ffmpeg
 
-- name: Remove flathub remote
-  become: yes
-  community.general.flatpak_remote:
-    name: flathub
-    state: absent
-
-- name: Re-configure flathub
+- name: Configure flathub
   become: yes
   community.general.flatpak_remote:
     name: flathub
