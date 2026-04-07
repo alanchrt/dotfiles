@@ -4,7 +4,7 @@
   dnf:
     name:
       - android-tools
-      - java-17-openjdk-devel
+      - java-21-openjdk-devel
 
 - name: Ensure Android SDK dir exists
   file:
@@ -29,7 +29,7 @@
       "platform-tools" "platforms;android-34" "build-tools;34.0.0" "emulator"
   environment:
     ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
-    JAVA_HOME: /usr/lib/jvm/java-17-openjdk
+    JAVA_HOME: /usr/lib/jvm/java-21-openjdk
   args:
     creates: "{{ ansible_env.HOME }}/.local/share/android-sdk/platform-tools/adb"
 
@@ -37,5 +37,5 @@
   shell: yes | "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/sdkmanager" --licenses
   environment:
     ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
-    JAVA_HOME: /usr/lib/jvm/java-17-openjdk
+    JAVA_HOME: /usr/lib/jvm/java-21-openjdk
   changed_when: false

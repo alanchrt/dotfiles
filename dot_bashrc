@@ -4,7 +4,7 @@ export PATH="$PATH:$HOME/.local/bin:$HOME/.pyenv/bin:/usr/local/go/bin:$HOME/.go
 # Set go path
 export GOPATH=$HOME/.go
 
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 export ANDROID_HOME="$HOME/.local/share/android-sdk"
 export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator"
 
