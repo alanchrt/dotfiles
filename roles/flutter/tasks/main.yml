@@ -26,3 +26,23 @@
 - name: Disable Flutter analytics
   shell: "{{ ansible_env.HOME }}/.local/src/flutter/bin/flutter --disable-analytics"
   changed_when: false
+
+- name: Install Flutter Linux desktop build dependencies
+  become: yes
+  dnf:
+    name:
+      - clang
+      - cmake
+      - ninja-build
+      - gtk3-devel
+      - pkgconf-pkg-config
+
+- name: Check Flutter config for linux-desktop flag
+  command: "{{ ansible_env.HOME }}/.local/src/flutter/bin/flutter config --list"
+  register: flutter_config
+  changed_when: false
+
+- name: Enable Flutter Linux desktop
+  command: "{{ ansible_env.HOME }}/.local/src/flutter/bin/flutter config --enable-linux-desktop"
+  when: "'enable-linux-desktop: true' not in flutter_config.stdout"
+  changed_when: true
