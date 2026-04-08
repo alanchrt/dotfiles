@@ -1,182 +1,142 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 # PreToolUse hook: prompt before production-modifying commands unless they
-# match known read-only subcommand patterns. Exit 0 = allow, JSON ask = prompt.
+# match known read-only subcommand patterns.
 
-set -euo pipefail
+import json
+import os
+import re
+import shlex
+import sys
 
-INPUT=$(cat)
-COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 
-# If no command found, allow (non-Bash tool or missing field)
-if [[ -z "$COMMAND" ]]; then
-  exit 0
-fi
+def positional_args(tokens):
+    """Return positional args, skipping flags and their space-separated values."""
+    result = []
+    i = 0
+    while i < len(tokens):
+        t = tokens[i]
+        if t.startswith("-"):
+            if "=" not in t:
+                i += 2  # --flag value: skip both
+            else:
+                i += 1  # --flag=value: skip one
+        else:
+            result.append(t)
+            i += 1
+    return result
 
-is_readonly() {
-  local cmd="${1:-$COMMAND}"
 
-  # Skip leading KEY=VALUE env var assignments to find the actual binary
-  local base
-  base=$(echo "$cmd" | awk '{
-    for (i = 1; i <= NF; i++) {
-      if ($i !~ /^[A-Za-z_][A-Za-z0-9_]*=/) {
-        print $i
-        exit
-      }
-    }
-  }')
-  base=$(basename "$base")
+def is_readonly(cmd):
+    try:
+        tokens = shlex.split(cmd)
+    except ValueError:
+        return False
 
-  case "$base" in
-    heroku)
-      local sub
-      sub=$(echo "$cmd" | awk '{print $2}')
-      case "$sub" in
-        logs|ps|config|info|status|apps|addons:info|pg:info)
-          return 0 ;;
-      esac
-      ;;
+    if not tokens:
+        return True
 
-    railway)
-      local sub
-      sub=$(echo "$cmd" | awk '{print $2}')
-      case "$sub" in
-        logs|status|list|whoami)
-          return 0 ;;
-      esac
-      ;;
+    # Strip leading KEY=VALUE env assignments
+    while tokens and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tokens[0]):
+        tokens.pop(0)
 
-    vercel)
-      local sub
-      sub=$(echo "$cmd" | awk '{print $2}')
-      case "$sub" in
-        list|ls|inspect|logs|whoami|project|env|dns|certs|domains)
-          return 0 ;;
-      esac
-      ;;
+    if not tokens:
+        return True
 
-    gcloud)
-      # Allow subcommands containing list, describe, get-iam-policy, info
-      if echo "$cmd" | grep -qE '\b(list|describe|get-iam-policy|info)\b'; then
-        return 0
-      fi
-      ;;
+    binary = os.path.basename(tokens[0])
+    args = positional_args(tokens[1:])
+    sub = args[0] if len(args) > 0 else ""
+    sub2 = args[1] if len(args) > 1 else ""
 
-    gh)
-      local sub sub2
-      sub=$(echo "$cmd" | awk '{print $2}')
-      sub2=$(echo "$cmd" | awk '{print $3}')
-      case "$sub" in
-        pr)
-          case "$sub2" in
-            list|view|status|checks|diff|create)
-              return 0 ;;
-          esac
-          ;;
-        issue)
-          case "$sub2" in
-            list|view|status)
-              return 0 ;;
-          esac
-          ;;
-        repo)
-          [[ "$sub2" == "view" ]] && return 0
-          ;;
-        api)
-          # Allow GET requests (no -X or explicit -X GET)
-          if ! echo "$cmd" | grep -qE '\-X\s+(?!GET)'; then
-            return 0
-          fi
-          ;;
-        run)
-          case "$sub2" in
-            list|view)
-              return 0 ;;
-          esac
-          ;;
-      esac
-      ;;
+    if binary == "heroku":
+        return sub in {"logs", "ps", "config", "info", "status", "apps", "addons:info", "pg:info"}
 
-    terraform)
-      local sub
-      sub=$(echo "$cmd" | awk '{print $2}')
-      case "$sub" in
-        plan|show|output|validate|fmt|providers)
-          return 0 ;;
-        state)
-          local sub2
-          sub2=$(echo "$cmd" | awk '{print $3}')
-          case "$sub2" in
-            list|show)
-              return 0 ;;
-          esac
-          ;;
-      esac
-      ;;
+    if binary == "railway":
+        return sub in {"logs", "status", "list", "whoami"}
 
-    kubectl)
-      local sub
-      sub=$(echo "$cmd" | awk '{print $2}')
-      case "$sub" in
-        get|describe|logs|top|explain|api-resources|api-versions|cluster-info|version)
-          return 0 ;;
-        config)
-          local sub2
-          sub2=$(echo "$cmd" | awk '{print $3}')
-          case "$sub2" in
-            view|current-context)
-              return 0 ;;
-          esac
-          ;;
-      esac
-      ;;
+    if binary == "vercel":
+        return sub in {"list", "ls", "inspect", "logs", "whoami", "project", "env", "dns", "certs", "domains"}
 
-    az)
-      # Allow subcommands containing list, show, get
-      if echo "$cmd" | grep -qE '\b(list|show|get)\b'; then
-        return 0
-      fi
-      ;;
+    if binary == "gcloud":
+        return bool(re.search(r"\b(list|describe|get-iam-policy|info)\b", cmd))
 
-    k9s)
-      # Always block — interactive TUI
-      return 1
-      ;;
+    if binary == "gh":
+        if sub == "pr":
+            return sub2 in {"list", "view", "status", "checks", "diff", "create"}
+        if sub == "issue":
+            return sub2 in {"list", "view", "status"}
+        if sub == "repo":
+            return sub2 == "view"
+        if sub == "api":
+            # Allow GET requests (no -X flag, or explicit -X GET)
+            return not re.search(r"-X\s+(?!GET)", cmd)
+        if sub == "run":
+            return sub2 in {"list", "view"}
+        return False
 
-    ssh)
-      # Always block — interactive/modifying
-      return 1
-      ;;
+    if binary == "terraform":
+        if sub in {"plan", "show", "output", "validate", "fmt", "providers"}:
+            return True
+        if sub == "state":
+            return sub2 in {"list", "show"}
+        return False
 
-    *)
-      # Not a production command, allow
-      return 0
-      ;;
-  esac
+    if binary == "kubectl":
+        if sub in {"get", "describe", "logs", "top", "explain", "api-resources",
+                   "api-versions", "cluster-info", "version"}:
+            return True
+        if sub == "config":
+            return sub2 in {"view", "current-context"}
+        return False
 
-  # Matched a production tool but not a read-only subcommand
-  return 1
-}
+    if binary == "az":
+        return bool(re.search(r"\b(list|show|get)\b", cmd))
 
-# Check each line of the command individually; allow only if all are read-only
-all_readonly=true
-while IFS= read -r line; do
-  [[ -z "${line// }" ]] && continue   # skip blank lines
-  if ! is_readonly "$line"; then
-    all_readonly=false
-    break
-  fi
-done <<< "$COMMAND"
+    if binary in {"k9s", "ssh"}:
+        return False  # Always block — interactive TUI / interactive shell
 
-if $all_readonly; then
-  jq -n '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "allow"}}'
-else
-  jq -n --arg reason "'$COMMAND' may modify production state." '{
-    hookSpecificOutput: {
-      hookEventName: "PreToolUse",
-      permissionDecision: "ask",
-      permissionDecisionReason: $reason
-    }
-  }'
-fi
-exit 0
+    # Not a production command, allow
+    return True
+
+
+def main():
+    try:
+        data = json.load(sys.stdin)
+    except (json.JSONDecodeError, ValueError):
+        sys.exit(0)
+
+    command = data.get("tool_input", {}).get("command", "")
+
+    if not command:
+        sys.exit(0)
+
+    # Check each line individually; allow only if all are read-only
+    all_readonly = True
+    for line in command.splitlines():
+        if not line.strip():
+            continue
+        if not is_readonly(line):
+            all_readonly = False
+            break
+
+    if all_readonly:
+        result = {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "allow",
+            }
+        }
+    else:
+        result = {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "ask",
+                "permissionDecisionReason": f"'{command}' may modify production state.",
+            }
+        }
+
+    print(json.dumps(result))
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()
