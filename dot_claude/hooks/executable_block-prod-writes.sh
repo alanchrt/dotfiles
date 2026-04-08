@@ -27,7 +27,7 @@ def positional_args(tokens):
 
 
 PRODUCTION_TOOLS = {"heroku", "railway", "vercel", "gcloud", "gh",
-                    "terraform", "kubectl", "az", "k9s", "ssh"}
+                    "terraform", "kubectl", "az", "k9s", "ssh", "git"}
 
 
 def is_readonly(cmd):
@@ -98,6 +98,27 @@ def is_readonly(cmd):
         if sub == "config":
             return sub2 in {"view", "current-context"}
         return False
+
+    if binary == "git":
+        raw = tokens[1:]
+        if sub == "reset" and "--hard" in raw:
+            return False
+        if sub == "push" and {"--force", "-f", "--force-with-lease"} & set(raw):
+            return False
+        if sub == "clean" and any(
+            t == "--force" or (t.startswith("-") and not t.startswith("--") and "f" in t)
+            for t in raw
+        ):
+            return False
+        if sub == "checkout" and "--" in raw:
+            return False
+        if sub == "restore":
+            return False
+        if sub == "stash" and sub2 in {"drop", "clear"}:
+            return False
+        if sub == "branch" and ("-D" in raw or ("--delete" in raw and "--force" in raw)):
+            return False
+        return True
 
     if binary == "az":
         return bool(re.search(r"\b(list|show|get)\b", cmd))

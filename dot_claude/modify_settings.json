@@ -13,11 +13,7 @@ managed=$(cat <<'MANAGED'
       "Read(*)", "Glob(*)", "Grep(*)", "Edit", "Write", "WebFetch", "WebSearch"
     ],
     "ask": [
-      "Bash(git reset --hard*)", "Bash(git push --force*)", "Bash(git push * --force*)",
-      "Bash(git push -f *)", "Bash(git push * -f *)", "Bash(git clean -f*)",
-      "Bash(git clean * -f*)", "Bash(git checkout -- *)", "Bash(git checkout .*)",
-      "Bash(git restore .*)", "Bash(git stash drop*)", "Bash(git stash clear*)",
-      "Bash(git branch -D*)", "Bash(sudo *)", "Bash(shutdown*)", "Bash(reboot*)",
+      "Bash(sudo *)", "Bash(shutdown*)", "Bash(reboot*)",
       "Bash(poweroff*)", "Bash(halt*)", "Bash(mkfs*)", "Bash(dd *)",
       "Bash(crontab -r*)", "Bash(truncate *)"
     ],
