@@ -26,11 +26,22 @@ def positional_args(tokens):
     return result
 
 
+PRODUCTION_TOOLS = {"heroku", "railway", "vercel", "gcloud", "gh",
+                    "terraform", "kubectl", "az", "k9s", "ssh"}
+
+
 def is_readonly(cmd):
     try:
         tokens = shlex.split(cmd)
     except ValueError:
-        return False
+        # Malformed quoting (e.g. heredoc in a multi-line command).
+        # Fall back to simple split to identify the binary; allow if it's
+        # not a known production tool.
+        raw = cmd.split()
+        while raw and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", raw[0]):
+            raw.pop(0)
+        binary = os.path.basename(raw[0]) if raw else ""
+        return binary not in PRODUCTION_TOOLS
 
     if not tokens:
         return True
