@@ -1,9 +1,22 @@
 ---
+- name: Check installed Go version
+  ansible.builtin.command: cat /usr/local/go/VERSION
+  register: installed_go_version
+  failed_when: false
+  changed_when: false
+
+- name: Remove outdated Go installation
+  become: yes
+  ansible.builtin.file:
+    path: /usr/local/go
+    state: absent
+  when: installed_go_version.rc != 0 or 'go1.26' not in installed_go_version.stdout
+
 - name: Download go
   become: yes
-  unarchive:
-    src: https://go.dev/dl/go1.22.1.linux-amd64.tar.gz
-    dest: "/usr/local"
+  ansible.builtin.unarchive:
+    src: https://go.dev/dl/go1.26.2.linux-amd64.tar.gz
+    dest: /usr/local
     remote_src: yes
     creates: /usr/local/go/bin/go
 
