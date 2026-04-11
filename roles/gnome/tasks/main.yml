@@ -226,18 +226,6 @@
     dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/unite@hardpixel.eu"
     creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/unite@hardpixel.eu/metadata.json"
 
-- name: Create NordVPN Quick Toggle extension directory
-  file:
-    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/nordvpnquicktoggle@wedaxi.com"
-    state: directory
-
-- name: Install NordVPN Quick Toggle extension
-  unarchive:
-    src: https://extensions.gnome.org/extension-data/nordvpnquicktogglewedaxi.com.v13.shell-extension.zip
-    remote_src: yes
-    dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/nordvpnquicktoggle@wedaxi.com"
-    creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/nordvpnquicktoggle@wedaxi.com/metadata.json"
-
 - name: Enable GNOME Shell extensions
   community.general.dconf:
     key: /org/gnome/shell/enabled-extensions
