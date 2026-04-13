@@ -1,0 +1,39 @@
+---
+- name: Install emacs and tree-sitter
+  become: yes
+  ansible.builtin.dnf:
+    name:
+      - emacs-pgtk
+      - libtree-sitter
+      - libtree-sitter-devel
+      - direnv
+      - ShellCheck
+      - shfmt
+      - tidy
+
+- name: Create autostart directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/autostart"
+    state: directory
+
+- name: Set up daemon autostart file
+  ansible.builtin.copy:
+    src: files/emacsd.desktop
+    dest: "{{ ansible_env.HOME }}/.config/autostart/emacsd.desktop"
+
+- name: Create user applications directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share/applications"
+    state: directory
+
+- name: Create desktop file
+  ansible.builtin.copy:
+    src: files/emacs.desktop
+    dest: "{{ ansible_env.HOME }}/.local/share/applications/emacs.desktop"
+  register: emacs_unit_file
+
+- name: Remove emacs client desktop file from rpm
+  become: yes
+  ansible.builtin.file:
+    path: /usr/share/applications/emacsclient.desktop
+    state: absent

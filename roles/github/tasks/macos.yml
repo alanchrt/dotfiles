@@ -1,0 +1,4 @@
+---
+- name: Install GitHub CLI
+  community.general.homebrew:
+    name: gh

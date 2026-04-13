@@ -21,7 +21,6 @@
       - dnf-plugins-core
       - ansible
       - flameshot
-      - ripgrep
       - ImageMagick
       - pandoc
       - paperkey
@@ -72,25 +71,3 @@
     state: present
     flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
 
-- name: Check if step cli is installed
-  command: rpm -q step-cli
-  register: step_cli_installed
-  changed_when: false
-  failed_when: false
-
-- name: Install step cli
-  become: yes
-  dnf:
-    name: https://dl.step.sm/gh-release/cli/gh-release-header/v0.19.0/step-cli_0.19.0_amd64.rpm
-    disable_gpg_check: yes
-  when: step_cli_installed.rc != 0
-
-- name: Install rbw and dust
-  shell: "cargo install {{ item.crate }}"
-  args:
-    creates: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.bin }}"
-  with_items:
-    - crate: rbw
-      bin: rbw
-    - crate: du-dust
-      bin: dust

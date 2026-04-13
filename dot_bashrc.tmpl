@@ -1,12 +1,18 @@
+{{ if eq .chezmoi.os "darwin" -}}
+# Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+{{ end -}}
 # Add extra bin dirs to path
 export PATH="$PATH:$HOME/.local/bin:$HOME/.pyenv/bin:/usr/local/go/bin:$HOME/.go/bin:$HOME/.cargo/bin"
 
 # Set go path
 export GOPATH=$HOME/.go
 
+{{ if eq .chezmoi.os "linux" -}}
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 export ANDROID_HOME="$HOME/.local/share/android-sdk"
 export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator"
+{{ end -}}
 
 # Use emacs as default editor
 export EDITOR="emacsclient -c"

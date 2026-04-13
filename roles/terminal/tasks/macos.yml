@@ -1,0 +1,26 @@
+---
+- name: Install terminal tooling via Homebrew
+  community.general.homebrew:
+    name:
+      - tmux
+      - fzf
+      - jq
+      - lsd
+      - bat
+      - age
+      - fastfetch
+      - htop
+      - ncdu
+      - fd
+      - ripgrep
+      - difftastic
+      - diceware
+      - doggo
+      - lf
+      - dust
+      - zsh
+      - step
+
+- name: Install alacritty
+  community.general.homebrew_cask:
+    name: alacritty

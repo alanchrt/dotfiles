@@ -1,0 +1,5 @@
+---
+- name: Install GitHub CLI
+  become: yes
+  ansible.builtin.dnf:
+    name: gh

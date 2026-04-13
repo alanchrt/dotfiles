@@ -1,0 +1,8 @@
+---
+- name: Install Hack Nerd Font
+  community.general.homebrew_cask:
+    name: font-hack-nerd-font
+
+- name: Set fonts directory
+  ansible.builtin.set_fact:
+    fonts_dir: "{{ ansible_env.HOME }}/Library/Fonts"

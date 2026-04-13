@@ -1,0 +1,22 @@
+---
+- name: Check if Hack fonts are installed
+  ansible.builtin.command: rpm -q hack-fonts
+  register: hack_fonts_installed
+  changed_when: false
+  failed_when: false
+
+- name: Add Hack fonts repository
+  become: yes
+  community.general.copr:
+    name: zawertun/hack-fonts
+  when: hack_fonts_installed.rc != 0
+
+- name: Install Hack fonts
+  become: yes
+  ansible.builtin.dnf:
+    name: hack-fonts
+  when: hack_fonts_installed.rc != 0
+
+- name: Set fonts directory
+  ansible.builtin.set_fact:
+    fonts_dir: "{{ ansible_env.HOME }}/.local/share/fonts"

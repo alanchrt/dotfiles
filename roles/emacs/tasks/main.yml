@@ -1,24 +1,20 @@
 ---
-- name: Install emacs and tree-sitter
-  become: yes
-  dnf:
-    name:
-      - emacs-pgtk
-      - libtree-sitter
-      - libtree-sitter-devel
-      - direnv
-      - ShellCheck
-      - shfmt
-      - tidy
+# Platform-specific packages
+- ansible.builtin.include_tasks: linux.yml
+  when: ansible_os_family == 'RedHat'
 
+- ansible.builtin.include_tasks: macos.yml
+  when: ansible_os_family == 'Darwin'
+
+# Shared Doom Emacs setup
 - name: Clone doom emacs
-  git:
+  ansible.builtin.git:
     repo: https://github.com/doomemacs/doomemacs
     dest: "{{ ansible_env.HOME }}/.config/emacs"
   register: doom_clone
 
 - name: Install doom emacs
-  expect:
+  ansible.builtin.expect:
     command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom install --no-env"
     timeout: null
     responses:
@@ -26,38 +22,11 @@
     creates: "{{ ansible_env.HOME }}/.config/emacs/.local"
 
 - name: Sync doom packages
-  command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom sync"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom sync"
   when: doom_clone.changed
   changed_when: false
 
-- name: Create autostart directory
-  file:
-    path: "{{ ansible_env.HOME }}/.config/autostart"
-    state: directory
-
-- name: Set up daemon autostart file
-  copy:
-    src: files/emacsd.desktop
-    dest: "{{ ansible_env.HOME }}/.config/autostart/emacsd.desktop"
-
-- name: Create user applications directory
-  file:
-    path: "{{ ansible_env.HOME }}/.local/share/applications"
-    state: directory
-
-- name: Create desktop file
-  copy:
-    src: files/emacs.desktop
-    dest: "{{ ansible_env.HOME }}/.local/share/applications/emacs.desktop"
-  register: emacs_unit_file
-
-- name: Remove emacs client desktop file from rpm
-  become: yes
-  file:
-    path: /usr/share/applications/emacsclient.desktop
-    state: absent
-
 - name: Create notes directory for org files
-  file:
+  ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/Documents/Notes"
     state: directory

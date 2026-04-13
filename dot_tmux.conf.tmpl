@@ -24,7 +24,11 @@ set-window-option -g mode-keys vi
 
 # copy binding
 bind-key -T copy-mode-vi v send-keys -X begin-selection
+{{ if eq .chezmoi.os "darwin" -}}
+bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
+{{ else -}}
 bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -selection clipboard > /dev/null"
+{{ end -}}
 
 # initialize plugins
 run '~/.tmux/plugins/tpm/tpm'

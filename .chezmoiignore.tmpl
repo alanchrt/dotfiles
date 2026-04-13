@@ -1,0 +1,21 @@
+screenshot.png
+README.md
+bootstrap.sh
+hosts
+local.yml
+macos.yml
+roles/
+
+{{ if eq .chezmoi.os "darwin" -}}
+dot_dir_colors
+dot_config/flameshot/
+dot_config/walker/
+dot_config/systemd/
+dot_config/dotfiles/
+dot_config/elephant/
+{{ end -}}
+
+{{ if eq .chezmoi.os "linux" -}}
+dot_config/aerospace/
+dot_config/karabiner/
+{{ end -}}

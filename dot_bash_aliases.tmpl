@@ -3,7 +3,11 @@ function dots {
     if [ "$1" = "sync" ]; then
         git -C $HOME/Projects/dotfiles pull origin master
     else
+{{ if eq .chezmoi.os "darwin" -}}
+        ansible-playbook -c local $(chezmoi source-path)/macos.yml -i $(chezmoi source-path)/hosts $@
+{{ else -}}
         ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts $@
+{{ end -}}
         chezmoi apply --force --verbose
     fi
 }
@@ -41,7 +45,11 @@ alias ipy="ipython"
 alias e="emacsclient -c"
 
 # clipboard
+{{ if eq .chezmoi.os "darwin" -}}
+alias clip="pbcopy"
+{{ else -}}
 alias clip="xclip -selection clipboard"
+{{ end -}}
 
 # diceware
 alias dw="diceware -d ' ' --no-caps"

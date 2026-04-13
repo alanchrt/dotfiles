@@ -1,0 +1,98 @@
+# AeroSpace tiling window manager configuration
+# Keybindings mirror GNOME vim-style setup from Linux dotfiles.
+# With Karabiner swapping Win <-> Alt, the physical Win key sends Option
+# to macOS, so all GNOME Super+X bindings become alt-X here.
+
+start-at-login = true
+
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# Mouse follows focus
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+on-focus-changed = ['move-mouse window-lazy-center']
+
+[gaps]
+inner.horizontal = 8
+inner.vertical = 8
+outer.left = 8
+outer.bottom = 8
+outer.top = 8
+outer.right = 8
+
+[mode.main.binding]
+
+# Focus windows (GNOME: Super+H/J/K/L)
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+
+# Move windows (GNOME: Shift+Super+H/J/K/L for tiling)
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
+
+# Close window (GNOME: Shift+Super+Q)
+alt-shift-q = 'close'
+
+# Fullscreen toggle (GNOME: Shift+Super+K maximize, Shift+Super+J unmaximize)
+alt-shift-f = 'fullscreen'
+
+# Workspace switching (GNOME: Super+[/])
+alt-bracketLeft = 'workspace prev'
+alt-bracketRight = 'workspace next'
+
+# Switch to specific workspace (GNOME: no direct equivalent)
+alt-1 = 'workspace 1'
+alt-2 = 'workspace 2'
+alt-3 = 'workspace 3'
+alt-4 = 'workspace 4'
+alt-5 = 'workspace 5'
+alt-6 = 'workspace 6'
+alt-7 = 'workspace 7'
+alt-8 = 'workspace 8'
+alt-9 = 'workspace 9'
+
+# Move window to prev/next workspace (GNOME: Shift+Super+{/})
+alt-shift-bracketLeft = 'move-node-to-workspace prev'
+alt-shift-bracketRight = 'move-node-to-workspace next'
+
+# Move window to specific workspace
+alt-shift-1 = 'move-node-to-workspace 1'
+alt-shift-2 = 'move-node-to-workspace 2'
+alt-shift-3 = 'move-node-to-workspace 3'
+alt-shift-4 = 'move-node-to-workspace 4'
+alt-shift-5 = 'move-node-to-workspace 5'
+alt-shift-6 = 'move-node-to-workspace 6'
+alt-shift-7 = 'move-node-to-workspace 7'
+alt-shift-8 = 'move-node-to-workspace 8'
+alt-shift-9 = 'move-node-to-workspace 9'
+
+# Move window to monitor (GNOME: Ctrl+Super+H/J/K/L)
+ctrl-alt-h = 'move-node-to-monitor left'
+ctrl-alt-j = 'move-node-to-monitor down'
+ctrl-alt-k = 'move-node-to-monitor up'
+ctrl-alt-l = 'move-node-to-monitor right'
+
+# Open terminal (GNOME: Super+Return)
+alt-enter = 'exec-and-forget open -na Alacritty --args --command tmux new-session'
+
+# Layout toggles
+alt-slash = 'layout tiles horizontal vertical'
+alt-comma = 'layout accordion horizontal vertical'
+
+# Toggle floating / tiling
+alt-shift-space = 'layout floating tiling'
+
+# Resize mode (GNOME: no equivalent)
+alt-r = 'mode resize'
+
+[mode.resize.binding]
+h = 'resize width -50'
+j = 'resize height +50'
+k = 'resize height -50'
+l = 'resize width +50'
+enter = 'mode main'
+esc = 'mode main'

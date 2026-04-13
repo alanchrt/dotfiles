@@ -1,0 +1,14 @@
+---
+- name: Install Karabiner-Elements
+  community.general.homebrew_cask:
+    name: karabiner-elements
+
+- name: Create Karabiner config directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/karabiner"
+    state: directory
+
+- name: Deploy Karabiner configuration
+  ansible.builtin.copy:
+    src: files/karabiner.json
+    dest: "{{ ansible_env.HOME }}/.config/karabiner/karabiner.json"

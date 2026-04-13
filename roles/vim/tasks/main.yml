@@ -1,15 +1,18 @@
 ---
-- name: Install vim
-  become: yes
-  dnf:
-    name: vim-enhanced
+# Platform-specific packages
+- ansible.builtin.include_tasks: linux.yml
+  when: ansible_os_family == 'RedHat'
 
-- name: Create themes
-  file:
+- ansible.builtin.include_tasks: macos.yml
+  when: ansible_os_family == 'Darwin'
+
+# Shared setup
+- name: Create themes directory
+  ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.vim/pack/themes/start"
     state: directory
 
 - name: Clone dracula theme
-  git:
+  ansible.builtin.git:
     repo: https://github.com/dracula/vim.git
     dest: "{{ ansible_env.HOME }}/.vim/pack/themes/start/dracula"

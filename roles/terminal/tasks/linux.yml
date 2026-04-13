@@ -1,0 +1,91 @@
+---
+- name: Install terminal tooling
+  become: yes
+  ansible.builtin.dnf:
+    name:
+      - alacritty
+      - tmux
+      - fzf
+      - jq
+      - lsd
+      - bat
+      - age
+      - fastfetch
+      - powertop
+      - xclip
+      - wmctrl
+      - htop
+      - ncdu
+      - fd-find
+      - difftastic
+      - diceware
+      - ripgrep
+
+- name: Configure ddterm
+  ansible.builtin.shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
+  changed_when: false
+
+- name: Install zsh
+  become: yes
+  ansible.builtin.dnf:
+    name: zsh
+
+- name: Configure default shell
+  become: yes
+  ansible.builtin.user:
+    name: "{{ ansible_env.USER }}"
+    shell: /usr/bin/zsh
+
+- name: Install lf
+  ansible.builtin.unarchive:
+    src: https://github.com/gokcehan/lf/releases/download/r26/lf-linux-amd64.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
+
+- name: Install doggo
+  ansible.builtin.unarchive:
+    src: https://github.com/mr-karan/doggo/releases/download/v1.0.5/doggo_1.0.5_Linux_x86_64.tar.gz
+    dest: "{{ ansible_env.HOME}}/.local/bin"
+    remote_src: yes
+    mode: +x
+    extra_opts:
+      - --strip-components=1
+      - doggo_1.0.5_Linux_x86_64/doggo
+
+- name: Download bib
+  ansible.builtin.unarchive:
+    src: https://github.com/prestonharberts/bib/archive/refs/tags/v1.0.1.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/src"
+    mode: +x
+    remote_src: yes
+    creates: "{{ ansible_env.HOME }}/.local/src/bib-1.0.1/bib"
+
+- name: Link bib binary
+  ansible.builtin.file:
+    state: link
+    src: "{{ ansible_env.HOME }}/.local/src/bib-1.0.1/bib"
+    dest: "{{ ansible_env.HOME }}/.local/bin/bib"
+
+- name: Check if step cli is installed
+  ansible.builtin.command: rpm -q step-cli
+  register: step_cli_installed
+  changed_when: false
+  failed_when: false
+
+- name: Install step cli
+  become: yes
+  ansible.builtin.dnf:
+    name: https://dl.step.sm/gh-release/cli/gh-release-header/v0.19.0/step-cli_0.19.0_amd64.rpm
+    disable_gpg_check: yes
+  when: step_cli_installed.rc != 0
+
+- name: Install rbw and dust
+  ansible.builtin.shell: "cargo install {{ item.crate }}"
+  args:
+    creates: "{{ ansible_env.HOME }}/.cargo/bin/{{ item.bin }}"
+  with_items:
+    - crate: rbw
+      bin: rbw
+    - crate: du-dust
+      bin: dust

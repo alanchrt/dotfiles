@@ -1,31 +1,21 @@
 ---
-- name: Check if Hack fonts are installed
-  command: rpm -q hack-fonts
-  register: hack_fonts_installed
-  changed_when: false
-  failed_when: false
+# Platform-specific packages
+- ansible.builtin.include_tasks: linux.yml
+  when: ansible_os_family == 'RedHat'
 
-- name: Add Hack fonts repository
-  become: yes
-  community.general.copr:
-    name: zawertun/hack-fonts
-  when: hack_fonts_installed.rc != 0
+- ansible.builtin.include_tasks: macos.yml
+  when: ansible_os_family == 'Darwin'
 
-- name: Install Hack fonts
-  become: yes
-  dnf:
-    name: hack-fonts
-  when: hack_fonts_installed.rc != 0
-
+# Shared font downloads
 - name: Create fonts directory
-  file:
-    path: "{{ ansible_env.HOME }}/.local/share/fonts"
+  ansible.builtin.file:
+    path: "{{ fonts_dir }}"
     state: directory
 
 - name: Install miscellaneous fonts
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ item.url }}"
-    dest: "{{ ansible_env.HOME }}/.local/share/fonts/{{ item.name }}.ttf"
+    dest: "{{ fonts_dir }}/{{ item.name }}.ttf"
   with_items:
     # spacemacs
     - name: Quivira
@@ -45,5 +35,5 @@
   register: install_fonts
 
 - name: Refresh font cache
-  shell: fc-cache --force
-  when: install_fonts.changed
+  ansible.builtin.shell: fc-cache --force
+  when: install_fonts.changed and ansible_os_family == 'RedHat'

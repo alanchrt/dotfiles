@@ -1,0 +1,13 @@
+---
+- hosts: all
+  roles:
+    - { name: terminal, tags: [terminal] }
+    - { name: fonts, tags: [fonts] }
+    - { name: karabiner, tags: [karabiner, wm] }
+    - { name: aerospace, tags: [aerospace, wm] }
+    - { name: vim, tags: [vim] }
+    - { name: emacs, tags: [emacs] }
+    - { name: github, tags: [github] }
+
+    # keep completions last since they depend on programs to generate
+    - { name: completions, tags: [completions] }

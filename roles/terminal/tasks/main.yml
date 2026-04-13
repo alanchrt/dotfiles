@@ -1,52 +1,24 @@
 ---
-- name: Install terminal tooling
-  become: yes
-  dnf:
-    name:
-      - alacritty
-      - tmux
-      - fzf
-      - jq
-      - lsd
-      - bat
-      - age
-      - fastfetch
-      - powertop
-      - xclip
-      - wmctrl
-      - htop
-      - ncdu
-      - fd-find
-      - difftastic
-      - diceware
+# Platform-specific packages
+- ansible.builtin.include_tasks: linux.yml
+  when: ansible_os_family == 'RedHat'
 
-- name: Configure ddterm
-  shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
-  changed_when: false
+- ansible.builtin.include_tasks: macos.yml
+  when: ansible_os_family == 'Darwin'
 
-- name: Install zsh
-  become: yes
-  dnf:
-    name: zsh
-
-- name: Configure default shell
-  become: yes
-  user:
-    name: "{{ ansible_env.USER }}"
-    shell: /usr/bin/zsh
-
+# Shared setup
 - name: Set up oh-my-zsh
-  git:
+  ansible.builtin.git:
     repo: https://github.com/ohmyzsh/ohmyzsh.git
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh"
 
 - name: Clone powerlevel10k theme
-  git:
+  ansible.builtin.git:
     repo: https://github.com/romkatv/powerlevel10k.git
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/themes/powerlevel10k"
 
 - name: Clone zsh-users plugins
-  git:
+  ansible.builtin.git:
     repo: "https://github.com/zsh-users/{{ item }}.git"
     dest: "{{ ansible_env.HOME }}/.oh-my-zsh/custom/plugins/{{ item }}"
   with_items:
@@ -55,66 +27,37 @@
     - zsh-history-substring-search
 
 - name: Make tmux plugins dir
-  file:
+  ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.tmux/plugins"
     state: directory
 
 - name: Install tpm for tmux plugins
-  git:
+  ansible.builtin.git:
     repo: https://github.com/tmux-plugins/tpm
     dest: "{{ ansible_env.HOME }}/.tmux/plugins/tpm"
 
 - name: Install tmux plugins via tpm
-  shell: "{{ ansible_env.HOME }}/.tmux/plugins/tpm/bin/install_plugins"
+  ansible.builtin.shell: "{{ ansible_env.HOME }}/.tmux/plugins/tpm/bin/install_plugins"
   changed_when: false
 
-- name: Install lf
-  unarchive:
-    src: https://github.com/gokcehan/lf/releases/download/r26/lf-linux-amd64.tar.gz
-    dest: "{{ ansible_env.HOME }}/.local/bin"
-    mode: +x
-    remote_src: yes
+- name: Create local bin directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/bin"
+    state: directory
 
 - name: Make lf config directory
-  file:
+  ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.config/lf"
     state: directory
 
 - name: Create pv binary (for bat file previews)
-  copy:
+  ansible.builtin.copy:
     src: "files/bin/pv"
     dest: "{{ ansible_env.HOME }}/.local/bin/pv"
     mode: +x
 
 - name: Create dropterm launcher
-  copy:
+  ansible.builtin.copy:
     src: "files/bin/dropterm"
     dest: "{{ ansible_env.HOME }}/.local/bin/dropterm"
     mode: +x
-
-- name: Install doggo
-  unarchive:
-    src: https://github.com/mr-karan/doggo/releases/download/v1.0.5/doggo_1.0.5_Linux_x86_64.tar.gz
-    dest: "{{ ansible_env.HOME}}/.local/bin"
-    remote_src: yes
-    mode: +x
-    extra_opts:
-      - --strip-components=1
-      - doggo_1.0.5_Linux_x86_64/doggo
-
-- name: Download bib
-  unarchive:
-    src: https://github.com/prestonharberts/bib/archive/refs/tags/v1.0.1.tar.gz
-    dest: "{{ ansible_env.HOME }}/.local/src"
-    mode: +x
-    remote_src: yes
-    creates: "{{ ansible_env.HOME }}/.local/src/bib-1.0.1/bib"
-
-- name: Link bib binary
-  file:
-    state: link
-    src: "{{ ansible_env.HOME }}/.local/src/bib-1.0.1/bib"
-    dest: "{{ ansible_env.HOME }}/.local/bin/bib"
-  with_items:
-    - terraform
-    - tfenv
