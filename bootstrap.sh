@@ -70,4 +70,12 @@ elif [[ "$OS" == "Linux" ]]; then
         -i hosts --extra-vars "ansible_become_password=$PASSWORD"
 fi
 
+if [[ "$OS" == "Darwin" ]]; then
+    echo ""
+    echo "Manual steps:"
+    echo "  1. Install Karabiner-Elements: brew install --cask karabiner-elements"
+    echo "  2. Open Karabiner-Elements and grant Accessibility/Input Monitoring permissions"
+    echo "  3. Open AeroSpace and grant Accessibility permissions"
+fi
+
 echo "Please restart this machine to make sure all groups, extensions, and services reload properly."
