@@ -43,20 +43,17 @@ hs.hotkey.bind({"alt"}, "u", function()
     -- No dropterm window found, launch a new one
     launching = true
     local home = os.getenv("HOME")
-    hs.task.new("/bin/sh", function()
-        hs.timer.doAfter(2, function()
-            launching = false
-            local w = findDroptermWindow()
-            if w then
-                positionDropterm(w)
-                w:focus()
-            end
-        end)
-    end, {
-        "-c",
-        string.format(
-            '/Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm &',
-            home, home
-        )
-    }):start()
+    hs.execute(string.format(
+        'export PATH="/opt/homebrew/bin:$PATH" && nohup /Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm </dev/null >/dev/null 2>&1 &',
+        home, home
+    ))
+
+    hs.timer.doAfter(2, function()
+        launching = false
+        local w = findDroptermWindow()
+        if w then
+            positionDropterm(w)
+            w:focus()
+        end
+    end)
 end)
