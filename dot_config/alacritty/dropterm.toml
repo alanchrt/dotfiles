@@ -1,0 +1,15 @@
+[general]
+import = ["~/.config/alacritty/dracula.toml"]
+
+[font]
+size = 14.0
+
+[font.normal]
+family = "MesloLGS NF"
+
+[window]
+decorations = "None"
+opacity = 0.92
+
+[window.title]
+title = "dropterm"
