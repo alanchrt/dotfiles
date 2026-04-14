@@ -15,14 +15,14 @@ read RBW_EMAIL
 PANEL_COLOR=""
 CHEZMOI_DATA="name = \"$NAME\"\nemail = \"$EMAIL\"\nrbw_email = \"$RBW_EMAIL\""
 
+echo -n "[sudo] password for $USER: "
+read -s PASSWORD
+echo
+
 if [[ "$OS" == "Linux" ]]; then
     echo -n "Top bar color override (leave blank for Dracula default, e.g. rgba(20, 20, 30, 0.98)): "
     # a nice alternative: rgba(118, 0, 100, 0.95)
     read PANEL_COLOR
-
-    echo -n "[sudo] password for $USER: "
-    read -s PASSWORD
-    echo
 fi
 
 CHEZMOI_DATA="$CHEZMOI_DATA\npanel_color = \"$PANEL_COLOR\""
@@ -59,7 +59,8 @@ chezmoi apply --source "$HOME/Projects/dotfiles"
 if [[ "$OS" == "Darwin" ]]; then
     ANSIBLE_FORCE_COLOR=true ansible-playbook -v -c local \
         "$HOME/Projects/dotfiles/macos.yml" \
-        -i "$HOME/Projects/dotfiles/hosts"
+        -i "$HOME/Projects/dotfiles/hosts" \
+        --extra-vars "ansible_sudo_pass=$PASSWORD"
 elif [[ "$OS" == "Linux" ]]; then
     # clean up chezmoi temp files
     rm -r /tmp/dotfiles

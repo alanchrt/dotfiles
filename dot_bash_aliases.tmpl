@@ -4,7 +4,7 @@ function dots {
         git -C $HOME/Projects/dotfiles pull origin master
     else
 {{ if eq .chezmoi.os "darwin" -}}
-        ansible-playbook -c local $(chezmoi source-path)/macos.yml -i $(chezmoi source-path)/hosts $@
+        ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/macos.yml -i $(chezmoi source-path)/hosts $@
 {{ else -}}
         ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts $@
 {{ end -}}

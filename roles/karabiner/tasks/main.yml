@@ -1,5 +1,6 @@
 ---
 - name: Install Karabiner-Elements
+  become: yes
   community.general.homebrew_cask:
     name: karabiner-elements
 
