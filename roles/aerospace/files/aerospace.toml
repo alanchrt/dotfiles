@@ -41,8 +41,8 @@ alt-shift-q = 'close'
 alt-shift-f = 'fullscreen'
 
 # Workspace switching (GNOME: Super+[/])
-alt-bracketLeft = 'workspace prev'
-alt-bracketRight = 'workspace next'
+"alt-[" = 'workspace prev'
+"alt-]" = 'workspace next'
 
 # Switch to specific workspace (GNOME: no direct equivalent)
 alt-1 = 'workspace 1'
@@ -56,8 +56,8 @@ alt-8 = 'workspace 8'
 alt-9 = 'workspace 9'
 
 # Move window to prev/next workspace (GNOME: Shift+Super+{/})
-alt-shift-bracketLeft = 'move-node-to-workspace prev'
-alt-shift-bracketRight = 'move-node-to-workspace next'
+"alt-shift-[" = 'move-node-to-workspace prev'
+"alt-shift-]" = 'move-node-to-workspace next'
 
 # Move window to specific workspace
 alt-shift-1 = 'move-node-to-workspace 1'
