@@ -7,6 +7,13 @@
   when: ansible_os_family == 'Darwin'
 
 # Shared Doom Emacs setup
+- name: Symlink .emacs.d to .config/emacs
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.config/emacs"
+    dest: "{{ ansible_env.HOME }}/.emacs.d"
+    state: link
+    force: yes
+
 - name: Clone doom emacs
   ansible.builtin.git:
     repo: https://github.com/doomemacs/doomemacs
