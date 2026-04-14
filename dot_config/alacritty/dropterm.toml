@@ -11,3 +11,8 @@ family = "MesloLGS NF"
 decorations = "None"
 opacity = 0.92
 title = "dropterm"
+startup_mode = "Maximized"
+
+[window.position]
+x = 0
+y = 0

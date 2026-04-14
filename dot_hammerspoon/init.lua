@@ -18,17 +18,23 @@ local function findDroptermWindow()
     return nil
 end
 
+local function killAllDropterms()
+    os.execute("pkill -f 'alacritty.*dropterm'")
+    droptermWindowID = nil
+end
+
 hs.hotkey.bind({"alt"}, "u", function()
     if launching then return end
 
     local win = findDroptermWindow()
 
     if win then
-        local pid = win:application():pid()
-        os.execute("kill " .. pid)
-        droptermWindowID = nil
+        killAllDropterms()
         return
     end
+
+    -- Kill any stale dropterms we lost track of, then launch fresh
+    killAllDropterms()
 
     launching = true
     local existingIDs = {}
