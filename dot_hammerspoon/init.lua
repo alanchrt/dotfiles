@@ -48,10 +48,11 @@ hs.hotkey.bind({"alt"}, "u", function()
     launching = true
     local existingIDs = getAlacrittyWindowIDs()
     local home = os.getenv("HOME")
-    hs.execute(string.format(
-        'export PATH="/opt/homebrew/bin:$PATH" && nohup /Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm </dev/null >/dev/null 2>&1 &',
+    local cmd = string.format(
+        'export PATH="/opt/homebrew/bin:$PATH" && /Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm &',
         home, home
-    ))
+    )
+    io.popen(cmd)
 
     hs.timer.doAfter(2, function()
         launching = false
