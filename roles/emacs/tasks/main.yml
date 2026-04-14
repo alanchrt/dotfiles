@@ -7,12 +7,17 @@
   when: ansible_os_family == 'Darwin'
 
 # Shared Doom Emacs setup
+- name: Remove default .emacs.d if it is a directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.emacs.d"
+    state: absent
+  when: ansible_env.HOME + '/.emacs.d' is directory
+
 - name: Symlink .emacs.d to .config/emacs
   ansible.builtin.file:
     src: "{{ ansible_env.HOME }}/.config/emacs"
     dest: "{{ ansible_env.HOME }}/.emacs.d"
     state: link
-    force: yes
 
 - name: Clone doom emacs
   ansible.builtin.git:
