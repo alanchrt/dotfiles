@@ -1,7 +1,7 @@
 -- Dropdown terminal toggle
--- Each press launches a new dropterm on the current space or hides/closes it.
+-- Launches a dropterm Alacritty or kills it if one exists.
 -- All instances share the same tmux "dropterm" session.
-local droptermWindows = {} -- spaceID -> windowID
+local droptermWindowID = nil
 local launching = false
 
 local function positionDropterm(win)
@@ -9,26 +9,29 @@ local function positionDropterm(win)
     win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h / 3))
 end
 
+local function findDroptermWindow()
+    if droptermWindowID then
+        local win = hs.window.get(droptermWindowID)
+        if win then return win end
+        droptermWindowID = nil
+    end
+    return nil
+end
+
 hs.hotkey.bind({"alt"}, "u", function()
     if launching then return end
 
-    local space = hs.spaces.focusedSpace()
-    local winID = droptermWindows[space]
+    local win = findDroptermWindow()
 
-    -- Check if we have a tracked window on this space
-    if winID then
-        local win = hs.window.get(winID)
-        if win then
-            -- Close this instance (tmux session persists)
-            win:close()
-            droptermWindows[space] = nil
-            return
-        end
-        -- Window is gone, clear stale reference
-        droptermWindows[space] = nil
+    if win then
+        -- Kill this Alacritty instance (tmux session persists)
+        local pid = win:application():pid()
+        os.execute("kill " .. pid)
+        droptermWindowID = nil
+        return
     end
 
-    -- Launch a new dropterm instance
+    -- Launch a new dropterm
     launching = true
     local existingIDs = {}
     for _, w in ipairs(hs.window.allWindows()) do
@@ -47,7 +50,7 @@ hs.hotkey.bind({"alt"}, "u", function()
         for _, w in ipairs(hs.window.allWindows()) do
             local app = w:application()
             if app and app:name() == "Alacritty" and not existingIDs[w:id()] then
-                droptermWindows[space] = w:id()
+                droptermWindowID = w:id()
                 positionDropterm(w)
                 w:focus()
                 launching = false
