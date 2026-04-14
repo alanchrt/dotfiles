@@ -1,6 +1,7 @@
 -- Dropdown terminal toggle
--- Tracks the dropterm window by its window ID after creation.
-local droptermWindowID = nil
+-- Each press launches a new dropterm on the current space or hides/closes it.
+-- All instances share the same tmux "dropterm" session.
+local droptermWindows = {} -- spaceID -> windowID
 local launching = false
 
 local function positionDropterm(win)
@@ -8,64 +9,47 @@ local function positionDropterm(win)
     win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h / 3))
 end
 
-local function findDroptermWindow()
-    if droptermWindowID then
-        local win = hs.window.get(droptermWindowID)
-        if win then return win end
-        droptermWindowID = nil
-    end
-    return nil
-end
-
-local function getAlacrittyWindowIDs()
-    local ids = {}
-    for _, win in ipairs(hs.window.allWindows()) do
-        local app = win:application()
-        if app and app:name() == "Alacritty" then
-            ids[win:id()] = true
-        end
-    end
-    return ids
-end
-
 hs.hotkey.bind({"alt"}, "u", function()
     if launching then return end
 
-    local win = findDroptermWindow()
+    local space = hs.spaces.focusedSpace()
+    local winID = droptermWindows[space]
 
-    if win then
-        if win:isVisible() then
-            win:application():hide()
-        else
-            local currentSpace = hs.spaces.focusedSpace()
-            hs.spaces.moveWindowToSpace(win, currentSpace)
-            win:application():unhide()
-            positionDropterm(win)
-            win:focus()
+    -- Check if we have a tracked window on this space
+    if winID then
+        local win = hs.window.get(winID)
+        if win then
+            -- Close this instance (tmux session persists)
+            win:close()
+            droptermWindows[space] = nil
+            return
         end
-        return
+        -- Window is gone, clear stale reference
+        droptermWindows[space] = nil
     end
 
-    -- No dropterm window found, launch a new one
+    -- Launch a new dropterm instance
     launching = true
-    local existingIDs = getAlacrittyWindowIDs()
+    local existingIDs = {}
+    for _, w in ipairs(hs.window.allWindows()) do
+        existingIDs[w:id()] = true
+    end
+
     local home = os.getenv("HOME")
-    local cmd = string.format(
+    io.popen(string.format(
         'export PATH="/opt/homebrew/bin:$PATH" && /Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm &',
         home, home
-    )
-    io.popen(cmd)
+    ))
 
-    -- Poll quickly to catch the window as soon as it appears
     local attempts = 0
     hs.timer.doEvery(0.3, function(timer)
         attempts = attempts + 1
-        for _, win in ipairs(hs.window.allWindows()) do
-            local app = win:application()
-            if app and app:name() == "Alacritty" and not existingIDs[win:id()] then
-                droptermWindowID = win:id()
-                positionDropterm(win)
-                win:focus()
+        for _, w in ipairs(hs.window.allWindows()) do
+            local app = w:application()
+            if app and app:name() == "Alacritty" and not existingIDs[w:id()] then
+                droptermWindows[space] = w:id()
+                positionDropterm(w)
+                w:focus()
                 launching = false
                 timer:stop()
                 return
