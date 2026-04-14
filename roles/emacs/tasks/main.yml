@@ -14,11 +14,8 @@
   register: doom_clone
 
 - name: Install doom emacs
-  ansible.builtin.expect:
-    command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom install --no-env"
-    timeout: null
-    responses:
-      (?i)fonts\?: y
+  ansible.builtin.shell: yes | {{ ansible_env.HOME }}/.config/emacs/bin/doom install --no-env
+  args:
     creates: "{{ ansible_env.HOME }}/.config/emacs/.local"
 
 - name: Sync doom packages
