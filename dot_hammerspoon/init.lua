@@ -1,5 +1,6 @@
 -- Dropdown terminal toggle
--- A single Alacritty dropterm instance assigned to all Spaces.
+-- Kill to dismiss, relaunch to show. The tmux session persists
+-- so reopening on any Space reattaches instantly.
 local droptermWindowID = nil
 local launching = false
 
@@ -23,17 +24,12 @@ hs.hotkey.bind({"alt"}, "u", function()
     local win = findDroptermWindow()
 
     if win then
-        if win:isVisible() then
-            win:application():hide()
-        else
-            win:application():unhide()
-            positionDropterm(win)
-            win:focus()
-        end
+        local pid = win:application():pid()
+        os.execute("kill " .. pid)
+        droptermWindowID = nil
         return
     end
 
-    -- Launch a new dropterm
     launching = true
     local existingIDs = {}
     for _, w in ipairs(hs.window.allWindows()) do
@@ -53,16 +49,6 @@ hs.hotkey.bind({"alt"}, "u", function()
             local app = w:application()
             if app and app:name() == "Alacritty" and not existingIDs[w:id()] then
                 droptermWindowID = w:id()
-                -- Assign to all Spaces
-                local allSpaces = {}
-                for _, screenSpaces in pairs(hs.spaces.allSpaces()) do
-                    for _, spaceID in ipairs(screenSpaces) do
-                        table.insert(allSpaces, spaceID)
-                    end
-                end
-                for _, spaceID in ipairs(allSpaces) do
-                    hs.spaces.moveWindowToSpace(w, spaceID, false)
-                end
                 positionDropterm(w)
                 w:focus()
                 launching = false
