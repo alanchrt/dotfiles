@@ -35,9 +35,9 @@ hs.hotkey.bind({"alt"}, "u", function()
 
     if win then
         if win:isVisible() then
-            win:minimize()
+            win:application():hide()
         else
-            win:unminimize()
+            win:application():unhide()
             positionDropterm(win)
             win:focus()
         end
@@ -54,17 +54,24 @@ hs.hotkey.bind({"alt"}, "u", function()
     )
     io.popen(cmd)
 
-    hs.timer.doAfter(2, function()
-        launching = false
-        -- Find the new Alacritty window that wasn't there before
+    -- Poll quickly to catch the window as soon as it appears
+    local attempts = 0
+    hs.timer.doEvery(0.3, function(timer)
+        attempts = attempts + 1
         for _, win in ipairs(hs.window.allWindows()) do
             local app = win:application()
             if app and app:name() == "Alacritty" and not existingIDs[win:id()] then
                 droptermWindowID = win:id()
                 positionDropterm(win)
                 win:focus()
+                launching = false
+                timer:stop()
                 return
             end
+        end
+        if attempts > 10 then
+            launching = false
+            timer:stop()
         end
     end)
 end)
