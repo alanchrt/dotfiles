@@ -37,6 +37,8 @@ hs.hotkey.bind({"alt"}, "u", function()
         if win:isVisible() then
             win:application():hide()
         else
+            local currentSpace = hs.spaces.focusedSpace()
+            hs.spaces.moveWindowToSpace(win, currentSpace)
             win:application():unhide()
             positionDropterm(win)
             win:focus()
