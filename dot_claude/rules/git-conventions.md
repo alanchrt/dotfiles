@@ -7,3 +7,4 @@ description: Global git conventions for all projects
 - Use the body for "why", not "what" — the diff shows the what
 - Prefer small, focused commits over large omnibus commits
 - Never commit secrets, credentials, or .env files
+- Do not use heredocs (cat <<'EOF') in git commit -m commands — use `-m "subject" -m "body"` for multi-line messages instead
