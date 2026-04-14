@@ -1,6 +1,4 @@
 -- Dropdown terminal toggle
--- Uses a separate Alacritty window with a unique title to distinguish
--- it from regular terminal windows.
 local droptermWindow = nil
 local launching = false
 
@@ -9,18 +7,16 @@ local function positionDropterm(win)
     win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h / 3))
 end
 
+-- Window filter that includes minimized windows
+local wf = hs.window.filter.new(false):setAppFilter("Alacritty", {allowTitles = "dropterm", visible = nil})
+
 local function findDroptermWindow()
-    if droptermWindow and droptermWindow:application() and droptermWindow:id() then
+    local wins = wf:getWindows()
+    if #wins > 0 then
+        droptermWindow = wins[1]
         return droptermWindow
     end
     droptermWindow = nil
-    local allWindows = hs.window.allWindows()
-    for _, win in ipairs(allWindows) do
-        if win:title() == "dropterm" then
-            droptermWindow = win
-            return win
-        end
-    end
     return nil
 end
 
