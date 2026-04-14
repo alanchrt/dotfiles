@@ -2,7 +2,11 @@
 import = ["{{ .chezmoi.homeDir }}/.config/alacritty/dracula.toml"]
 
 [font]
+{{ if eq .chezmoi.os "darwin" -}}
+size = 14.0
+{{ else -}}
 size = 12.0
+{{ end -}}
 
 [font.normal]
 family = "MesloLGS NF"
