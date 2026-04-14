@@ -86,6 +86,25 @@
                         ]
                     },
                     {
+                        "description": "Ctrl+Alt+P to launch project picker",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "p",
+                                    "modifiers": {
+                                        "mandatory": ["left_option", "left_control"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "shell_command": "export PATH=/opt/homebrew/bin:$PATH && ~/.local/bin/project-launcher"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "description": "Alt+Enter to open Alacritty+tmux",
                         "manipulators": [
                             {

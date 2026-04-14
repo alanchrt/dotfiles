@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+shorthand=$(ls ~/Projects | choose -u -c BD93F9 -b 44475A -f "MesloLGS NF" -s 16 -p "project" -n 15)
+[ -z "$shorthand" ] && exit
+
+path=~/Projects/$shorthand
+session=$(basename "$path" | sed 's/\./_/g')
+
+if tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -q "^${session}$"; then
+    open -na Alacritty --args --title "$session" --command tmux attach-session -t "$session"
+else
+    open -na Alacritty --args --title "$session" --command tmux new-session -d -c "$path" -s "$session" \; split-window -h -t "$session" -c "$path" "$HOME/.local/bin/claude" \; select-pane -t "${session}:0.0" \; attach-session -t "$session"
+fi
