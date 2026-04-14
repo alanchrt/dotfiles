@@ -6,7 +6,6 @@
 - name: Install emacs-plus
   community.general.homebrew:
     name: emacs-plus@30
-    install_options: with-native-comp
 
 - name: Install emacs support tools
   community.general.homebrew:
