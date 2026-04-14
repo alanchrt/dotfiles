@@ -39,10 +39,12 @@ hs.hotkey.bind({"alt"}, "u", function()
 
     -- No dropterm window found, launch a new one
     local home = os.getenv("HOME")
-    os.execute(string.format(
-        'open -na Alacritty --args --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm &',
-        home, home
-    ))
+    hs.task.new("/usr/bin/open", nil, {
+        "-na", "Alacritty", "--args",
+        "--config-file", home .. "/.config/alacritty/dropterm.toml",
+        "-T", "dropterm",
+        "--command", home .. "/.local/bin/dropterm"
+    }):start()
 
     hs.timer.doAfter(1.5, function()
         local w = findDroptermWindow()
