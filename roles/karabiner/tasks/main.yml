@@ -1,8 +1,12 @@
 ---
+- name: Authorize sudo for Karabiner pkg install
+  ansible.builtin.shell: "echo '{{ ansible_become_password }}' | sudo -S true"
+  no_log: true
+  changed_when: false
+
 - name: Install Karabiner-Elements
   community.general.homebrew_cask:
     name: karabiner-elements
-    sudo_password: "{{ ansible_sudo_pass }}"
 
 - name: Create Karabiner config directory
   ansible.builtin.file:
