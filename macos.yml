@@ -3,7 +3,6 @@
   roles:
     - { name: terminal, tags: [terminal] }
     - { name: fonts, tags: [fonts] }
-    - { name: karabiner, tags: [karabiner, wm] }
     - { name: aerospace, tags: [aerospace, wm] }
     - { name: vim, tags: [vim] }
     - { name: emacs, tags: [emacs] }
