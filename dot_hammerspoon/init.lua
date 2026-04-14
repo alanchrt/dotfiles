@@ -40,7 +40,7 @@ hs.hotkey.bind({"alt"}, "u", function()
     -- No dropterm window found, launch a new one
     local home = os.getenv("HOME")
     os.execute(string.format(
-        'eval "$(/opt/homebrew/bin/brew shellenv)" && /Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm &',
+        'open -na Alacritty --args --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm &',
         home, home
     ))
 
