@@ -1,44 +1,54 @@
 -- Dropdown terminal toggle
--- Tracks the dropdown window separately from regular Alacritty windows
+-- Uses a separate Alacritty window with a unique title to distinguish
+-- it from regular terminal windows.
 local droptermWindow = nil
 
+local function positionDropterm(win)
+    local screen = hs.screen.mainScreen():frame()
+    win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h * 0.4))
+end
+
+local function findDroptermWindow()
+    if droptermWindow and droptermWindow:isVisible() then
+        return droptermWindow
+    end
+    -- Search all windows for one with "dropterm" in the title
+    local wins = hs.window.filter.new("Alacritty"):getWindows()
+    for _, win in ipairs(wins) do
+        if win:title():find("dropterm") then
+            droptermWindow = win
+            return win
+        end
+    end
+    return nil
+end
+
 hs.hotkey.bind({"alt"}, "u", function()
-    -- Check if our tracked window still exists
-    if droptermWindow and droptermWindow:application() then
-        if droptermWindow:isVisible() then
-            droptermWindow:application():hide()
+    local win = findDroptermWindow()
+
+    if win then
+        if win:isVisible() and win == hs.window.focusedWindow() then
+            win:minimize()
         else
-            local screen = hs.screen.mainScreen():frame()
-            droptermWindow:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h * 0.4))
-            droptermWindow:focus()
+            win:unminimize()
+            positionDropterm(win)
+            win:focus()
         end
         return
     end
 
-    -- Launch a new Alacritty instance with the dropterm config
+    -- No dropterm window found, launch a new one
     hs.task.new("/Applications/Alacritty.app/Contents/MacOS/alacritty", nil, {
         "--config-file", os.getenv("HOME") .. "/.config/alacritty/dropterm.toml",
+        "-T", "dropterm",
         "--command", os.getenv("HOME") .. "/.local/bin/dropterm"
     }):start()
 
-    -- Wait for it to launch, then position and track it
-    hs.timer.doAfter(1, function()
-        local wins = hs.window.filter.new("Alacritty"):getWindows()
-        for _, win in ipairs(wins) do
-            if win:title():find("dropterm") then
-                droptermWindow = win
-                local screen = hs.screen.mainScreen():frame()
-                win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h * 0.4))
-                win:focus()
-                return
-            end
-        end
-        -- Fallback: grab the most recent Alacritty window
-        if #wins > 0 then
-            droptermWindow = wins[1]
-            local screen = hs.screen.mainScreen():frame()
-            droptermWindow:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h * 0.4))
-            droptermWindow:focus()
+    hs.timer.doAfter(1.5, function()
+        local w = findDroptermWindow()
+        if w then
+            positionDropterm(w)
+            w:focus()
         end
     end)
 end)
