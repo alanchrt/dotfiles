@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-shorthand=$(ls ~/Projects | choose -u -c BD93F9 -b 44475A -f "MesloLGS NF" -s 16 -p "project" -n 15)
+shorthand=$(ls ~/Projects | choose -u -c BD93F9 -b 44475A -f "MesloLGS NF" -s 22 -w 35 -p "project" -n 15)
 [ -z "$shorthand" ] && exit
 
 path=~/Projects/$shorthand
