@@ -11,7 +11,10 @@ family = "MesloLGS NF"
 decorations = "None"
 opacity = 0.92
 title = "dropterm"
-startup_mode = "Maximized"
+
+[window.dimensions]
+columns = 400
+lines = 24
 
 [window.position]
 x = 0
