@@ -23,8 +23,7 @@
                                 "from": {
                                     "key_code": "h",
                                     "modifiers": {
-                                        "mandatory": ["left_option"],
-                                        "optional": ["any"]
+                                        "mandatory": ["left_option"]
                                     }
                                 },
                                 "to": [
@@ -39,8 +38,7 @@
                                 "from": {
                                     "key_code": "l",
                                     "modifiers": {
-                                        "mandatory": ["left_option"],
-                                        "optional": ["any"]
+                                        "mandatory": ["left_option"]
                                     }
                                 },
                                 "to": [
