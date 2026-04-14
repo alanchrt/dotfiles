@@ -24,3 +24,8 @@
 - name: Install alacritty
   community.general.homebrew_cask:
     name: alacritty
+
+- name: Remove quarantine flag from Alacritty
+  ansible.builtin.command: xattr -d com.apple.quarantine /Applications/Alacritty.app
+  changed_when: false
+  failed_when: false
