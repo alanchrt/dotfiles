@@ -12,18 +12,20 @@ read EMAIL
 echo -n "Your rbw (Bitwarden) email: "
 read RBW_EMAIL
 
+PANEL_COLOR=""
 CHEZMOI_DATA="name = \"$NAME\"\nemail = \"$EMAIL\"\nrbw_email = \"$RBW_EMAIL\""
 
 if [[ "$OS" == "Linux" ]]; then
     echo -n "Top bar color override (leave blank for Dracula default, e.g. rgba(20, 20, 30, 0.98)): "
     # a nice alternative: rgba(118, 0, 100, 0.95)
     read PANEL_COLOR
-    CHEZMOI_DATA="$CHEZMOI_DATA\npanel_color = \"$PANEL_COLOR\""
 
     echo -n "[sudo] password for $USER: "
     read -s PASSWORD
     echo
 fi
+
+CHEZMOI_DATA="$CHEZMOI_DATA\npanel_color = \"$PANEL_COLOR\""
 
 # install base deps
 if [[ "$OS" == "Darwin" ]]; then
