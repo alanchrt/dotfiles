@@ -6,13 +6,3 @@
 - name: Install AeroSpace
   community.general.homebrew_cask:
     name: aerospace
-
-- name: Create AeroSpace config directory
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.config/aerospace"
-    state: directory
-
-- name: Deploy AeroSpace configuration
-  ansible.builtin.copy:
-    src: files/aerospace.toml
-    dest: "{{ ansible_env.HOME }}/.config/aerospace/aerospace.toml"
