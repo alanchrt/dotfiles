@@ -60,14 +60,14 @@ if [[ "$OS" == "Darwin" ]]; then
     ANSIBLE_FORCE_COLOR=true ansible-playbook -v -c local \
         "$HOME/Projects/dotfiles/macos.yml" \
         -i "$HOME/Projects/dotfiles/hosts" \
-        --extra-vars "ansible_sudo_pass=$PASSWORD"
+        --extra-vars "ansible_become_password=$PASSWORD"
 elif [[ "$OS" == "Linux" ]]; then
     # clean up chezmoi temp files
     rm -r /tmp/dotfiles
 
     ANSIBLE_FORCE_COLOR=true ansible-pull -v --checkout master \
         --url https://github.com/alanchrt/dotfiles.git \
-        -i hosts --extra-vars "ansible_sudo_pass=$PASSWORD"
+        -i hosts --extra-vars "ansible_become_password=$PASSWORD"
 fi
 
 echo "Please restart this machine to make sure all groups, extensions, and services reload properly."
