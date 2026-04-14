@@ -21,7 +21,11 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
+{{ if eq .chezmoi.os "darwin" -}}
+(setq doom-font (font-spec :family "Hack Nerd Font" :size 16))
+{{ else -}}
 (setq doom-font (font-spec :family "Hack" :size 16))
+{{ end -}}
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
