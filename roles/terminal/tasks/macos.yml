@@ -20,6 +20,7 @@
       - dust
       - zsh
       - step
+      - ipython
 
 - name: Install alacritty
   community.general.homebrew_cask:
@@ -27,5 +28,14 @@
 
 - name: Remove quarantine flag from Alacritty
   ansible.builtin.command: xattr -d com.apple.quarantine /Applications/Alacritty.app
+  changed_when: false
+  failed_when: false
+
+- name: Install Hammerspoon
+  community.general.homebrew_cask:
+    name: hammerspoon
+
+- name: Remove quarantine flag from Hammerspoon
+  ansible.builtin.command: xattr -d com.apple.quarantine /Applications/Hammerspoon.app
   changed_when: false
   failed_when: false

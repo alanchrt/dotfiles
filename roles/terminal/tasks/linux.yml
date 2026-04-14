@@ -20,6 +20,7 @@
       - difftastic
       - diceware
       - ripgrep
+      - python3-ipython
 
 - name: Configure ddterm
   ansible.builtin.shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"

@@ -1,10 +1,4 @@
 ---
-- name: Install base tools
-  become: yes
-  dnf:
-    name:
-      - python3-ipython
-
 - name: Install common packages
   pip:
     name:
