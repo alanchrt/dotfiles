@@ -5,7 +5,7 @@
     brew install --cask karabiner-elements
   args:
     creates: /Applications/Karabiner-Elements.app
-  no_log: true
+  # no_log: true  # temporarily disabled for debugging
 
 - name: Create Karabiner config directory
   ansible.builtin.file:
