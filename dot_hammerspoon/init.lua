@@ -2,6 +2,7 @@
 -- Uses a separate Alacritty window with a unique title to distinguish
 -- it from regular terminal windows.
 local droptermWindow = nil
+local launching = false
 
 local function positionDropterm(win)
     local screen = hs.screen.mainScreen():frame()
@@ -9,13 +10,13 @@ local function positionDropterm(win)
 end
 
 local function findDroptermWindow()
-    if droptermWindow and droptermWindow:isVisible() then
+    if droptermWindow and droptermWindow:application() and droptermWindow:id() then
         return droptermWindow
     end
-    -- Search all windows for one with "dropterm" in the title
-    local wins = hs.window.filter.new("Alacritty"):getWindows()
-    for _, win in ipairs(wins) do
-        if win:title():find("dropterm") then
+    droptermWindow = nil
+    local allWindows = hs.window.allWindows()
+    for _, win in ipairs(allWindows) do
+        if win:title() == "dropterm" then
             droptermWindow = win
             return win
         end
@@ -24,6 +25,8 @@ local function findDroptermWindow()
 end
 
 hs.hotkey.bind({"alt"}, "u", function()
+    if launching then return end
+
     local win = findDroptermWindow()
 
     if win then
@@ -38,19 +41,22 @@ hs.hotkey.bind({"alt"}, "u", function()
     end
 
     -- No dropterm window found, launch a new one
+    launching = true
     local home = os.getenv("HOME")
-    hs.task.new("/usr/bin/open", nil, {
-        "-na", "Alacritty", "--args",
-        "--config-file", home .. "/.config/alacritty/dropterm.toml",
-        "-T", "dropterm",
-        "--command", home .. "/.local/bin/dropterm"
+    hs.task.new("/bin/sh", function()
+        hs.timer.doAfter(2, function()
+            launching = false
+            local w = findDroptermWindow()
+            if w then
+                positionDropterm(w)
+                w:focus()
+            end
+        end)
+    end, {
+        "-c",
+        string.format(
+            '/Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm &',
+            home, home
+        )
     }):start()
-
-    hs.timer.doAfter(1.5, function()
-        local w = findDroptermWindow()
-        if w then
-            positionDropterm(w)
-            w:focus()
-        end
-    end)
 end)
