@@ -3,7 +3,7 @@
   roles:
     - { name: terminal, tags: [terminal] }
     - { name: fonts, tags: [fonts] }
-    - { name: aerospace, tags: [aerospace, wm] }
+    - { name: rectangle, tags: [rectangle, wm] }
     - { name: vim, tags: [vim] }
     - { name: emacs, tags: [emacs] }
     - { name: github, tags: [github] }

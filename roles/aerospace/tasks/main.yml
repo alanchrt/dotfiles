@@ -1,8 +1,0 @@
----
-- name: Tap AeroSpace
-  community.general.homebrew_tap:
-    name: nikitabobko/tap
-
-- name: Install AeroSpace
-  community.general.homebrew_cask:
-    name: aerospace

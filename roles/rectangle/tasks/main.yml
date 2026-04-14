@@ -1,0 +1,23 @@
+---
+- name: Install Rectangle
+  community.general.homebrew_cask:
+    name: rectangle
+
+- name: Remove quarantine flag from Rectangle
+  ansible.builtin.command: xattr -d com.apple.quarantine /Applications/Rectangle.app
+  changed_when: false
+  failed_when: false
+
+- name: Configure Rectangle keyboard shortcuts
+  ansible.builtin.shell: |
+    # alt-shift-h → left half (keyCode 4 = h, modifierFlags 655360 = opt+shift)
+    defaults write com.knollsoft.Rectangle leftHalf -dict keyCode -float 4 modifierFlags -float 655360
+    # alt-shift-l → right half (keyCode 37 = l)
+    defaults write com.knollsoft.Rectangle rightHalf -dict keyCode -float 37 modifierFlags -float 655360
+    # alt-shift-k → maximize (keyCode 40 = k)
+    defaults write com.knollsoft.Rectangle maximize -dict keyCode -float 40 modifierFlags -float 655360
+    # alt-shift-j → restore / unmaximize (keyCode 38 = j)
+    defaults write com.knollsoft.Rectangle restore -dict keyCode -float 38 modifierFlags -float 655360
+    # Disable all other default shortcuts to avoid conflicts
+    defaults write com.knollsoft.Rectangle rightHalf -dict keyCode -float 37 modifierFlags -float 655360
+  changed_when: false
