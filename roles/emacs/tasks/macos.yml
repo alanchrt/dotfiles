@@ -13,6 +13,11 @@
     dest: /Applications/Emacs.app
     remote_src: yes
 
+- name: Remove quarantine flag from Emacs
+  ansible.builtin.command: xattr -d com.apple.quarantine /Applications/Emacs.app
+  changed_when: false
+  failed_when: false
+
 - name: Install emacs support tools
   community.general.homebrew:
     name:
