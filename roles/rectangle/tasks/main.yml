@@ -18,6 +18,8 @@
     defaults write com.knollsoft.Rectangle maximize -dict keyCode -float 40 modifierFlags -float 655360
     # alt-shift-j → restore / unmaximize (keyCode 38 = j)
     defaults write com.knollsoft.Rectangle restore -dict keyCode -float 38 modifierFlags -float 655360
-    # Disable all other default shortcuts to avoid conflicts
-    defaults write com.knollsoft.Rectangle rightHalf -dict keyCode -float 37 modifierFlags -float 655360
+    # ctrl-alt-h → previous display (keyCode 4 = h, modifierFlags 1310720 = ctrl+cmd after Karabiner swap)
+    defaults write com.knollsoft.Rectangle previousDisplay -dict keyCode -float 4 modifierFlags -float 1310720
+    # ctrl-alt-l → next display (keyCode 37 = l)
+    defaults write com.knollsoft.Rectangle nextDisplay -dict keyCode -float 37 modifierFlags -float 1310720
   changed_when: false
