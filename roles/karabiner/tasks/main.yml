@@ -1,8 +1,8 @@
 ---
 - name: Install Karabiner-Elements
-  become: yes
   community.general.homebrew_cask:
     name: karabiner-elements
+    sudo_password: "{{ ansible_sudo_pass }}"
 
 - name: Create Karabiner config directory
   ansible.builtin.file:
