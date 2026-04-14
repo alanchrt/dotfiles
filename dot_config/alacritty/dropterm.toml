@@ -10,6 +10,4 @@ family = "MesloLGS NF"
 [window]
 decorations = "None"
 opacity = 0.92
-
-[window.title]
 title = "dropterm"
