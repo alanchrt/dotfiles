@@ -1,5 +1,6 @@
 -- Dropdown terminal toggle
-local droptermWindow = nil
+-- Tracks the dropterm window by its window ID after creation.
+local droptermWindowID = nil
 local launching = false
 
 local function positionDropterm(win)
@@ -7,17 +8,24 @@ local function positionDropterm(win)
     win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h / 3))
 end
 
--- Window filter that includes minimized windows
-local wf = hs.window.filter.new(false):setAppFilter("Alacritty", {allowTitles = "dropterm", visible = nil})
-
 local function findDroptermWindow()
-    local wins = wf:getWindows()
-    if #wins > 0 then
-        droptermWindow = wins[1]
-        return droptermWindow
+    if droptermWindowID then
+        local win = hs.window.get(droptermWindowID)
+        if win then return win end
+        droptermWindowID = nil
     end
-    droptermWindow = nil
     return nil
+end
+
+local function getAlacrittyWindowIDs()
+    local ids = {}
+    for _, win in ipairs(hs.window.allWindows()) do
+        local app = win:application()
+        if app and app:name() == "Alacritty" then
+            ids[win:id()] = true
+        end
+    end
+    return ids
 end
 
 hs.hotkey.bind({"alt"}, "u", function()
@@ -38,6 +46,7 @@ hs.hotkey.bind({"alt"}, "u", function()
 
     -- No dropterm window found, launch a new one
     launching = true
+    local existingIDs = getAlacrittyWindowIDs()
     local home = os.getenv("HOME")
     hs.execute(string.format(
         'export PATH="/opt/homebrew/bin:$PATH" && nohup /Applications/Alacritty.app/Contents/MacOS/alacritty --config-file %s/.config/alacritty/dropterm.toml -T dropterm --command %s/.local/bin/dropterm </dev/null >/dev/null 2>&1 &',
@@ -46,10 +55,15 @@ hs.hotkey.bind({"alt"}, "u", function()
 
     hs.timer.doAfter(2, function()
         launching = false
-        local w = findDroptermWindow()
-        if w then
-            positionDropterm(w)
-            w:focus()
+        -- Find the new Alacritty window that wasn't there before
+        for _, win in ipairs(hs.window.allWindows()) do
+            local app = win:application()
+            if app and app:name() == "Alacritty" and not existingIDs[win:id()] then
+                droptermWindowID = win:id()
+                positionDropterm(win)
+                win:focus()
+                return
+            end
         end
     end)
 end)
