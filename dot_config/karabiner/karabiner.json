@@ -51,6 +51,41 @@
                         ]
                     },
                     {
+                        "description": "Alt+[/] to switch Spaces",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "open_bracket",
+                                    "modifiers": {
+                                        "mandatory": ["left_option"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_arrow",
+                                        "modifiers": ["left_control"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "close_bracket",
+                                    "modifiers": {
+                                        "mandatory": ["left_option"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "right_arrow",
+                                        "modifiers": ["left_control"]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "description": "Alt+Enter to open Alacritty+tmux",
                         "manipulators": [
                             {
