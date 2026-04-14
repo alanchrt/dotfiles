@@ -13,6 +13,47 @@
                     "to": [{ "key_code": "left_command" }]
                 }
             ],
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "Cmd+H/L to switch apps",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "h",
+                                    "modifiers": {
+                                        "mandatory": ["left_command"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["left_command"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "l",
+                                    "modifiers": {
+                                        "mandatory": ["left_command"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["left_command", "left_shift"]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
             "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
         }
     ]
