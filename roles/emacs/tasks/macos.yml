@@ -7,6 +7,12 @@
   community.general.homebrew:
     name: emacs-plus@30
 
+- name: Copy Emacs.app to Applications
+  ansible.builtin.copy:
+    src: /opt/homebrew/opt/emacs-plus@30/Emacs.app
+    dest: /Applications/Emacs.app
+    remote_src: yes
+
 - name: Install emacs support tools
   community.general.homebrew:
     name:
@@ -15,18 +21,3 @@
       - shellcheck
       - shfmt
       - tidy-html5
-
-- name: Create LaunchAgents directory
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/Library/LaunchAgents"
-    state: directory
-
-- name: Install Emacs daemon launchd plist
-  ansible.builtin.copy:
-    src: files/com.gnu.emacs.daemon.plist
-    dest: "{{ ansible_env.HOME }}/Library/LaunchAgents/com.gnu.emacs.daemon.plist"
-  register: emacs_plist
-
-- name: Load Emacs daemon launchd service
-  ansible.builtin.command: launchctl load -w {{ ansible_env.HOME }}/Library/LaunchAgents/com.gnu.emacs.daemon.plist
-  when: emacs_plist.changed
