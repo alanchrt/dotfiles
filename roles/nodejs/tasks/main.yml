@@ -24,6 +24,11 @@
     remote_src: yes
     creates: "{{ ansible_env.HOME }}/.local/bin/fnm"
 
+- name: Install bun
+  ansible.builtin.shell: curl -fsSL https://bun.sh/install | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.bun/bin/bun"
+
 - name: Install common node tools
   become: yes
   community.general.npm:
