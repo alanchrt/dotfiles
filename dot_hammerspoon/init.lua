@@ -6,7 +6,7 @@ local launching = false
 
 local function positionDropterm(win)
     local screen = hs.screen.mainScreen():frame()
-    win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h * 0.4))
+    win:setFrame(hs.geometry.rect(screen.x, screen.y, screen.w, screen.h / 3))
 end
 
 local function findDroptermWindow()
@@ -30,7 +30,7 @@ hs.hotkey.bind({"alt"}, "u", function()
     local win = findDroptermWindow()
 
     if win then
-        if win:isVisible() and win == hs.window.focusedWindow() then
+        if win:isVisible() then
             win:minimize()
         else
             win:unminimize()
