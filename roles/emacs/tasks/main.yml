@@ -18,17 +18,17 @@
     state: absent
   when: emacs_d.stat.exists and emacs_d.stat.isdir
 
-- name: Symlink .emacs.d to .config/emacs
-  ansible.builtin.file:
-    src: "{{ ansible_env.HOME }}/.config/emacs"
-    dest: "{{ ansible_env.HOME }}/.emacs.d"
-    state: link
-
 - name: Clone doom emacs
   ansible.builtin.git:
     repo: https://github.com/doomemacs/doomemacs
     dest: "{{ ansible_env.HOME }}/.config/emacs"
   register: doom_clone
+
+- name: Symlink .emacs.d to .config/emacs
+  ansible.builtin.file:
+    src: "{{ ansible_env.HOME }}/.config/emacs"
+    dest: "{{ ansible_env.HOME }}/.emacs.d"
+    state: link
 
 - name: Install doom emacs
   ansible.builtin.shell: yes | {{ ansible_env.HOME }}/.config/emacs/bin/doom install --no-env
