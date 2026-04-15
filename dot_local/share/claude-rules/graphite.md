@@ -4,13 +4,20 @@ description: Graphite stacking workflow for team projects — symlink this file 
 
 # Graphite Workflow
 
-This project uses Graphite for stacked PRs. Use `gt` instead of `git branch` / `gh pr create`.
+This project uses Graphite for stacked PRs. **This entirely replaces the worktree workflow from CLAUDE.md.**
 
-## When Graphite rules are present, override these global defaults:
+## Critical: No worktrees
 
-- Do NOT use worktrees — Graphite stacks are sequential dependent branches that should be managed in the main checkout
+Do NOT use worktrees (`EnterWorktree`) in this project. Graphite and worktrees are incompatible — Graphite manages stacked branches in the main checkout and needs to control branch relationships and rebasing. Worktrees isolate branches in separate directories which breaks Graphite's metadata.
+
+Work serially in the main checkout. If you need to switch between independent streams of work, use separate Graphite stacks and `gt checkout` to switch between them.
+
+## Overrides
+
 - Do NOT use `gh pr create` — Graphite manages PR creation
+- Do NOT use `git branch` / `git checkout -b` — use `gt create` instead
 - Do NOT manually delete branches — `gt sync` cleans up after merge
+- Do NOT use `git rebase` — use `gt restack` instead
 
 ## Creating changes
 
@@ -29,6 +36,7 @@ This project uses Graphite for stacked PRs. Use `gt` instead of `git branch` / `
 - `gt up` / `gt down` — move between branches in a stack
 - `gt log short` — see the current stack
 - `gt trunk` — return to the main branch
+- `gt checkout <branch>` — switch to a different stack
 
 ## Syncing
 

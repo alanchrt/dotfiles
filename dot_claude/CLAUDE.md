@@ -6,7 +6,7 @@
 - Before committing, make a small effort to verify changes work when reasonable (e.g., run a linter, execute a relevant command, check syntax). Don't skip this just to move faster.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
 - When finished, summarize what was done so the work can be reviewed in a pull request.
-- Some projects use Graphite (`gt`) for stacked PRs. If the project has a `.claude/rules/graphite.md` file, follow the Graphite workflow described there instead of the worktree workflow below.
+- Some projects use Graphite (`gt`) for stacked PRs. If the project has a `.claude/rules/graphite.md` file, follow the Graphite workflow described there. **This completely replaces the worktree workflow below** — do not use worktrees in Graphite projects.
 
 # Worktree Workflow
 
