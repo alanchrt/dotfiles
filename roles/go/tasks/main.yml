@@ -21,12 +21,11 @@
     creates: /usr/local/go/bin/go
 
 - name: Install go tooling
-  shell: "go install {{ item.url }}"
+  shell: "/usr/local/go/bin/go install {{ item.url }}"
   args:
     creates: "{{ ansible_env.HOME }}/.go/pkg/mod/{{ item.path }}"
   environment:
     GOPATH: "{{ ansible_env.HOME }}/.go"
-    PATH: "/usr/local/go/bin:{{ ansible_env.PATH }}"
   with_items:
     - url: github.com/x-motemen/gore/cmd/gore@latest
       path: github.com/x-motemen/gore@*
