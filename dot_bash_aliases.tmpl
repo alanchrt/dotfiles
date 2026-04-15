@@ -54,6 +54,9 @@ alias clip="xclip -selection clipboard"
 # diceware
 alias dw="diceware -d ' ' --no-caps"
 
+# graphite rules symlink for team projects
+alias gtinit='mkdir -p .claude/rules && ln -sf ~/.local/share/claude-rules/graphite.md .claude/rules/graphite.md && echo "Graphite rules linked"'
+
 # worktree preview
 function gwo {
     git checkout -B "preview/$1" "worktree-$1"

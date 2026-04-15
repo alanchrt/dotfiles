@@ -27,7 +27,7 @@ def positional_args(tokens):
 
 
 PRODUCTION_TOOLS = {"heroku", "railway", "vercel", "gcloud", "gh",
-                    "terraform", "kubectl", "az", "k9s", "ssh", "git"}
+                    "terraform", "kubectl", "az", "k9s", "ssh", "git", "gt"}
 
 
 def is_readonly(cmd):
@@ -119,6 +119,17 @@ def is_readonly(cmd):
         if sub == "branch" and ("-D" in raw or ("--delete" in raw and "--force" in raw)):
             return False
         return True
+
+    if binary == "gt":
+        if sub in {"log", "ls", "status", "up", "down", "trunk", "branch", "info"}:
+            return True
+        if sub in {"create", "modify", "restack", "sync"}:
+            return True
+        if sub == "submit":
+            return "--force" not in raw
+        if sub == "repo":
+            return sub2 != "init" or "--force" not in raw
+        return False
 
     if binary == "az":
         return bool(re.search(r"\b(list|show|get)\b", cmd))

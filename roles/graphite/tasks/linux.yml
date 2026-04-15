@@ -1,0 +1,5 @@
+---
+- name: Install Graphite CLI
+  community.general.npm:
+    name: "@withgraphite/graphite-cli"
+    global: yes

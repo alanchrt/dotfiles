@@ -1,0 +1,8 @@
+---
+- name: Tap Graphite
+  community.general.homebrew_tap:
+    name: withgraphite/tap
+
+- name: Install Graphite CLI
+  community.general.homebrew:
+    name: graphite

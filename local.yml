@@ -45,6 +45,8 @@
       tags: [mcp, dev]
     - name: claude-code
       tags: [claude-code, dev]
+    - name: graphite
+      tags: [graphite, dev]
 
     # keep completions last since they depend on programs to generate
     - name: completions
