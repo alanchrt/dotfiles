@@ -60,17 +60,6 @@ fi
 # Include local operations
 [[ ! -f ~/.sh_local ]] || source ~/.sh_local
 
-# Doom Emacs CLI
-export PATH="$HOME/.config/emacs/bin:$PATH"
-
-# proto
-export PROTO_HOME="$HOME/.proto";
-export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH";
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
 # Dracula theme for zsh-syntax-highlighting
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main)
 typeset -gA ZSH_HIGHLIGHT_STYLES
