@@ -54,6 +54,11 @@
       - --strip-components=1
       - doggo_1.0.5_Linux_x86_64/doggo
 
+- name: Create local src directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/src"
+    state: directory
+
 - name: Download bib
   ansible.builtin.unarchive:
     src: https://github.com/prestonharberts/bib/archive/refs/tags/v1.0.1.tar.gz

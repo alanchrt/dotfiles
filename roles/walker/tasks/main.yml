@@ -107,9 +107,14 @@
     dest: ~/.local/bin/walker-rbw
     mode: "0755"
 
+- name: Create autostart directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/autostart"
+    state: directory
+
 - name: Create elephant autostart entry
-  copy:
-    dest: ~/.config/autostart/elephant.desktop
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.config/autostart/elephant.desktop"
     content: |
       [Desktop Entry]
       Type=Application
@@ -117,3 +122,7 @@
       Exec=elephant
       X-GNOME-Autostart-enabled=true
     mode: "0644"
+
+- name: Start elephant if not running
+  ansible.builtin.shell: pgrep -x elephant || nohup elephant &
+  changed_when: false
