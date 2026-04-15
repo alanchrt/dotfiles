@@ -18,10 +18,17 @@ SENSITIVE_DIRS=(
   "$HOME/.aws"
   "$HOME/.config/gcloud"
   "$HOME/.kube"
+  "$HOME/.config/gh"
   "$HOME/.mozilla"
   "$HOME/.config/google-chrome"
   "$HOME/.config/chromium"
   "$HOME/.config/BraveSoftware"
+  "$HOME/Library/Keychains"
+  "$HOME/Library/Application Support/Google/Chrome"
+  "$HOME/Library/Application Support/Bitwarden"
+  "$HOME/Library/Application Support/Discord"
+  "$HOME/Library/Application Support/Arc"
+  "$HOME/Library/Application Support/BraveSoftware"
 )
 
 for dir in "${SENSITIVE_DIRS[@]}"; do
