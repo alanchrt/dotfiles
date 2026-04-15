@@ -152,12 +152,17 @@ def main():
     if not command:
         sys.exit(0)
 
-    # Check each line individually; allow only if all are read-only
+    # Join multi-line commands into one line before splitting on &&/;
+    # This prevents multi-line -m values from being split mid-quote
+    single_line = " ".join(command.splitlines())
+
+    # Split on && and ; to check each command in a chain
     all_readonly = True
-    for line in command.splitlines():
-        if not line.strip():
+    for part in re.split(r"\s*&&\s*|\s*;\s*", single_line):
+        part = part.strip()
+        if not part:
             continue
-        if not is_readonly(line):
+        if not is_readonly(part):
             all_readonly = False
             break
 
