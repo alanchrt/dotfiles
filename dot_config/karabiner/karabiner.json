@@ -51,6 +51,41 @@
                         ]
                     },
                     {
+                        "description": "Alt+J/K to switch windows of same app",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "j",
+                                    "modifiers": {
+                                        "mandatory": ["left_option"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "grave_accent_and_tilde",
+                                        "modifiers": ["left_command"]
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "k",
+                                    "modifiers": {
+                                        "mandatory": ["left_option"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "grave_accent_and_tilde",
+                                        "modifiers": ["left_command", "left_shift"]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
                         "description": "Alt+[/] to switch Spaces",
                         "manipulators": [
                             {
