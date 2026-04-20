@@ -190,7 +190,7 @@
     - caffeine@patapon.info
     - no-overview@fthx
     - system-monitor-next@paradoxxx.zero.gmail.com
-    - appindicator@rgcjonas.gmail.com
+    - appindicatorsupport@rgcjonas.gmail.com
 
 - name: Create user extensions directory
   file:
@@ -229,7 +229,12 @@
 - name: Enable GNOME Shell extensions
   community.general.dconf:
     key: /org/gnome/shell/enabled-extensions
-    value: "['appindicator@rgcjonas.gmail.com', 'caffeine@patapon.info', 'ddterm@amezin.github.com', 'no-overview@fthx', 'unite@hardpixel.eu', 'nordvpnquicktoggle@wedaxi.com', 'system-monitor-next@paradoxxx.zero.gmail.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']"
+    value: "['appindicatorsupport@rgcjonas.gmail.com', 'caffeine@patapon.info', 'ddterm@amezin.github.com', 'no-overview@fthx', 'unite@hardpixel.eu', 'nordvpnquicktoggle@wedaxi.com', 'system-monitor-next@paradoxxx.zero.gmail.com', 'user-theme@gnome-shell-extensions.gcampax.github.com']"
+
+- name: Clear disabled-extensions list
+  community.general.dconf:
+    key: /org/gnome/shell/disabled-extensions
+    value: "[]"
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
