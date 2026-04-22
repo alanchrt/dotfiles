@@ -234,7 +234,7 @@
 - name: Clear disabled-extensions list
   community.general.dconf:
     key: /org/gnome/shell/disabled-extensions
-    value: "[]"
+    value: "@as []"
 
 - name: Configure caffeine
   shell: "dconf load /org/gnome/shell/extensions/caffeine/ < {{ role_path }}/files/caffeine.conf"
