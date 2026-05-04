@@ -2,6 +2,7 @@
 name: docs-writer
 description: Generates clear, concise documentation matching existing style
 model: haiku
+permissionMode: default
 tools:
   - Read
   - Grep

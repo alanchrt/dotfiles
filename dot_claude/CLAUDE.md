@@ -1,6 +1,7 @@
 # Workflow
 
 - Always draft a plan before starting implementation work.
+- In plan mode, the only writable target is the harness-allocated plan file at `~/.claude/plans/<slug>.md`. Do not Edit/Write/NotebookEdit anywhere else, and do not run Bash commands that mutate state (no installs, commits, pushes, file moves, network writes). If you think a real change is needed to validate the plan, ask via `AskUserQuestion`. Plan mode ends only via `ExitPlanMode`.
 - Once you begin working, be independent until finished. Do not ask unnecessary questions mid-task.
 - Make small, focused commits as you work unless explicitly told not to commit.
 - Before committing, make a small effort to verify changes work when reasonable (e.g., run a linter, execute a relevant command, check syntax). Don't skip this just to move faster.
