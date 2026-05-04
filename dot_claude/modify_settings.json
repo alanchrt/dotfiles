@@ -59,6 +59,12 @@ managed=$(cat <<'MANAGED'
           {"type": "command", "command": "~/.claude/hooks/block-prod-writes.sh"},
           {"type": "command", "command": "~/.claude/hooks/block-sensitive-paths.sh"}
         ]
+      },
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {"type": "command", "command": "~/.claude/hooks/enforce-plan-mode.sh"}
+        ]
       }
     ],
     "PostToolUse": [
