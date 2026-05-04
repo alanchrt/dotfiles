@@ -167,21 +167,18 @@ def main():
             break
 
     if all_readonly:
-        result = {
-            "hookSpecificOutput": {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "allow",
-            }
-        }
-    else:
-        result = {
-            "hookSpecificOutput": {
-                "hookEventName": "PreToolUse",
-                "permissionDecision": "ask",
-                "permissionDecisionReason": f"'{command}' may modify production state.",
-            }
-        }
+        # Silent exit: defer to the harness's normal permission flow
+        # (allow-list / plan mode / user prompt). Returning "allow" here would
+        # short-circuit plan mode — see Claude Code 2.1.102 changelog.
+        sys.exit(0)
 
+    result = {
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "ask",
+            "permissionDecisionReason": f"'{command}' may modify production state.",
+        }
+    }
     print(json.dumps(result))
     sys.exit(0)
 

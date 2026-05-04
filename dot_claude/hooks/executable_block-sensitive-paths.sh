@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse hook: prompt before Bash commands that reference sensitive directories.
-# Exit 0 = allow, JSON ask = prompt.
+# Silent exit 0 = no decision (defer to the harness's normal permission flow,
+# including plan mode). JSON ask = prompt the user.
 
 set -euo pipefail
 
@@ -44,5 +45,4 @@ for dir in "${SENSITIVE_DIRS[@]}"; do
   fi
 done
 
-jq -n '{hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "allow"}}'
 exit 0
