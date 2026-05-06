@@ -1,0 +1,18 @@
+---
+# Android system images to install via sdkmanager.
+# Format: SDK package strings (semicolon-separated). Each image's `system.img`
+# is the idempotency anchor for installation.
+android_system_images:
+  - "system-images;android-34;google_apis_playstore;x86_64"
+
+# Android virtual devices (AVDs) to provision.
+# Naming convention: <device>_api<level>_<variant>
+#   variant = "play" for google_apis_playstore, "aosp" for google_apis (no Play),
+#             "default" for the bare system image.
+# To add a new AVD: append here, and add its `package` to android_system_images
+# above if it isn't already covered. No project-specific names — AVDs are
+# capability-named so any project on this machine can target them.
+android_avds:
+  - name: pixel_7_api34_play
+    device: pixel_7
+    package: "system-images;android-34;google_apis_playstore;x86_64"

@@ -1,10 +1,25 @@
 ---
-- name: Install Android device tools and JDK
+- name: Install Android device tools and JDKs
   become: yes
   dnf:
     name:
       - android-tools
       - java-21-openjdk-devel
+      - java-17-openjdk-devel
+
+- name: Verify JDK 17 install path matches the project-script expectation
+  ansible.builtin.stat:
+    path: /usr/lib/jvm/java-17-openjdk
+  register: jdk17_path
+
+- name: Fail if JDK 17 install path differs
+  ansible.builtin.fail:
+    msg: |
+      Expected /usr/lib/jvm/java-17-openjdk to exist after installing
+      java-17-openjdk-devel, but it does not. Inspect /usr/lib/jvm/ and
+      either symlink the versioned dir or update the consuming project's
+      run:android script to point at the actual path.
+  when: not jdk17_path.stat.exists
 
 - name: Ensure Android SDK dir exists
   file:
@@ -39,3 +54,34 @@
     ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
     JAVA_HOME: /usr/lib/jvm/java-21-openjdk
   changed_when: false
+
+- name: Install Android system images via sdkmanager
+  ansible.builtin.shell: |
+    yes | "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/sdkmanager" "{{ item }}"
+  environment:
+    ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
+    JAVA_HOME: /usr/lib/jvm/java-17-openjdk
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/share/android-sdk/{{ item | replace(';', '/') }}/system.img"
+  loop: "{{ android_system_images }}"
+
+- name: Create Android virtual devices
+  ansible.builtin.command: >
+    {{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/avdmanager
+    create avd
+    --name {{ item.name }}
+    --package "{{ item.package }}"
+    --device "{{ item.device }}"
+  environment:
+    ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
+    JAVA_HOME: /usr/lib/jvm/java-17-openjdk
+  args:
+    creates: "{{ ansible_env.HOME }}/.android/avd/{{ item.name }}.avd"
+  loop: "{{ android_avds }}"
+
+- name: Ensure user is in kvm group for /dev/kvm access
+  become: yes
+  ansible.builtin.user:
+    name: "{{ ansible_env.USER }}"
+    groups: kvm
+    append: yes
