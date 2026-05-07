@@ -1,11 +1,29 @@
 ---
+- name: Add Adoptium RPM repo (provides JDK 17; not in Fedora 43 default repos)
+  become: yes
+  ansible.builtin.yum_repository:
+    name: adoptium
+    description: Adoptium Eclipse Temurin
+    baseurl: https://packages.adoptium.net/artifactory/rpm/fedora/$releasever/$basearch
+    gpgcheck: yes
+    gpgkey: https://packages.adoptium.net/artifactory/api/gpg/key/public
+    enabled: yes
+
 - name: Install Android device tools and JDKs
   become: yes
   dnf:
     name:
       - android-tools
       - java-21-openjdk-devel
-      - java-17-openjdk-devel
+      - temurin-17-jdk
+
+- name: Symlink /usr/lib/jvm/java-17-openjdk -> /usr/lib/jvm/temurin-17-jdk
+  become: yes
+  ansible.builtin.file:
+    src: /usr/lib/jvm/temurin-17-jdk
+    dest: /usr/lib/jvm/java-17-openjdk
+    state: link
+    force: yes
 
 - name: Verify JDK 17 install path matches the project-script expectation
   ansible.builtin.stat:
@@ -15,10 +33,10 @@
 - name: Fail if JDK 17 install path differs
   ansible.builtin.fail:
     msg: |
-      Expected /usr/lib/jvm/java-17-openjdk to exist after installing
-      java-17-openjdk-devel, but it does not. Inspect /usr/lib/jvm/ and
-      either symlink the versioned dir or update the consuming project's
-      run:android script to point at the actual path.
+      Expected /usr/lib/jvm/java-17-openjdk to exist as a symlink to
+      /usr/lib/jvm/temurin-17-jdk, but it does not. Inspect /usr/lib/jvm/
+      and confirm the temurin-17-jdk install path; update the symlink task's
+      `src:` if Adoptium has changed its layout.
   when: not jdk17_path.stat.exists
 
 - name: Ensure Android SDK dir exists
@@ -60,7 +78,7 @@
     yes | "{{ ansible_env.HOME }}/.local/share/android-sdk/cmdline-tools/latest/bin/sdkmanager" "{{ item }}"
   environment:
     ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
-    JAVA_HOME: /usr/lib/jvm/java-17-openjdk
+    JAVA_HOME: /usr/lib/jvm/java-21-openjdk
   args:
     creates: "{{ ansible_env.HOME }}/.local/share/android-sdk/{{ item | replace(';', '/') }}/system.img"
   loop: "{{ android_system_images }}"
@@ -74,7 +92,7 @@
     --device "{{ item.device }}"
   environment:
     ANDROID_HOME: "{{ ansible_env.HOME }}/.local/share/android-sdk"
-    JAVA_HOME: /usr/lib/jvm/java-17-openjdk
+    JAVA_HOME: /usr/lib/jvm/java-21-openjdk
   args:
     creates: "{{ ansible_env.HOME }}/.android/avd/{{ item.name }}.avd"
   loop: "{{ android_avds }}"
