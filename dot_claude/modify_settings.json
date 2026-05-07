@@ -11,15 +11,13 @@ managed=$(cat <<'MANAGED'
     "defaultMode": "plan",
     "allow": [
       "Read(*)", "Glob(*)", "Grep(*)", "Edit", "Write", "WebFetch", "WebSearch",
-      "Bash(grep:*)", "Bash(rg:*)", "Bash(find:*)", "Bash(ls:*)", "Bash(pwd:*)",
-      "Bash(which:*)", "Bash(ps:*)", "Bash(jq:*)", "Bash(cat:*)",
-      "Bash(head:*)", "Bash(tail:*)", "Bash(wc:*)",
-      "Bash(git status:*)", "Bash(git log:*)", "Bash(git show:*)", "Bash(git diff:*)"
+      "Bash(*)"
     ],
     "ask": [
       "Bash(sudo *)", "Bash(shutdown*)", "Bash(reboot*)",
       "Bash(poweroff*)", "Bash(halt*)", "Bash(mkfs*)", "Bash(dd *)",
-      "Bash(crontab -r*)", "Bash(truncate *)"
+      "Bash(crontab -r*)", "Bash(truncate *)",
+      "Bash(rm -rf*)", "Bash(rm -fr*)"
     ],
     "deny": [
       "Read(~/.ssh/**)", "Read(~/.gnupg/**)", "Read(~/.gpg/**)", "Read(~/.aws/**)",
