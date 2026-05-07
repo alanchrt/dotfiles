@@ -97,6 +97,13 @@
     creates: "{{ ansible_env.HOME }}/.android/avd/{{ item.name }}.avd"
   loop: "{{ android_avds }}"
 
+- name: Enable hardware keyboard on AVDs (host typing)
+  ansible.builtin.lineinfile:
+    path: "{{ ansible_env.HOME }}/.android/avd/{{ item.name }}.avd/config.ini"
+    regexp: '^hw\.keyboard\s*='
+    line: 'hw.keyboard = yes'
+  loop: "{{ android_avds }}"
+
 - name: Ensure user is in kvm group for /dev/kvm access
   become: yes
   ansible.builtin.user:
