@@ -168,6 +168,11 @@
     key: /org/gnome/mutter/overlay-key
     value: "''"
 
+- name: Raise mutter "not responding" timeout to 15s
+  community.general.dconf:
+    key: /org/gnome/mutter/check-alive-timeout
+    value: "uint32 15000"
+
 - name: Load keybinding configuration
   shell: "dconf load /org/gnome/ < {{ role_path }}/files/keybindings.conf"
   changed_when: false
