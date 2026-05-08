@@ -97,12 +97,14 @@
     creates: "{{ ansible_env.HOME }}/.android/avd/{{ item.name }}.avd"
   loop: "{{ android_avds }}"
 
-- name: Enable hardware keyboard on AVDs (host typing)
+- name: Apply hardware settings to AVDs
   ansible.builtin.lineinfile:
-    path: "{{ ansible_env.HOME }}/.android/avd/{{ item.name }}.avd/config.ini"
-    regexp: '^hw\.keyboard\s*='
-    line: 'hw.keyboard = yes'
-  loop: "{{ android_avds }}"
+    path: "{{ ansible_env.HOME }}/.android/avd/{{ item.0.name }}.avd/config.ini"
+    regexp: '^{{ item.1.key | regex_escape }}\s*='
+    line: '{{ item.1.key }} = {{ item.1.value }}'
+  loop: "{{ android_avds | product(android_avd_settings) | list }}"
+  loop_control:
+    label: "{{ item.0.name }} :: {{ item.1.key }} = {{ item.1.value }}"
 
 - name: Ensure user is in kvm group for /dev/kvm access
   become: yes

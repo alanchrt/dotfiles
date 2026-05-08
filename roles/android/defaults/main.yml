@@ -16,3 +16,14 @@ android_avds:
   - name: pixel_7_api34_play
     device: pixel_7
     package: "system-images;android-34;google_apis_playstore;x86_64"
+
+# Hardware overrides written into every AVD's config.ini after creation.
+# Idempotent: lineinfile updates the key if present, appends it if absent.
+# Tuned for a 16-core / 62 GB host. On weaker hardware, lower ncore/ramSize.
+android_avd_settings:
+  - { key: hw.keyboard,    value: "yes" }    # host keyboard typing
+  - { key: hw.ramSize,     value: "6144" }   # 6 GB; default 2 GB stalls big bundles
+  - { key: vm.heapSize,    value: "1024" }   # per-app heap; default 256 is small
+  - { key: hw.cpu.ncore,   value: "8" }      # half of host's 16 cores
+  - { key: hw.gpu.enabled, value: "yes" }    # required for `-gpu host`
+  - { key: hw.gpu.mode,    value: "host" }   # use host GPU acceleration
