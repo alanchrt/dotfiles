@@ -1,0 +1,492 @@
+#!/usr/bin/env bash
+# wst — workstream manager: parallel AI-coding streams via independent clones + devcontainers.
+# See: dot_claude/CLAUDE.md "Workstream Workflow" and dot_local/share/wst/README.md.
+
+set -euo pipefail
+
+PROJECTS_ROOT="${WST_PROJECTS_ROOT:-$HOME/Projects}"
+STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/wst"
+PORTS_FILE="$STATE_DIR/ports.json"
+OVERRIDES_DIR="$STATE_DIR/overrides"
+DEFAULT_PORT_RANGE_LO=13000
+DEFAULT_PORT_RANGE_HI=13999
+
+mkdir -p "$STATE_DIR" "$OVERRIDES_DIR"
+
+die() { printf 'wst: %s\n' "$*" >&2; exit 1; }
+warn() { printf 'wst: %s\n' "$*" >&2; }
+info() { printf '==> %s\n' "$*"; }
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+require_tool() {
+  have "$1" || die "$1 not found on PATH. Install it first (see roles/$2/)."
+}
+
+# ---- project / stream resolution ----
+
+slugify() {
+  printf '%s' "$1" | tr '/' '-' | tr -c 'A-Za-z0-9._-' '-'
+}
+
+session_name() {
+  printf '%s' "$1" | sed -r 's/\./_/g'
+}
+
+# Resolve the project directory (~/Projects/<project>/) from cwd or --project flag.
+# Echoes the project name on stdout.
+resolve_project() {
+  local explicit="${1:-}"
+  if [[ -n "$explicit" ]]; then
+    [[ -d "$PROJECTS_ROOT/$explicit" ]] || die "Project '$explicit' not found at $PROJECTS_ROOT/$explicit"
+    printf '%s' "$explicit"
+    return
+  fi
+  local pwd_abs
+  pwd_abs=$(realpath "$PWD")
+  local prefix="$PROJECTS_ROOT/"
+  case "$pwd_abs" in
+    "$prefix"*)
+      local rel="${pwd_abs#"$prefix"}"
+      printf '%s' "${rel%%/*}"
+      ;;
+    *)
+      die "Not inside $PROJECTS_ROOT — pass --project <name> or cd into a project."
+      ;;
+  esac
+}
+
+canonical_dir() {
+  printf '%s/%s/main' "$PROJECTS_ROOT" "$1"
+}
+
+stream_dir() {
+  printf '%s/%s/%s' "$PROJECTS_ROOT" "$1" "$2"
+}
+
+# ---- port allocation ----
+
+ports_init() {
+  require_tool jq core
+  [[ -s "$PORTS_FILE" ]] && return
+  cat > "$PORTS_FILE" <<EOF
+{"range": [$DEFAULT_PORT_RANGE_LO, $DEFAULT_PORT_RANGE_HI], "assignments": {}}
+EOF
+}
+
+# Look up the port for a stream key (project/slug). Empty if unassigned.
+port_get() {
+  ports_init
+  jq -r --arg k "$1" '.assignments[$k] // empty' "$PORTS_FILE"
+}
+
+# Allocate and persist the lowest-unused port for a stream key.
+port_allocate() {
+  ports_init
+  local key="$1"
+  local existing
+  existing=$(port_get "$key")
+  if [[ -n "$existing" ]]; then
+    printf '%s' "$existing"
+    return
+  fi
+  local lo hi
+  lo=$(jq -r '.range[0]' "$PORTS_FILE")
+  hi=$(jq -r '.range[1]' "$PORTS_FILE")
+  local used
+  used=$(jq -r '.assignments[]' "$PORTS_FILE" | sort -n)
+  local p
+  for ((p=lo; p<=hi; p++)); do
+    if ! grep -qx "$p" <<<"$used"; then
+      local tmp="$PORTS_FILE.tmp"
+      jq --arg k "$key" --argjson v "$p" '.assignments[$k] = $v' "$PORTS_FILE" > "$tmp"
+      mv "$tmp" "$PORTS_FILE"
+      printf '%s' "$p"
+      return
+    fi
+  done
+  die "port range $lo-$hi exhausted (edit $PORTS_FILE to widen)"
+}
+
+port_free() {
+  ports_init
+  local tmp="$PORTS_FILE.tmp"
+  jq --arg k "$1" 'del(.assignments[$k])' "$PORTS_FILE" > "$tmp"
+  mv "$tmp" "$PORTS_FILE"
+}
+
+# ---- subcommand: new ----
+
+cmd_new() {
+  local branch="" base="" project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --base)    base="$2"; shift 2 ;;
+      --project) project="$2"; shift 2 ;;
+      -*)        die "unknown flag: $1" ;;
+      *)         [[ -z "$branch" ]] && branch="$1" || die "unexpected arg: $1"; shift ;;
+    esac
+  done
+  [[ -n "$branch" ]] || die "usage: wst new <branch> [--base <base>] [--project <name>]"
+  local proj; proj=$(resolve_project "$project")
+  local canonical; canonical=$(canonical_dir "$proj")
+  [[ -d "$canonical/.git" ]] || die "canonical '$canonical' is not a git repo (run: wst migrate)"
+  [[ -f "$canonical/.devcontainer/devcontainer.json" ]] \
+    || die "no .devcontainer/ in $canonical — add one (https://containers.dev/) before using wst"
+
+  local slug; slug=$(slugify "$branch")
+  local target; target=$(stream_dir "$proj" "$slug")
+  [[ ! -e "$target" ]] || die "stream dir $target already exists — use: wst attach $branch"
+
+  # Resolve base if unset: origin/HEAD short name → fallback to current canonical branch
+  if [[ -z "$base" ]]; then
+    base=$(git -C "$canonical" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||' || true)
+    [[ -n "$base" ]] || base=$(git -C "$canonical" branch --show-current)
+  fi
+
+  info "Cloning $canonical → $target (base: $base, branch: $branch)"
+  git clone --local "$canonical" "$target"
+  local origin_url
+  origin_url=$(git -C "$canonical" remote get-url origin)
+  git -C "$target" remote set-url origin "$origin_url"
+  git -C "$target" fetch origin
+  git -C "$target" checkout -B "$branch" "origin/$base"
+
+  local key="$proj/$slug"
+  local host_port
+  host_port=$(port_allocate "$key")
+  info "Allocated host port $host_port for $key"
+
+  info "Bringing up devcontainer..."
+  WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
+    WST_HOST_PORT="$host_port" WST_TARGET="$target" \
+    "$HOME/.local/bin/wst-container-up"
+
+  info "Provisioning in-container tooling..."
+  provision_container "$target"
+
+  info "Creating tmux window..."
+  tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port"
+
+  cat <<EOF
+
+Stream '$branch' ready.
+  Workdir : $target
+  Preview : http://localhost:$host_port/
+  Attach  : wa $branch
+EOF
+}
+
+# ---- subcommand: attach ----
+
+cmd_attach() {
+  local branch="${1:-}"
+  [[ -n "$branch" ]] || die "usage: wst attach <branch>"
+  local proj; proj=$(resolve_project)
+  local slug; slug=$(slugify "$branch")
+  local target; target=$(stream_dir "$proj" "$slug")
+  [[ -d "$target" ]] || die "stream '$branch' doesn't exist. Create with: wst new $branch"
+
+  local session; session=$(session_name "$proj")
+  if ! tmux has-session -t "$session" 2>/dev/null; then
+    tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
+  fi
+
+  # Bring container up if stopped
+  local container_id
+  container_id=$(docker ps -q --filter "label=devcontainer.local_folder=$target" 2>/dev/null || true)
+  if [[ -z "$container_id" ]]; then
+    info "Container stopped — bringing it back up..."
+    local key="$proj/$slug"
+    local host_port; host_port=$(port_get "$key")
+    [[ -n "$host_port" ]] || host_port=$(port_allocate "$key")
+    WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
+      WST_HOST_PORT="$host_port" WST_TARGET="$target" \
+      "$HOME/.local/bin/wst-container-up"
+  fi
+
+  # Window may not exist yet — create on first attach after a container restart
+  if ! tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null | grep -qx "$slug"; then
+    local key="$proj/$slug"
+    local host_port; host_port=$(port_get "$key")
+    tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port"
+  fi
+
+  if [[ -n "${TMUX:-}" ]]; then
+    tmux select-window -t "$session:$slug"
+  else
+    tmux attach-session -t "$session" \; select-window -t "$session:$slug"
+  fi
+}
+
+# ---- subcommand: preview ----
+
+cmd_preview() {
+  local branch="${1:-}"
+  local port=""
+  if [[ -z "$branch" ]]; then
+    [[ -n "${TMUX:-}" ]] || die "preview needs <branch> outside tmux"
+    port=$(tmux show-options -wqv @wst-port 2>/dev/null || true)
+    [[ -n "$port" ]] || die "current tmux window is not a stream window (no @wst-port). Pass <branch>."
+  else
+    local proj; proj=$(resolve_project)
+    local slug; slug=$(slugify "$branch")
+    port=$(port_get "$proj/$slug")
+    [[ -n "$port" ]] || die "no port allocated for $proj/$slug — did wst new run?"
+  fi
+  local url="http://localhost:$port/"
+  printf '%s\n' "$url"
+  have xdg-open && xdg-open "$url" >/dev/null 2>&1 || true
+}
+
+# ---- subcommand: ls ----
+
+cmd_ls() {
+  local all=false
+  [[ "${1:-}" == "--all" ]] && all=true
+  if $all; then
+    for pdir in "$PROJECTS_ROOT"/*/; do
+      [[ -d "$pdir" ]] || continue
+      local pname; pname=$(basename "$pdir")
+      _ls_project "$pname"
+    done
+  else
+    local proj; proj=$(resolve_project)
+    _ls_project "$proj"
+  fi
+}
+
+_ls_project() {
+  local proj="$1"
+  local any=false
+  for sdir in "$PROJECTS_ROOT/$proj"/*/; do
+    [[ -d "$sdir/.git" ]] || continue
+    local slug; slug=$(basename "$sdir")
+    [[ "$slug" == "main" ]] && continue
+    local key="$proj/$slug"
+    local port; port=$(port_get "$key")
+    local container_state="down"
+    if [[ -n $(docker ps -q --filter "label=devcontainer.local_folder=$sdir" 2>/dev/null || true) ]]; then
+      container_state="up"
+    fi
+    printf '%s/%s\t%s\tport:%s\n' "$proj" "$slug" "$container_state" "${port:-?}"
+    any=true
+  done
+  $any || printf '(no streams in %s)\n' "$proj"
+}
+
+# ---- subcommand: rm ----
+
+cmd_rm() {
+  local branch="" force=false
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --force|-f) force=true; shift ;;
+      *)          [[ -z "$branch" ]] && branch="$1" || die "unexpected arg: $1"; shift ;;
+    esac
+  done
+  [[ -n "$branch" ]] || die "usage: wst rm <branch> [--force]"
+  local proj; proj=$(resolve_project)
+  local slug; slug=$(slugify "$branch")
+  local target; target=$(stream_dir "$proj" "$slug")
+  [[ "$slug" != "main" ]] || die "refuse: 'main' is the canonical, not a stream"
+  [[ -d "$target" ]] || { warn "$target does not exist (already removed?)"; return 0; }
+
+  if ! $force; then
+    local unpushed=0 unstaged=0
+    if git -C "$target" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+      unpushed=$(git -C "$target" log --oneline '@{upstream}..HEAD' 2>/dev/null | wc -l)
+    else
+      unpushed=$(git -C "$target" log --oneline 2>/dev/null | wc -l)
+    fi
+    unstaged=$(git -C "$target" status --porcelain 2>/dev/null | wc -l)
+    if (( unpushed > 0 || unstaged > 0 )); then
+      warn "stream has $unpushed unpushed / $unstaged unstaged changes — pass --force to remove anyway"
+      return 1
+    fi
+  fi
+
+  local cid
+  cid=$(docker ps -aq --filter "label=devcontainer.local_folder=$target" 2>/dev/null || true)
+  if [[ -n "$cid" ]]; then
+    info "Removing container $cid"
+    docker rm -f "$cid" >/dev/null
+  fi
+
+  local session; session=$(session_name "$proj")
+  if tmux has-session -t "$session" 2>/dev/null \
+       && tmux list-windows -t "$session" -F '#{window_name}' | grep -qx "$slug"; then
+    tmux kill-window -t "$session:$slug" || true
+  fi
+
+  info "Removing $target"
+  rm -rf "$target"
+  port_free "$proj/$slug"
+  rm -f "$OVERRIDES_DIR/$proj-$slug.json"
+  info "Stream '$branch' removed"
+}
+
+# ---- subcommand: doctor ----
+
+cmd_doctor() {
+  local ok=true
+  printf 'Host prerequisites:\n'
+  for t in docker devcontainer jq tmux git gh; do
+    if have "$t"; then
+      printf '  %-15s ok\n' "$t"
+    else
+      printf '  %-15s MISSING\n' "$t"
+      ok=false
+    fi
+  done
+
+  printf '\nADB bridge:\n'
+  if have adb && adb -P 5037 devices >/dev/null 2>&1; then
+    printf '  adb server on :5037 responding\n'
+    local listening
+    listening=$(ss -ltn 2>/dev/null | awk '$4 ~ /:5037$/ {print $4}' | head -1 || true)
+    if [[ "$listening" == "0.0.0.0:5037" || "$listening" == "*:5037" ]]; then
+      printf '  listening on all interfaces (containers can reach it)\n'
+    else
+      printf '  WARNING: adb may be bound to loopback only — start with: adb-start-bridged\n'
+    fi
+  else
+    printf '  adb not running (start with: systemctl --user start adb-bridge)\n'
+  fi
+
+  printf '\nProjects layout (%s):\n' "$PROJECTS_ROOT"
+  for d in "$PROJECTS_ROOT"/*/; do
+    [[ -d "$d" ]] || continue
+    local name; name=$(basename "$d")
+    if [[ -d "$d/.git" ]]; then
+      printf '  %-30s pre-migration layout (needs: wst migrate)\n' "$name"
+      ok=false
+    elif [[ -d "$d/main/.git" ]]; then
+      printf '  %-30s migrated\n' "$name"
+    fi
+  done
+
+  printf '\nPort assignments:\n'
+  ports_init
+  jq -r '.assignments | to_entries[] | "  " + .key + " → " + (.value|tostring)' "$PORTS_FILE"
+
+  printf '\nOrphaned chrome volumes (wst-chrome-*):\n'
+  docker volume ls --filter 'name=wst-chrome-' --format '  {{.Name}}' 2>/dev/null || true
+
+  $ok || exit 1
+}
+
+# ---- subcommand: migrate ----
+
+cmd_migrate() {
+  exec "$HOME/.local/bin/wst-migrate-canonical" "$@"
+}
+
+# ---- helpers ----
+
+provision_container() {
+  local target="$1"
+  local provision_script
+  provision_script=$(cat <<'SH'
+set -e
+# pkg manager detection
+if command -v apt-get >/dev/null 2>&1; then PM=apt-get
+elif command -v apk >/dev/null 2>&1; then PM=apk
+elif command -v dnf >/dev/null 2>&1; then PM=dnf
+else PM=""; fi
+
+inst() {
+  case "$PM" in
+    apt-get) sudo apt-get update -qq && sudo apt-get install -y -qq "$@" ;;
+    apk)     sudo apk add --no-cache "$@" ;;
+    dnf)     sudo dnf install -y -q "$@" ;;
+    *)       echo "no supported package manager" >&2; return 1 ;;
+  esac
+}
+
+# gh
+if ! command -v gh >/dev/null 2>&1; then
+  case "$PM" in
+    apt-get) sudo apt-get install -y -qq gh || true ;;
+    *)       inst gh || true ;;
+  esac
+fi
+if command -v gh >/dev/null 2>&1 && [ -n "${GITHUB_TOKEN:-}" ]; then
+  gh auth status >/dev/null 2>&1 || printf '%s' "$GITHUB_TOKEN" | gh auth login --with-token >/dev/null 2>&1 || true
+fi
+
+# graphite if project is opted in
+if [ -f ".claude/rules/graphite.md" ]; then
+  command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1 || true
+fi
+
+# playwright MCP (only fetches once; idempotent)
+command -v npx >/dev/null 2>&1 && {
+  npm install -g @playwright/mcp >/dev/null 2>&1 || true
+  npx -y playwright install chromium >/dev/null 2>&1 || true
+}
+
+# register Playwright MCP for in-container Claude Code
+mkdir -p "$HOME/.claude"
+cat > "$HOME/.claude/mcp_servers.json" <<JSON
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}
+JSON
+
+# sanity: ADB bridge reachable (non-fatal)
+if [ -n "${ADB_SERVER_SOCKET:-}" ] && command -v adb >/dev/null 2>&1; then
+  adb devices >/dev/null 2>&1 || true
+fi
+SH
+)
+  devcontainer exec --workspace-folder "$target" bash -c "$provision_script" || warn "post-up provisioning had non-fatal errors (continuing)"
+}
+
+tmux_create_window() {
+  local proj="$1" branch="$2" slug="$3" target="$4" host_port="$5"
+  local session; session=$(session_name "$proj")
+  if ! tmux has-session -t "$session" 2>/dev/null; then
+    tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
+  fi
+  tmux new-window -t "$session:" -n "$slug" -c "$target"
+  tmux set-option -w -t "$session:$slug" @wst-project "$proj"
+  tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
+  tmux set-option -w -t "$session:$slug" @wst-workdir "$target"
+  tmux set-option -w -t "$session:$slug" @wst-port    "$host_port"
+  tmux send-keys -t "$session:$slug" "devcontainer exec --workspace-folder '$target' zsh" Enter
+}
+
+# ---- dispatch ----
+
+usage() {
+  cat <<'EOF'
+wst — workstream manager
+
+usage:
+  wst new <branch> [--base <base>] [--project <name>]   create stream
+  wst attach <branch>                                   switch to / boot stream window  (alias: wa)
+  wst preview [<branch>]                                open localhost:<port>/           (alias: wp)
+  wst ls [--all]                                        list streams                     (alias: wls)
+  wst rm <branch> [--force]                             tear down stream
+  wst doctor                                            diagnostics
+  wst migrate                                           one-shot canonical relocation
+EOF
+}
+
+case "${1:-}" in
+  new)     shift; cmd_new "$@" ;;
+  attach)  shift; cmd_attach "$@" ;;
+  preview) shift; cmd_preview "$@" ;;
+  ls)      shift; cmd_ls "$@" ;;
+  rm)      shift; cmd_rm "$@" ;;
+  doctor)  shift; cmd_doctor "$@" ;;
+  migrate) shift; cmd_migrate "$@" ;;
+  -h|--help|help|"") usage ;;
+  *)       usage; exit 1 ;;
+esac

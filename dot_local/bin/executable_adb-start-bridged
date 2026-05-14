@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# adb-start-bridged — start adb listening on 0.0.0.0:5037 so containers can reach it.
+# Run via systemd user unit `adb-bridge.service` at login.
+
+set -euo pipefail
+
+if ! command -v adb >/dev/null 2>&1; then
+  echo "adb not found; android role needs to install platform-tools first" >&2
+  exit 1
+fi
+
+adb kill-server 2>/dev/null || true
+exec adb -a -P 5037 nodaemon server

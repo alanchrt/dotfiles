@@ -1,0 +1,26 @@
+# wst (workstream manager) configuration
+#
+# All values are optional. wst reads them via shell env vars before falling back
+# to its hard-coded defaults (in ~/.local/bin/wst). If you want a setting to
+# take effect, source this file from your shell rc, or export the vars yourself.
+#
+# This file is currently informational — wst doesn't parse YAML directly. The
+# canonical place to override behavior is environment variables in your shell.
+
+# Host port range used for stream forwarding (one port per stream).
+# WST_PORT_RANGE_LO=13000
+# WST_PORT_RANGE_HI=13999
+
+# Default container-internal port to forward when the project's devcontainer.json
+# doesn't declare forwardPorts.
+# WST_DEFAULT_CONTAINER_PORT=3000
+
+# Override the projects root (defaults to ~/Projects).
+# WST_PROJECTS_ROOT="$HOME/Projects"
+
+# Optional extra host paths to bind-mount read-only into every stream container.
+# Format: "host_path:container_path" pairs. Not yet wired into wst-container-up;
+# add manually if needed (this file is a placeholder for future config).
+# WST_EXTRA_MOUNTS=(
+#   "$HOME/.npmrc:/home/vscode/.npmrc"
+# )

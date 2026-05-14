@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# wst-container-up — invoke `devcontainer up` with the credential / port / ADB-bridge override.
+# Required env (set by wst orchestrator):
+#   WST_PROJECT    project name
+#   WST_BRANCH     git branch name (not slugged)
+#   WST_SLUG       slugified branch (dir name)
+#   WST_TARGET     absolute workspace folder
+#   WST_HOST_PORT  host port to forward
+# Optional env:
+#   WST_CONTAINER_PORT (default: $DEFAULT_CONTAINER_PORT below, or first project forwardPorts entry)
+
+set -euo pipefail
+
+DEFAULT_CONTAINER_PORT=3000
+
+: "${WST_PROJECT:?required}"
+: "${WST_BRANCH:?required}"
+: "${WST_SLUG:?required}"
+: "${WST_TARGET:?required}"
+: "${WST_HOST_PORT:?required}"
+
+STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/wst"
+OVERRIDES_DIR="$STATE_DIR/overrides"
+mkdir -p "$OVERRIDES_DIR"
+
+# Default GITHUB_TOKEN from `gh auth token` if shell env doesn't set it
+if [[ -z "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/null 2>&1; then
+  GITHUB_TOKEN=$(gh auth token 2>/dev/null || true)
+fi
+export GITHUB_TOKEN
+
+# Pick container port: explicit env > project's first forwardPorts entry > default
+container_port="${WST_CONTAINER_PORT:-}"
+if [[ -z "$container_port" ]] && command -v jq >/dev/null 2>&1; then
+  dc_json="$WST_TARGET/.devcontainer/devcontainer.json"
+  if [[ -f "$dc_json" ]]; then
+    # devcontainer.json allows comments; strip them defensively
+    container_port=$(sed 's|//.*$||; s|/\*.*\*/||' "$dc_json" \
+      | jq -r '.forwardPorts? // [] | .[0] // empty' 2>/dev/null || true)
+  fi
+fi
+container_port="${container_port:-$DEFAULT_CONTAINER_PORT}"
+
+override="$OVERRIDES_DIR/$WST_PROJECT-$WST_SLUG.json"
+chrome_volume="wst-chrome-$WST_PROJECT"
+
+# Optional mounts — only include those that exist on host
+mounts=()
+add_bind_ro() {
+  local src="$1" dest="$2"
+  [[ -e "$src" ]] || return 0
+  mounts+=("\"source=$src,target=$dest,type=bind,readonly\"")
+}
+add_bind_ro "$HOME/.ssh/id_ed25519"      "/home/vscode/.ssh/id_ed25519"
+add_bind_ro "$HOME/.ssh/id_ed25519.pub"  "/home/vscode/.ssh/id_ed25519.pub"
+add_bind_ro "$HOME/.ssh/known_hosts"     "/home/vscode/.ssh/known_hosts"
+add_bind_ro "$HOME/.gitconfig"           "/home/vscode/.gitconfig"
+add_bind_ro "$HOME/.config/gh"           "/home/vscode/.config/gh"
+mounts+=("\"source=$chrome_volume,target=/home/vscode/.config/chromium,type=volume\"")
+
+# Compose JSON
+mounts_json=$(IFS=,; printf '%s' "${mounts[*]}")
+cat > "$override" <<EOF
+{
+  "mounts": [$mounts_json],
+  "remoteEnv": {
+    "GITHUB_TOKEN":      "\${localEnv:GITHUB_TOKEN}",
+    "ANTHROPIC_API_KEY": "\${localEnv:ANTHROPIC_API_KEY}",
+    "ADB_SERVER_SOCKET": "tcp:host.docker.internal:5037",
+    "WST_PORT":          "$container_port",
+    "WST_HOST_PORT":     "$WST_HOST_PORT",
+    "WST_PROJECT":       "$WST_PROJECT",
+    "WST_STREAM":        "$WST_BRANCH"
+  },
+  "runArgs": [
+    "--add-host=host.docker.internal:host-gateway",
+    "-p", "$WST_HOST_PORT:$container_port"
+  ]
+}
+EOF
+
+exec devcontainer up \
+  --workspace-folder "$WST_TARGET" \
+  --override-config "$override"

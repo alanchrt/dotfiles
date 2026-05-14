@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# wst-migrate-canonical — one-shot, idempotent migrator.
+# For each ~/Projects/<entry> that is a git repo, move it under <entry>/<subdir>/
+# where <subdir> is "main" if HEAD matches origin/HEAD, else the current branch name.
+# Skips entries that are already in the new layout.
+
+set -euo pipefail
+
+PROJECTS_ROOT="${WST_PROJECTS_ROOT:-$HOME/Projects}"
+STAGING="$PROJECTS_ROOT/.wst-migrate-staging"
+DRY_RUN=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -n|--dry-run) DRY_RUN=true; shift ;;
+    -h|--help)
+      cat <<EOF
+usage: wst migrate [-n|--dry-run]
+
+Relocates each git repo at ~/Projects/<entry> to ~/Projects/<entry>/<subdir>/
+where <subdir> = "main" if HEAD == origin/HEAD short name, else current branch.
+Idempotent: skips entries already nested under a subdir.
+EOF
+      exit 0
+      ;;
+    *) echo "unknown arg: $1" >&2; exit 1 ;;
+  esac
+done
+
+run() {
+  if $DRY_RUN; then
+    printf '[dry-run] %s\n' "$*"
+  else
+    "$@"
+  fi
+}
+
+migrate_one() {
+  local entry_dir="$1"
+  local entry_name; entry_name=$(basename "$entry_dir")
+
+  if [[ ! -d "$entry_dir/.git" ]]; then
+    return 0  # already migrated, or not a project, skip silently
+  fi
+
+  local branch
+  branch=$(git -C "$entry_dir" symbolic-ref --short HEAD 2>/dev/null || true)
+  if [[ -z "$branch" ]]; then
+    echo "skip $entry_name (detached HEAD)" >&2
+    return 0
+  fi
+
+  local default_branch=""
+  default_branch=$(git -C "$entry_dir" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null \
+                   | sed 's|^origin/||' || true)
+
+  local subdir
+  if [[ -n "$default_branch" && "$branch" == "$default_branch" ]]; then
+    subdir="main"
+  else
+    subdir=$(printf '%s' "$branch" | tr '/' '-' | tr -c 'A-Za-z0-9._-' '-')
+  fi
+
+  echo "migrate $entry_name → $entry_name/$subdir/  (branch: $branch)"
+
+  run mkdir -p "$STAGING"
+  run mv "$entry_dir" "$STAGING/$entry_name"
+  run mkdir -p "$entry_dir"
+  run mv "$STAGING/$entry_name" "$entry_dir/$subdir"
+}
+
+shopt -s nullglob
+for d in "$PROJECTS_ROOT"/*/; do
+  d="${d%/}"
+  [[ "$(basename "$d")" == ".wst-migrate-staging" ]] && continue
+  migrate_one "$d"
+done
+
+# Tidy: remove empty staging dir
+[[ -d "$STAGING" ]] && rmdir "$STAGING" 2>/dev/null || true
+echo "Migration complete."

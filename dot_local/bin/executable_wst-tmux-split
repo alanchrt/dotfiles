@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# wst-tmux-split — split-pane helper that auto-execs into the stream's devcontainer.
+# Bound from dot_tmux.conf.tmpl to `bind '"'` and `bind '%'`.
+# Argument: h (horizontal) | v (vertical)
+
+set -euo pipefail
+
+flag="-v"
+[[ "${1:-}" = h ]] && flag="-h"
+
+dir=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
+
+if [[ -n "$dir" && -d "$dir" ]]; then
+  tmux split-window "$flag" -c "$dir" "cd '$dir' && devcontainer exec --workspace-folder . zsh"
+else
+  tmux split-window "$flag"
+fi
