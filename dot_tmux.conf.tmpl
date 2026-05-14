@@ -19,6 +19,13 @@ bind-key a send-prefix
 bind P new-window -n ipy ipython3 --no-banner --nosep --no-confirm-exit
 bind B new-window -n bib $HOME/.local/bin/bib
 
+# stream-aware split bindings: if the current window has @wst-workdir set
+# (created by `wst new`/`wa`), the new pane auto-execs into the devcontainer.
+unbind '"'
+unbind %
+bind '"' run-shell '~/.local/bin/wst-tmux-split v'
+bind % run-shell '~/.local/bin/wst-tmux-split h'
+
 # use vi keys in copy mode
 set-window-option -g mode-keys vi
 

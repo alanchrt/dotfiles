@@ -57,25 +57,10 @@ alias dw="diceware -d ' ' --no-caps"
 # graphite rules symlink for team projects
 alias gtinit='mkdir -p .claude/rules && ln -sf ~/.local/share/claude-rules/graphite.md .claude/rules/graphite.md && echo "Graphite rules linked"'
 
-# worktree preview
-function gwo {
-    git checkout -B "preview/$1" "worktree-$1"
-}
-
-function gwd {
-    local branch
-    branch=$(git rev-parse --abbrev-ref HEAD)
-    git checkout - && git branch -D "$branch"
-}
-
-if [[ -n "$ZSH_VERSION" ]]; then
-    _gwo() {
-        local -a suffixes
-        suffixes=(${${(M)${(f)"$(git branch --format='%(refname:short)' 2>/dev/null)"}:#worktree-*}#worktree-})
-        _describe 'worktree suffix' suffixes
-    }
-    compdef _gwo gwo
-fi
+# workstream — parallel AI-coding streams (see ~/.local/bin/wst)
+alias wa='wst attach'
+alias wp='wst preview'
+alias wls='wst ls'
 
 # new named tmux session
 function to {
