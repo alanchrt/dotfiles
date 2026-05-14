@@ -115,6 +115,28 @@ port_free() {
   mv "$tmp" "$PORTS_FILE"
 }
 
+# ---- subcommand: clone ----
+
+cmd_clone() {
+  local url="${1:-}" name="${2:-}"
+  [[ -n "$url" ]] || die "usage: wst clone <git-url> [project-name]"
+  if [[ -z "$name" ]]; then
+    name=$(basename "$url" .git)
+  fi
+  local target="$PROJECTS_ROOT/$name"
+  [[ ! -e "$target" ]] || die "$target already exists"
+  info "Cloning $url → $target/main"
+  mkdir -p "$target"
+  git clone "$url" "$target/main"
+  info "Project laid out at $target/main"
+  cat <<EOF
+
+Next steps:
+  cd $target/main
+  wst new <branch> [--base main]   # create a stream
+EOF
+}
+
 # ---- subcommand: new ----
 
 cmd_new() {
@@ -469,10 +491,11 @@ usage() {
 wst — workstream manager
 
 usage:
+  wst clone <git-url> [project-name]                    clone repo into ~/Projects/<name>/main/  (alias: wcl)
   wst new <branch> [--base <base>] [--project <name>]   create stream
-  wst attach <branch>                                   switch to / boot stream window  (alias: wa)
-  wst preview [<branch>]                                open localhost:<port>/           (alias: wp)
-  wst ls [--all]                                        list streams                     (alias: wls)
+  wst attach <branch>                                   switch to / boot stream window           (alias: wa)
+  wst preview [<branch>]                                open localhost:<port>/                   (alias: wp)
+  wst ls [--all]                                        list streams                             (alias: wls)
   wst rm <branch> [--force]                             tear down stream
   wst doctor                                            diagnostics
   wst migrate                                           one-shot canonical relocation
@@ -480,6 +503,7 @@ EOF
 }
 
 case "${1:-}" in
+  clone)   shift; cmd_clone "$@" ;;
   new)     shift; cmd_new "$@" ;;
   attach)  shift; cmd_attach "$@" ;;
   preview) shift; cmd_preview "$@" ;;

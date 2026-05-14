@@ -27,6 +27,7 @@ Streams are isolated parallel development environments — each one is its own g
 **Commands** (the host `wst` script — see `~/.local/bin/wst`; chezmoi source: `dot_local/bin/executable_wst`):
 
 ```bash
+wcl <git-url> [name]               # clone repo into ~/Projects/<name>/main/
 wst new <branch> [--base <base>]   # clone + container up + tmux window
 wa <branch>                        # attach (or boot if stopped) — switches tmux window
 wp [<branch>]                      # preview: open localhost:<port>/ in host browser
