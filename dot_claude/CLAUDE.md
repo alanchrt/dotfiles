@@ -7,47 +7,42 @@
 - Before committing, make a small effort to verify changes work when reasonable (e.g., run a linter, execute a relevant command, check syntax). Don't skip this just to move faster.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
 - When finished, summarize what was done so the work can be reviewed in a pull request.
-- Some projects use Graphite (`gt`) for stacked PRs. If the project has a `.claude/rules/graphite.md` file, follow the Graphite workflow described there. **This completely replaces the worktree workflow below** — do not use worktrees in Graphite projects.
+- Some projects use Graphite (`gt`) for stacked PRs. If the project has a `.claude/rules/graphite.md` file, follow the Graphite workflow described there for branching inside a stream.
 
-# Worktree Workflow
+# Workstream Workflow
 
-During planning, assess whether the task warrants its own branch and worktree.
+Streams are isolated parallel development environments — each one is its own git clone in its own devcontainer with its own port. Stream layout: `~/Projects/<project>/main/` is the canonical, `~/Projects/<project>/<branch>/` are streams.
 
-**Use a worktree when:**
+**Use a stream when:**
 - On `main`/`master` and the task is more than a trivial change
-- The task is unrelated to the current branch's purpose (branches should stay on-topic — this applies whether the branch has uncommitted work or not)
+- The task is unrelated to the current branch's purpose
 - The task would benefit from an isolated PR
+- Multiple features need to be developed in parallel
 
-**Don't use a worktree when:**
-- Small, quick fixes (typos, single-line changes)
-- Already on a feature branch for this task
+**Don't use a stream when:**
+- Small, quick fixes (typos, single-line changes) — edit in `<project>/main/` and ask for confirmation before committing to main
+- Already inside an existing stream window (you're attached if `tmux show-options -wqv @wst-stream` returns a value)
 - The user explicitly says to work on the current branch
 
-**Testing worktree changes in the main project directory:**
-
-Use `gwo <suffix>` to create a `preview/<suffix>` branch off the worktree branch and check it out. The dev server sees the changes live. When done, `gwd` returns to the previous branch and cleans up.
+**Commands** (the host `wst` script — see `~/.local/bin/wst`; chezmoi source: `dot_local/bin/executable_wst`):
 
 ```bash
-gwo add-search-api   # checks out preview/add-search-api from worktree-add-search-api
-gwd                  # returns to previous branch, deletes preview/add-search-api
+wst new <branch> [--base <base>]   # clone + container up + tmux window
+wa <branch>                        # attach (or boot if stopped) — switches tmux window
+wp [<branch>]                      # preview: open localhost:<port>/ in host browser
+wls                                # list streams in current project
+wst rm <branch>                    # tear down: container + clone dir + tmux window
+wst doctor                         # diagnostics
 ```
 
-When finishing work in a worktree, mention that the user can run `gwo <suffix>` to test the changes in their main project directory.
+- All commits, PRs, dev server runs, and Claude Code invocations live *inside the container* — that's the pane `wa` drops you into. The host clones exist for filesystem navigation only.
+- Default to plain `git` + `gh`. If `.claude/rules/graphite.md` exists in the project, use `gt` inside the container instead (see Graphite section).
+- Push: `git push -u origin HEAD` — the stream branch already has the final name, no prefix mapping.
+- After merge: `wst rm <branch>` removes the container, the clone dir, the tmux window, and frees the port.
 
-- Use `EnterWorktree` with a descriptive kebab-case name. Use conventional prefixes: `fix-`, `chore-`, `docs-`, `refactor-`, or no prefix (defaults to `feat/`).
-  - Examples: `fix-auth-timeout`, `chore-update-deps`, `add-search-api`
-- Commit freely on the worktree branch (no main-branch confirmation needed)
-- **Pushing**: Before creating a PR, push with a mapped remote branch name:
-  - Strip `worktree-` prefix, extract known prefix (`fix`, `chore`, `docs`, `refactor`) or default to `feat`, keep hyphens
-  - `git push -u origin worktree-NAME:refs/heads/{prefix}/hyphenated-name`
-  - Examples:
-    - `worktree-fix-auth-timeout` → `git push -u origin worktree-fix-auth-timeout:refs/heads/fix/auth-timeout`
-    - `worktree-add-search-api` → `git push -u origin worktree-add-search-api:refs/heads/feat/add-search-api`
-    - `worktree-chore-update-deps` → `git push -u origin worktree-chore-update-deps:refs/heads/chore/update-deps`
-- **PR creation**: `gh pr create --draft` as usual, report PR URL
-- **After merge**: Clean up fully:
-  1. Delete remote branch: `git push origin --delete {prefix}/hyphenated-name` (skip if GitHub already auto-deleted it)
-  2. `ExitWorktree` with `action: "remove"` to delete the local worktree and branch
+**Tmux integration:** stream windows split into the same container (`prefix + "` / `prefix + %`). Non-stream windows split normally on the host. The split-pane helper is at `~/.local/bin/wst-tmux-split`.
+
+**Android emulator:** the emulator runs on host (KVM access). Containers reach it through `ADB_SERVER_SOCKET=tcp:host.docker.internal:5037` (set automatically by `wst-container-up`). Host adb listens on all interfaces via the `adb-bridge` systemd user service. Run `adb devices` inside the container to verify the host emulator is visible.
 
 # Production Safety
 

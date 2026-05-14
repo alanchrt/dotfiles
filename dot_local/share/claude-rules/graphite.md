@@ -4,13 +4,11 @@ description: Graphite stacking workflow for team projects — symlink this file 
 
 # Graphite Workflow
 
-This project uses Graphite for stacked PRs. **This entirely replaces the worktree workflow from CLAUDE.md.**
+This project uses Graphite for stacked PRs. Use `gt` instead of plain `git`/`gh` for branch creation, restacking, and PR submission. Graphite works *inside* a workstream (see CLAUDE.md "Workstream Workflow") — each stream is a separate clone, so `gt`'s metadata stays clean per-stream.
 
-## Critical: No worktrees
+## Where to run gt
 
-Do NOT use worktrees (`EnterWorktree`) in this project. Graphite and worktrees are incompatible — Graphite manages stacked branches in the main checkout and needs to control branch relationships and rebasing. Worktrees isolate branches in separate directories which breaks Graphite's metadata.
-
-Work serially in the main checkout. If you need to switch between independent streams of work, use separate Graphite stacks and `gt checkout` to switch between them.
+Run `gt` inside the stream's devcontainer (the pane you land in after `wa <branch>`). Each stream gets its own gt metadata, so stacks created in one stream don't collide with stacks in another. The host-side canonical at `~/Projects/<project>/main/` is for navigation; don't run gt there during stream work.
 
 ## Overrides
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Scans all git repos under ~/Projects/ for in-flight worktree branches
-# and unpushed work. Sends a desktop notification summary.
+# Scans all stream clones under ~/Projects/<project>/<branch>/ for in-flight work
+# (uncommitted, unpushed) and open PRs. Sends a desktop notification summary.
 # Intended to run via systemd timer, not as a Claude hook.
 
 set -euo pipefail
@@ -8,42 +8,39 @@ set -euo pipefail
 PROJECTS_DIR="$HOME/Projects"
 INFLIGHT=()
 
-for repo_dir in "$PROJECTS_DIR"/*/; do
-  [[ -d "$repo_dir/.git" ]] || continue
-  repo_name=$(basename "$repo_dir")
+for project_dir in "$PROJECTS_DIR"/*/; do
+  [[ -d "$project_dir" ]] || continue
+  project_name=$(basename "$project_dir")
 
-  # Check for worktree branches with unmerged work
-  while IFS= read -r worktree_line; do
-    wt_path=$(echo "$worktree_line" | awk '{print $1}')
-    wt_branch=$(echo "$worktree_line" | sed 's/.*\[//;s/\]//')
+  for stream_dir in "$project_dir"*/; do
+    [[ -d "$stream_dir/.git" ]] || continue
+    stream_slug=$(basename "$stream_dir")
+    # Skip the canonical
+    [[ "$stream_slug" == "main" ]] && continue
 
-    # Skip bare/detached
-    [[ -z "$wt_branch" ]] && continue
-    [[ "$wt_branch" == "(detached"* ]] && continue
+    current_branch=$(git -C "$stream_dir" branch --show-current 2>/dev/null || true)
+    [[ -z "$current_branch" ]] && continue
 
-    # Only report worktree- prefixed branches (created by Claude)
-    if [[ "$wt_branch" == worktree-* ]]; then
-      branch_display="${wt_branch#worktree-}"
-      INFLIGHT+=("$branch_display ($repo_name)")
+    # Unpushed commits
+    if git -C "$stream_dir" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+      unpushed=$(git -C "$stream_dir" log --oneline '@{upstream}..HEAD' 2>/dev/null | wc -l)
+    else
+      unpushed=$(git -C "$stream_dir" log --oneline 2>/dev/null | wc -l)
     fi
-  done < <(git -C "$repo_dir" worktree list 2>/dev/null | tail -n +2)
-
-  # Check for branches with unpushed commits
-  current_branch=$(git -C "$repo_dir" branch --show-current 2>/dev/null || true)
-  if [[ -n "$current_branch" && "$current_branch" != "main" && "$current_branch" != "master" ]]; then
-    unpushed=$(git -C "$repo_dir" log --oneline "@{upstream}..HEAD" 2>/dev/null | wc -l || echo 0)
     if [[ "$unpushed" -gt 0 ]]; then
-      INFLIGHT+=("$current_branch — $unpushed unpushed ($repo_name)")
+      INFLIGHT+=("$current_branch — $unpushed unpushed ($project_name)")
     fi
-  fi
 
-  # Check for open PRs authored by me
-  if command -v gh &>/dev/null; then
-    while IFS=$'\t' read -r pr_number pr_title; do
-      [[ -z "$pr_number" ]] && continue
-      INFLIGHT+=("#$pr_number: $pr_title ($repo_name)")
-    done < <(gh pr list --repo "$repo_dir" --author "@me" --json number,title --jq '.[] | [.number, .title] | @tsv' 2>/dev/null || true)
-  fi
+    # Open PRs authored by me, scoped to this stream's checkout
+    if command -v gh &>/dev/null; then
+      while IFS=$'\t' read -r pr_number pr_title; do
+        [[ -z "$pr_number" ]] && continue
+        INFLIGHT+=("#$pr_number: $pr_title ($project_name)")
+      done < <(gh -R "$(git -C "$stream_dir" remote get-url origin 2>/dev/null)" \
+                  pr list --author "@me" --head "$current_branch" \
+                  --json number,title --jq '.[] | [.number, .title] | @tsv' 2>/dev/null || true)
+    fi
+  done
 done
 
 if [[ ${#INFLIGHT[@]} -eq 0 ]]; then

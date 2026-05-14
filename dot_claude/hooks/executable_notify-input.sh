@@ -22,10 +22,11 @@ GIT_INFO=""
 if [[ -n "$CWD" ]] && command -v git >/dev/null 2>&1; then
   BRANCH=$(git -C "$CWD" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
   if [[ -n "$BRANCH" ]]; then
-    GIT_DIR=$(git -C "$CWD" rev-parse --git-dir 2>/dev/null || true)
-    GIT_COMMON=$(git -C "$CWD" rev-parse --git-common-dir 2>/dev/null || true)
-    if [[ -n "$GIT_DIR" && -n "$GIT_COMMON" && "$GIT_DIR" != "$GIT_COMMON" ]]; then
-      GIT_INFO="worktree: $BRANCH"
+    # Detect a stream clone: parent is ~/Projects/<project>/, dir name != "main"
+    SLUG=$(basename "$CWD")
+    PARENT=$(dirname "$CWD")
+    if [[ "$PARENT" == "$HOME/Projects/"* && "$SLUG" != "main" && -d "$CWD/.git" ]]; then
+      GIT_INFO="stream: $BRANCH"
     else
       GIT_INFO="branch: $BRANCH"
     fi
