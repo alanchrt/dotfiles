@@ -29,6 +29,8 @@
       tags: [vim, dev]
     - name: docker
       tags: [docker, dev]
+    - name: devcontainer
+      tags: [devcontainer, dev]
     - name: kubernetes
       tags: [kubernetes, dev]
     - name: terraform

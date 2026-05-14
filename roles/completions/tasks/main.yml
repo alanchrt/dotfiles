@@ -21,8 +21,17 @@
       generate: step completion zsh
   register: install_completions
 
+- name: Install static completions (shipped files)
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.oh-my-zsh/completions/{{ item }}"
+    mode: "0644"
+  with_items:
+    - _wst
+  register: install_static_completions
+
 - name: Remove compinit dump file
   file:
     path: "{{ ansible_env.HOME }}/.zcompdump_completion"
     state: absent
-  when: install_completions.changed
+  when: install_completions.changed or install_static_completions.changed

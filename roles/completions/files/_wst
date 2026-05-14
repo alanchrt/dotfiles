@@ -1,0 +1,106 @@
+#compdef wst wa wp wls
+# Zsh completion for wst (workstream manager) and its short aliases.
+
+_wst_projects_root() {
+  echo "${WST_PROJECTS_ROOT:-$HOME/Projects}"
+}
+
+# Figure out the project the user is currently inside (parent dir under ~/Projects).
+_wst_current_project() {
+  local root pwd_abs
+  root=$(_wst_projects_root)
+  pwd_abs=${PWD:A}
+  if [[ "$pwd_abs" == "$root"/* ]]; then
+    local rel=${pwd_abs#$root/}
+    echo "${rel%%/*}"
+  fi
+}
+
+# Echo stream slugs under the current project (excluding "main").
+_wst_streams() {
+  local proj root
+  proj=$(_wst_current_project)
+  [[ -z "$proj" ]] && return
+  root=$(_wst_projects_root)
+  local d
+  for d in "$root/$proj"/*/; do
+    [[ -d "${d}.git" ]] || continue
+    local name=${d:t:h}  # last segment
+    name=$(basename "$d")
+    [[ "$name" == "main" ]] && continue
+    echo "$name"
+  done
+}
+
+# Echo branch names (local + origin remotes, deduped) for `wst new`.
+_wst_branches() {
+  local proj root canonical
+  proj=$(_wst_current_project)
+  root=$(_wst_projects_root)
+  if [[ -n "$proj" && -d "$root/$proj/main/.git" ]]; then
+    canonical="$root/$proj/main"
+  elif git rev-parse --git-dir >/dev/null 2>&1; then
+    canonical=$(git rev-parse --show-toplevel)
+  else
+    return
+  fi
+  git -C "$canonical" for-each-ref \
+    --format='%(refname:short)' \
+    refs/heads refs/remotes/origin 2>/dev/null \
+    | sed 's|^origin/||' \
+    | sort -u \
+    | grep -v '^HEAD$'
+}
+
+_wst() {
+  local -a subcmds streams branches
+  subcmds=(
+    'new:create a new stream'
+    'attach:attach to existing stream'
+    'preview:open stream URL in browser'
+    'ls:list streams'
+    'rm:tear down stream'
+    'doctor:diagnostics'
+    'migrate:relocate canonicals to <project>/main/'
+  )
+  if (( CURRENT == 2 )); then
+    _describe 'wst subcommand' subcmds
+    return
+  fi
+  case "$words[2]" in
+    new)
+      if (( CURRENT == 3 )); then
+        branches=("${(@f)$(_wst_branches)}")
+        _describe 'branch' branches
+      fi
+      ;;
+    attach|preview|rm)
+      if (( CURRENT == 3 )); then
+        streams=("${(@f)$(_wst_streams)}")
+        _describe 'stream' streams
+      fi
+      ;;
+  esac
+}
+
+# The short aliases attach to subcommands directly.
+_wa() {
+  local streams=("${(@f)$(_wst_streams)}")
+  _describe 'stream' streams
+}
+
+_wp() {
+  local streams=("${(@f)$(_wst_streams)}")
+  _describe 'stream' streams
+}
+
+_wls() {
+  _arguments '--all[list streams across all projects]'
+}
+
+case "$service" in
+  wst) _wst "$@" ;;
+  wa)  _wa  "$@" ;;
+  wp)  _wp  "$@" ;;
+  wls) _wls "$@" ;;
+esac

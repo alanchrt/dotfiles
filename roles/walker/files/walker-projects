@@ -2,8 +2,24 @@
 
 set -euo pipefail
 
+PROJECTS_ROOT="${WST_PROJECTS_ROOT:-$HOME/Projects}"
+
+# List project parent dirs that contain at least one git checkout one level deeper
+# (i.e. <project>/main/.git or <project>/<branch>/.git). Falls back to listing any
+# subdir so newly-cloned, not-yet-migrated projects still appear.
+list_projects() {
+    local d
+    for d in "$PROJECTS_ROOT"/*/; do
+        [ -d "$d" ] || continue
+        local name
+        name=$(basename "$d")
+        [ "$name" = ".wst-migrate-staging" ] && continue
+        echo "$name"
+    done
+}
+
 if [ "${1:-}" = "--kill" ]; then
-    shorthand=$(printf '%s\n' ~/Projects/* | cut -d '/' -f 5 | walker -d -t dracula -p "kill session")
+    shorthand=$(list_projects | walker -d -t dracula -p "kill session")
     [ -z "$shorthand" ] && exit
     session=$(echo "$shorthand" | sed -r 's/\./_/g')
     tmux kill-session -t "$session"
@@ -11,15 +27,15 @@ if [ "${1:-}" = "--kill" ]; then
     exit
 fi
 
-shorthand=$(printf '%s\n' ~/Projects/* | cut -d '/' -f 5 | walker -d -t dracula -p "project")
+shorthand=$(list_projects | walker -d -t dracula -p "project")
 [ -z "$shorthand" ] && exit
 
-path=~/Projects/$shorthand
+path="$PROJECTS_ROOT/$shorthand"
 session=$(basename "$path" | sed -r 's/\./_/g')
 
 if tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -q "^${session}$"; then
     env -u WAYLAND_DISPLAY alacritty --title "$session" --command tmux attach-session -t "$session"
     notify-send "Existing session" "Opening existing session $session"
 else
-    env -u WAYLAND_DISPLAY alacritty --title "$session" --command tmux new-session -d -c "$path" -s "$session" \; split-window -h -t "$session" -c "$path" "$HOME/.local/bin/claude" \; select-pane -t "${session}:0.0" \; attach-session -t "$session"
+    env -u WAYLAND_DISPLAY alacritty --title "$session" --command tmux new-session -c "$path" -s "$session"
 fi

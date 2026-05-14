@@ -112,3 +112,42 @@
     name: "{{ ansible_env.USER }}"
     groups: kvm
     append: yes
+
+- name: Ensure systemd user dir exists (for adb-bridge unit)
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: "0755"
+
+- name: Install adb-bridge user systemd unit
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/adb-bridge.service"
+    content: |
+      [Unit]
+      Description=adb server listening on all interfaces (for devcontainer access)
+      After=default.target
+
+      [Service]
+      Type=simple
+      Restart=on-failure
+      RestartSec=3
+      Environment=PATH=%h/.local/share/android-sdk/platform-tools:/usr/local/bin:/usr/bin:/bin
+      ExecStart=%h/.local/bin/adb-start-bridged
+
+      [Install]
+      WantedBy=default.target
+    mode: "0644"
+  register: adb_bridge_unit
+
+- name: Reload systemd user units if changed
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    scope: user
+  when: adb_bridge_unit.changed
+
+- name: Enable adb-bridge user service
+  ansible.builtin.systemd:
+    name: adb-bridge
+    scope: user
+    enabled: yes
+    state: started
