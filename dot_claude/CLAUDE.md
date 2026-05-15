@@ -9,6 +9,15 @@
 - When finished, summarize what was done so the work can be reviewed in a pull request.
 - Some projects use Graphite (`gt`) for stacked PRs. If the project has a `.claude/rules/graphite.md` file, follow the Graphite workflow described there for branching inside a stream.
 
+# Shared host files
+
+When the user refers to "the screenshot", "that file I downloaded", or otherwise points to a file by description without a path, check these locations first:
+
+- `~/Downloads/` — files the user dropped from host browsers/apps. Same path on the host and inside every stream container (bind-mounted).
+- Screenshots: `~/Pictures/Screenshots/` on the host, `~/Screenshots/` inside stream containers (bind-mounted from `~/Pictures/Screenshots/`, flattened for a shorter path).
+
+Both mounts are read-only inside containers — read freely, but don't try to modify them in place.
+
 # Workstream Workflow
 
 Streams are isolated parallel development environments — each one is its own git clone in its own devcontainer with its own port. Stream layout: `~/Projects/<project>/main/` is the canonical, `~/Projects/<project>/<branch>/` are streams.
