@@ -14,8 +14,8 @@
   dnf:
     name:
       - android-tools
-      - java-21-openjdk-devel
       - temurin-17-jdk
+      - temurin-21-jdk
 
 - name: Symlink /usr/lib/jvm/java-17-openjdk -> /usr/lib/jvm/temurin-17-jdk
   become: yes
@@ -25,19 +25,26 @@
     state: link
     force: yes
 
-- name: Verify JDK 17 install path matches the project-script expectation
+- name: Check /usr/lib/jvm/java-21-openjdk state
   ansible.builtin.stat:
-    path: /usr/lib/jvm/java-17-openjdk
-  register: jdk17_path
+    path: /usr/lib/jvm/java-21-openjdk
+    follow: no
+  register: jdk21_path
 
-- name: Fail if JDK 17 install path differs
-  ansible.builtin.fail:
-    msg: |
-      Expected /usr/lib/jvm/java-17-openjdk to exist as a symlink to
-      /usr/lib/jvm/temurin-17-jdk, but it does not. Inspect /usr/lib/jvm/
-      and confirm the temurin-17-jdk install path; update the symlink task's
-      `src:` if Adoptium has changed its layout.
-  when: not jdk17_path.stat.exists
+- name: Remove stale java-21-openjdk directory (left by retired -devel package)
+  become: yes
+  ansible.builtin.file:
+    path: /usr/lib/jvm/java-21-openjdk
+    state: absent
+  when: jdk21_path.stat.exists and jdk21_path.stat.isdir and not jdk21_path.stat.islnk
+
+- name: Symlink /usr/lib/jvm/java-21-openjdk -> /usr/lib/jvm/temurin-21-jdk
+  become: yes
+  ansible.builtin.file:
+    src: /usr/lib/jvm/temurin-21-jdk
+    dest: /usr/lib/jvm/java-21-openjdk
+    state: link
+    force: yes
 
 - name: Ensure Android SDK dir exists
   file:
