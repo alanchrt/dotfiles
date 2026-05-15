@@ -537,6 +537,12 @@ if command -v gh >/dev/null 2>&1 && [ -n "${GITHUB_TOKEN:-}" ]; then
   gh auth status >/dev/null 2>&1 || printf '%s' "$GITHUB_TOKEN" | gh auth login --with-token >/dev/null 2>&1 || true
 fi
 
+# Claude Code (the host's ~/.claude/ config is bind-mounted in, but the CLI
+# itself has to be installed inside the container)
+if ! command -v claude >/dev/null 2>&1; then
+  curl -fsSL https://claude.ai/install.sh | bash >/dev/null 2>&1 || true
+fi
+
 # graphite if project is opted in (presence of the .claude/rules/graphite.md rule)
 if [ -f ".claude/rules/graphite.md" ]; then
   command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1 || true
