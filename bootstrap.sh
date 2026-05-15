@@ -36,35 +36,32 @@ if [[ "$OS" == "Darwin" ]]; then
     brew install ansible chezmoi
 elif [[ "$OS" == "Linux" ]]; then
     echo "$PASSWORD" | sudo -S dnf install -y ansible python3-psutil
-    mkdir -p /tmp/dotfiles
-
-    # install chezmoi
-    if [[ ! -f /tmp/dotfiles/chezmoi.tar.gz ]]; then
-        wget --no-clobber https://github.com/twpayne/chezmoi/releases/download/v2.10.0/chezmoi_2.10.0_linux_amd64.tar.gz -O /tmp/dotfiles/chezmoi.tar.gz
-        (cd /tmp/dotfiles && tar -xzf chezmoi.tar.gz)
-    fi
     mkdir -p "$HOME/.local/bin"
-    install /tmp/dotfiles/chezmoi "$HOME/.local/bin"
+
+    # install chezmoi (latest release; `chezmoi upgrade` can refresh later)
+    if ! command -v chezmoi >/dev/null 2>&1; then
+        sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+    fi
 fi
 
 # init and apply chezmoi
-mkdir -p "$HOME/Projects"
-if [[ ! -d "$HOME/Projects/dotfiles" ]]; then
-    git clone https://github.com/alanchrt/dotfiles.git "$HOME/Projects/dotfiles"
+# Layout matches the wst workstream convention: ~/Projects/<project>/<canonical>/
+# Here the canonical dir is `master` (matches the default branch).
+DOTFILES_DIR="$HOME/Projects/dotfiles/master"
+mkdir -p "$HOME/Projects/dotfiles"
+if [[ ! -d "$DOTFILES_DIR" ]]; then
+    git clone https://github.com/alanchrt/dotfiles.git "$DOTFILES_DIR"
 fi
-printf "$CHEZMOI_DATA\n" > "$HOME/Projects/dotfiles/.chezmoidata.toml"
-chezmoi apply --source "$HOME/Projects/dotfiles"
+printf "$CHEZMOI_DATA\n" > "$DOTFILES_DIR/.chezmoidata.toml"
+chezmoi apply --source "$DOTFILES_DIR"
 
 # run ansible playbook
 if [[ "$OS" == "Darwin" ]]; then
     ANSIBLE_FORCE_COLOR=true ansible-playbook -v -c local \
-        "$HOME/Projects/dotfiles/macos.yml" \
-        -i "$HOME/Projects/dotfiles/hosts" \
+        "$DOTFILES_DIR/macos.yml" \
+        -i "$DOTFILES_DIR/hosts" \
         --extra-vars "ansible_become_password=$PASSWORD"
 elif [[ "$OS" == "Linux" ]]; then
-    # clean up chezmoi temp files
-    rm -r /tmp/dotfiles
-
     ANSIBLE_FORCE_COLOR=true ansible-pull -v --checkout master \
         --url https://github.com/alanchrt/dotfiles.git \
         -i hosts --extra-vars "ansible_become_password=$PASSWORD"

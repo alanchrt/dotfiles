@@ -7,16 +7,16 @@ macos.yml
 roles/
 
 {{ if eq .chezmoi.os "darwin" -}}
-dot_dir_colors
-dot_config/flameshot/
-dot_config/rbw/
-dot_config/walker/
-dot_config/systemd/
-dot_config/dotfiles/
-dot_config/elephant/
+.dir_colors
+.config/flameshot/
+.config/rbw/
+.config/walker/
+.config/systemd/
+.config/dotfiles/
+.config/elephant/
 {{ end -}}
 
 {{ if eq .chezmoi.os "linux" -}}
-dot_config/karabiner/
-dot_hammerspoon/
+.config/karabiner/
+.hammerspoon/
 {{ end -}}
