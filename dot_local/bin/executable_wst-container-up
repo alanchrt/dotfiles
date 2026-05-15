@@ -83,6 +83,10 @@ add_bind_ro "$HOME/.config/graphite"     "/home/vscode/.config/graphite"
 # on host and inside the container so a single absolute symlink in a stream's
 # working tree resolves on both sides — see `wst gtinit`.
 add_bind_ro "$HOME/.local/share/claude-rules" "$HOME/.local/share/claude-rules"
+# Screenshots and downloads (RO) at matching absolute paths so absolute host
+# paths Claude sees in conversations resolve inside the container too.
+add_bind_ro "$HOME/Downloads"                 "$HOME/Downloads"
+add_bind_ro "$HOME/Pictures/Screenshots"      "$HOME/Pictures/Screenshots"
 # Full host ~/.claude/ (RW) so the in-container Claude Code sees the same
 # settings.json, CLAUDE.md, hooks/, agents/, commands/, plans/, etc. Includes
 # .credentials.json — refresh-token writes propagate back to the host.
