@@ -18,6 +18,13 @@ INPUT=$(cat)
 CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // empty')
 
+# Session id = transcript filename without .jsonl. Used downstream by the
+# dispatcher to dedupe notifications per Claude session.
+SESSION_ID=""
+if [[ -n "$TRANSCRIPT" ]]; then
+  SESSION_ID=$(basename "$TRANSCRIPT" .jsonl)
+fi
+
 # --- Project name ---
 PROJECT=""
 [[ -n "$CWD" ]] && PROJECT=$(basename "$CWD")
@@ -89,11 +96,13 @@ jq -n \
   --arg pane_target "$PANE_TARGET" \
   --arg wst_project "${WST_PROJECT:-}" \
   --arg wst_stream "${WST_STREAM:-}" \
+  --arg session_id "$SESSION_ID" \
   '{
     title: $title,
     body: $body,
     pane_target: (if $pane_target == "" then null else $pane_target end),
     wst_project:  (if $wst_project  == "" then null else $wst_project  end),
-    wst_stream:   (if $wst_stream   == "" then null else $wst_stream   end)
+    wst_stream:   (if $wst_stream   == "" then null else $wst_stream   end),
+    session_id:   (if $session_id   == "" then null else $session_id   end)
   }' > "$tmp"
 mv "$tmp" "$final"

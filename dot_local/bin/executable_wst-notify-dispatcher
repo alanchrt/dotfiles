@@ -9,7 +9,8 @@
 set -euo pipefail
 
 queue_dir="$HOME/.cache/wst/notify-queue"
-mkdir -p "$queue_dir"
+state_dir="$HOME/.cache/wst/notify-state"
+mkdir -p "$queue_dir" "$state_dir"
 
 # Map a project name to its tmux session name (mirrors `session_name` in wst:
 # replace '.' with '_').
@@ -26,13 +27,23 @@ dispatch_one() {
   local file="$1"
   [[ -f "$file" ]] || return 0
 
-  local title body pane_target wst_project wst_stream
+  local title body pane_target wst_project wst_stream session_id
   title=$(jq -r '.title // ""' "$file" 2>/dev/null || true)
   body=$(jq -r '.body // ""' "$file" 2>/dev/null || true)
   pane_target=$(jq -r '.pane_target // ""' "$file" 2>/dev/null || true)
   wst_project=$(jq -r '.wst_project // ""' "$file" 2>/dev/null || true)
   wst_stream=$(jq -r '.wst_stream // ""' "$file" 2>/dev/null || true)
+  session_id=$(jq -r '.session_id // ""' "$file" 2>/dev/null || true)
   rm -f "$file"
+
+  # Per-Claude-session state file holds the last notification id we got from
+  # notify-send (-p prints it). Replacing via -r ensures only one notification
+  # is on screen for a given session at a time.
+  local state_file="" prev_id=""
+  if [[ -n "$session_id" ]]; then
+    state_file="$state_dir/$session_id"
+    [[ -f "$state_file" ]] && prev_id=$(cat "$state_file" 2>/dev/null || true)
+  fi
 
   # Resolve pane_target from wst metadata if the hook couldn't (in-container case)
   if [[ -z "$pane_target" && -n "$wst_project" && -n "$wst_stream" ]] \
@@ -69,32 +80,50 @@ dispatch_one() {
   # Dispatch in a backgrounded subshell so multiple notifications can be
   # waiting on user click concurrently.
   (
-    local action
+    # Compose notify-send args. -p prints the new notification id; -r replaces
+    # any existing notification from the same Claude session.
+    local -a notify_args
+    notify_args=(-i dialog-information -p)
+    [[ -n "$pane_target" ]] && notify_args+=(-A "default=Focus")
+    [[ -n "$prev_id" ]]     && notify_args+=(-r "$prev_id")
+
+    # Read notify-send's stdout eagerly via process substitution so we can
+    # capture the new id and write it to the state file BEFORE the user
+    # interacts (otherwise a second notification arriving while this one is
+    # still showing wouldn't have the new id to replace against). stdbuf -oL
+    # forces line buffering so the id flushes to the pipe immediately.
+    exec 3< <(stdbuf -oL notify-send "${notify_args[@]}" "$title" "$body" 2>/dev/null || true)
+
+    local new_id=""
+    if IFS= read -t 2 -r -u 3 new_id 2>/dev/null && [[ -n "$new_id" ]]; then
+      [[ -n "$state_file" ]] && printf '%s\n' "$new_id" > "$state_file"
+    fi
+
+    local action=""
     if [[ -n "$pane_target" ]]; then
-      action=$(notify-send -i dialog-information -A "default=Focus" "$title" "$body" 2>/dev/null || true)
-      if [[ "$action" == "default" ]]; then
-        local win="${pane_target%.*}"
-        tmux select-window -t "$win" 2>/dev/null || true
-        tmux select-pane  -t "$pane_target" 2>/dev/null || true
-        # Raise the Alacritty client attached to that session
-        if command -v wmctrl >/dev/null 2>&1; then
-          local session client_pid alacritty_pid pname win_id
-          session="${pane_target%%:*}"
-          client_pid=$(tmux list-clients -t "$session" -F "#{client_pid}" 2>/dev/null | head -1)
-          if [[ -n "$client_pid" ]]; then
-            alacritty_pid=$(ps -o ppid= -p "$client_pid" 2>/dev/null | tr -d ' ')
-            pname=$(ps -o comm= -p "$alacritty_pid" 2>/dev/null | tr -d ' ')
-            if [[ "$pname" == "alacritty" ]]; then
-              win_id=$(wmctrl -l -p 2>/dev/null \
-                | awk -v pid="$alacritty_pid" '$3==pid {print $1; exit}')
-              [[ -n "$win_id" ]] && wmctrl -i -a "$win_id" 2>/dev/null || true
-            fi
+      IFS= read -r -u 3 action 2>/dev/null || true
+    fi
+    exec 3<&-
+
+    if [[ "$action" == "default" && -n "$pane_target" ]]; then
+      local win="${pane_target%.*}"
+      tmux select-window -t "$win" 2>/dev/null || true
+      tmux select-pane  -t "$pane_target" 2>/dev/null || true
+      # Raise the Alacritty client attached to that session
+      if command -v wmctrl >/dev/null 2>&1; then
+        local session client_pid alacritty_pid pname win_id
+        session="${pane_target%%:*}"
+        client_pid=$(tmux list-clients -t "$session" -F "#{client_pid}" 2>/dev/null | head -1)
+        if [[ -n "$client_pid" ]]; then
+          alacritty_pid=$(ps -o ppid= -p "$client_pid" 2>/dev/null | tr -d ' ')
+          pname=$(ps -o comm= -p "$alacritty_pid" 2>/dev/null | tr -d ' ')
+          if [[ "$pname" == "alacritty" ]]; then
+            win_id=$(wmctrl -l -p 2>/dev/null \
+              | awk -v pid="$alacritty_pid" '$3==pid {print $1; exit}')
+            [[ -n "$win_id" ]] && wmctrl -i -a "$win_id" 2>/dev/null || true
           fi
         fi
       fi
-    else
-      # No pane target known — fire a plain notification.
-      notify-send -i dialog-information "$title" "$body" 2>/dev/null || true
     fi
   ) &
   disown
