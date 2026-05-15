@@ -1,4 +1,4 @@
-#compdef wst wa wp wls wcl
+#compdef wst wn wa wp wls wcl
 # Zsh completion for wst (workstream manager) and its short aliases.
 
 _wst_projects_root() {
@@ -99,8 +99,14 @@ _wls() {
   _arguments '--all[list streams across all projects]'
 }
 
+_wn() {
+  local branches=("${(@f)$(_wst_branches)}")
+  _describe 'branch' branches
+}
+
 case "$service" in
   wst) _wst "$@" ;;
+  wn)  _wn  "$@" ;;
   wa)  _wa  "$@" ;;
   wp)  _wp  "$@" ;;
   wls) _wls "$@" ;;
