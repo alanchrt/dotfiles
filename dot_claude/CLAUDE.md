@@ -33,11 +33,12 @@ wa <branch>                        # attach (or boot if stopped) — switches tm
 wp [<branch>]                      # preview: open localhost:<port>/ in host browser
 wls                                # list streams in current project
 wst rm <branch>                    # tear down: container + clone dir + tmux window
+wst gtinit [--project <name>]      # mark project as Graphite-enabled (one-time per project)
 wst doctor                         # diagnostics
 ```
 
 - All commits, PRs, dev server runs, and Claude Code invocations live *inside the container* — that's the pane `wa` drops you into. The host clones exist for filesystem navigation only.
-- Default to plain `git` + `gh`. If `.claude/rules/graphite.md` exists in the project, use `gt` inside the container instead (see Graphite section).
+- Default to plain `git` + `gh`. If `.claude/rules/graphite.md` exists in the project, use `gt` inside the container instead (see Graphite section). To enable Graphite for a project, run `wst gtinit` once — it links the rule into the canonical and every existing stream, and runs `gt repo init` in each running container. Future `wst new` streams inherit the setup automatically.
 - Push: `git push -u origin HEAD` — the stream branch already has the final name, no prefix mapping.
 - After merge: `wst rm <branch>` removes the container, the clone dir, the tmux window, and frees the port.
 

@@ -1,5 +1,5 @@
 ---
-description: Graphite stacking workflow for team projects — symlink this file into .claude/rules/
+description: Graphite stacking workflow for team projects — enable per project with `wst gtinit`
 ---
 
 # Graphite Workflow

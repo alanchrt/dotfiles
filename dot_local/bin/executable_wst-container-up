@@ -61,6 +61,11 @@ add_bind_ro "$HOME/.ssh/id_ed25519.pub"  "/home/vscode/.ssh/id_ed25519.pub"
 add_bind_ro "$HOME/.ssh/known_hosts"     "/home/vscode/.ssh/known_hosts"
 add_bind_ro "$HOME/.gitconfig"           "/home/vscode/.gitconfig"
 add_bind_ro "$HOME/.config/gh"           "/home/vscode/.config/gh"
+add_bind_ro "$HOME/.config/graphite"     "/home/vscode/.config/graphite"
+# Shared Claude rule files (e.g. graphite.md). Mounted at the same literal path on host
+# and inside the container so a single absolute symlink in a stream's working tree
+# resolves on both sides — see `wst gtinit`.
+add_bind_ro "$HOME/.local/share/claude-rules" "$HOME/.local/share/claude-rules"
 # Claude Code Claude.ai-subscription OAuth credentials (RW so refresh-token writes propagate).
 # If the user has an Anthropic API key instead, ANTHROPIC_API_KEY in remoteEnv covers that path.
 add_bind_rw "$HOME/.claude/.credentials.json" "/home/vscode/.claude/.credentials.json"

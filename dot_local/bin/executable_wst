@@ -174,6 +174,12 @@ cmd_new() {
   git -C "$target" fetch origin
   git -C "$target" checkout -B "$branch" "origin/$base"
 
+  # Propagate Graphite enablement from canonical (rule symlink + git exclude).
+  # The matching in-container `gt repo init` runs during provision_container.
+  if [[ -L "$canonical/.claude/rules/graphite.md" ]]; then
+    seed_graphite_rule "$target"
+  fi
+
   local key="$proj/$slug"
   local host_port
   host_port=$(port_allocate "$key")
@@ -197,6 +203,85 @@ Stream '$branch' ready.
   Preview : http://localhost:$host_port/
   Attach  : wa $branch
 EOF
+}
+
+# ---- subcommand: gtinit ----
+
+# Mark a project as Graphite-enabled: symlink the shared graphite.md rule into
+# the canonical and every existing stream's .claude/rules/, ignore the path via
+# .git/info/exclude, and run `gt repo init` inside each running stream's
+# container. Idempotent. Future streams pick up the rule automatically via
+# cmd_new + provision_container.
+cmd_gtinit() {
+  local project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$2"; shift 2 ;;
+      -*)        die "unknown flag: $1" ;;
+      *)         die "unexpected arg: $1 (usage: wst gtinit [--project <name>])" ;;
+    esac
+  done
+
+  local proj; proj=$(resolve_project "$project")
+  local proj_root="$PROJECTS_ROOT/$proj"
+  local canonical; canonical=$(canonical_dir "$proj")
+  [[ -d "$canonical/.git" ]] || die "canonical '$canonical' is not a git repo"
+
+  local rules_src="$HOME/.local/share/claude-rules/graphite.md"
+  [[ -f "$rules_src" ]] || die "no rule at $rules_src — run: chezmoi apply"
+
+  local -a clones=("$canonical")
+  for sdir in "$proj_root"/*/; do
+    [[ -d "$sdir/.git" ]] || continue
+    [[ "$(basename "$sdir")" == "main" ]] && continue
+    clones+=("${sdir%/}")
+  done
+
+  for clone in "${clones[@]}"; do
+    seed_graphite_rule "$clone"
+    info "Linked rule into $clone"
+  done
+
+  local trunk
+  trunk=$(git -C "$canonical" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null \
+    | sed 's|^origin/||' || true)
+  [[ -n "$trunk" ]] || trunk=$(git -C "$canonical" branch --show-current)
+
+  for sdir in "$proj_root"/*/; do
+    [[ -d "$sdir/.git" ]] || continue
+    local slug; slug=$(basename "$sdir")
+    [[ "$slug" == "main" ]] && continue
+    local sdir_clean="${sdir%/}"
+    local cid
+    cid=$(docker ps -q --filter "label=devcontainer.local_folder=$sdir_clean" 2>/dev/null || true)
+    if [[ -z "$cid" ]]; then
+      warn "skipping gt init in $slug — container not running (boot with: wa $slug)"
+      continue
+    fi
+    info "Running gt repo init in $slug (trunk: $trunk)"
+    devcontainer exec --workspace-folder "$sdir_clean" bash -lc \
+      "command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1; gt repo init --trunk $trunk" \
+      || warn "gt repo init reported errors for $slug (continuing)"
+  done
+}
+
+# Seed .claude/rules/graphite.md as a symlink to the chezmoi-managed rule, and
+# git-ignore the path. The symlink target is an absolute host path; combined
+# with the matching bind-mount in wst-container-up, it resolves on host AND
+# inside the container.
+seed_graphite_rule() {
+  local clone="$1"
+  local rules_src="$HOME/.local/share/claude-rules/graphite.md"
+  [[ -f "$rules_src" ]] || return 0
+  mkdir -p "$clone/.claude/rules"
+  ln -sfn "$rules_src" "$clone/.claude/rules/graphite.md"
+  local exclude_file="$clone/.git/info/exclude"
+  if [[ ! -f "$exclude_file" ]]; then
+    mkdir -p "$(dirname "$exclude_file")"
+    : > "$exclude_file"
+  fi
+  grep -qxF ".claude/rules/graphite.md" "$exclude_file" \
+    || echo ".claude/rules/graphite.md" >> "$exclude_file"
 }
 
 # ---- subcommand: attach ----
@@ -437,9 +522,14 @@ if command -v gh >/dev/null 2>&1 && [ -n "${GITHUB_TOKEN:-}" ]; then
   gh auth status >/dev/null 2>&1 || printf '%s' "$GITHUB_TOKEN" | gh auth login --with-token >/dev/null 2>&1 || true
 fi
 
-# graphite if project is opted in
+# graphite if project is opted in (presence of the .claude/rules/graphite.md rule)
 if [ -f ".claude/rules/graphite.md" ]; then
   command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1 || true
+  if command -v gt >/dev/null 2>&1; then
+    _trunk=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
+    [ -n "$_trunk" ] || _trunk=$(git branch --show-current)
+    gt repo init --trunk "$_trunk" >/dev/null 2>&1 || true
+  fi
 fi
 
 # playwright MCP (only fetches once; idempotent)
@@ -497,6 +587,7 @@ usage:
   wst preview [<branch>]                                open localhost:<port>/                   (alias: wp)
   wst ls [--all]                                        list streams                             (alias: wls)
   wst rm <branch> [--force]                             tear down stream
+  wst gtinit [--project <name>]                         enable Graphite in canonical + all streams
   wst doctor                                            diagnostics
   wst migrate                                           one-shot canonical relocation
 EOF
@@ -509,6 +600,7 @@ case "${1:-}" in
   preview) shift; cmd_preview "$@" ;;
   ls)      shift; cmd_ls "$@" ;;
   rm)      shift; cmd_rm "$@" ;;
+  gtinit)  shift; cmd_gtinit "$@" ;;
   doctor)  shift; cmd_doctor "$@" ;;
   migrate) shift; cmd_migrate "$@" ;;
   -h|--help|help|"") usage ;;
