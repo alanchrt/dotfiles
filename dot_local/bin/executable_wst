@@ -581,12 +581,15 @@ tmux_create_window() {
   if ! tmux has-session -t "$session" 2>/dev/null; then
     tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
   fi
-  tmux new-window -t "$session:" -n "$slug" -c "$target"
+  # Pass the command as the new-window argument so the pane's process IS the
+  # devcontainer exec — same pattern as wst-tmux-split for pane splits, and
+  # avoids leaving the launch command visible in the pane's scrollback.
+  tmux new-window -t "$session:" -n "$slug" -c "$target" \
+    "devcontainer exec --workspace-folder '$target' zsh"
   tmux set-option -w -t "$session:$slug" @wst-project "$proj"
   tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
   tmux set-option -w -t "$session:$slug" @wst-workdir "$target"
   tmux set-option -w -t "$session:$slug" @wst-port    "$host_port"
-  tmux send-keys -t "$session:$slug" "devcontainer exec --workspace-folder '$target' zsh" Enter
 }
 
 # ---- dispatch ----
