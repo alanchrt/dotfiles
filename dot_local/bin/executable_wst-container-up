@@ -77,8 +77,12 @@ add_bind_ro "$HOME/.ssh/id_ed25519"      "/home/vscode/.ssh/id_ed25519"
 add_bind_ro "$HOME/.ssh/id_ed25519.pub"  "/home/vscode/.ssh/id_ed25519.pub"
 add_bind_ro "$HOME/.ssh/known_hosts"     "/home/vscode/.ssh/known_hosts"
 add_bind_ro "$HOME/.gitconfig"           "/home/vscode/.gitconfig"
-add_bind_ro "$HOME/.config/gh"           "/home/vscode/.config/gh"
-add_bind_ro "$HOME/.config/graphite"     "/home/vscode/.config/graphite"
+# Share only the auth-relevant files (not the whole config dir) so each
+# container can still manage its own per-repo gh/gt state without the
+# host's RO mount blocking writes.
+add_bind_ro "$HOME/.config/gh/hosts.yml"     "/home/vscode/.config/gh/hosts.yml"
+add_bind_ro "$HOME/.config/graphite/auth"    "/home/vscode/.config/graphite/auth"
+add_bind_ro "$HOME/.config/graphite/aliases" "/home/vscode/.config/graphite/aliases"
 # Shared Claude rule files (e.g. graphite.md). Mounted at the same literal path
 # on host and inside the container so a single absolute symlink in a stream's
 # working tree resolves on both sides — see `wst gtinit`.
@@ -125,6 +129,8 @@ printf '%s' "$project_json" | jq \
       GITHUB_TOKEN: $github_token,
       ANTHROPIC_API_KEY: $anthropic_key,
       ADB_SERVER_SOCKET: "tcp:host.docker.internal:5037",
+      TERM: "tmux-256color",
+      COLORTERM: "truecolor",
       WST_PORT: $cport,
       WST_HOST_PORT: $host_port,
       WST_PROJECT: $project,
