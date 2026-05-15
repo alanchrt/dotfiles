@@ -5,3 +5,53 @@
     name: "@devcontainers/cli"
     global: true
     state: present
+
+- name: Install inotify-tools (needed by wst-notify-dispatcher)
+  become: yes
+  ansible.builtin.dnf:
+    name: inotify-tools
+
+- name: Ensure wst cache + notify-queue dir exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.cache/wst/notify-queue"
+    state: directory
+    mode: "0755"
+
+- name: Ensure systemd user dir exists (for wst-notify-dispatcher unit)
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: "0755"
+
+- name: Install wst-notify-dispatcher user systemd unit
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/wst-notify-dispatcher.service"
+    content: |
+      [Unit]
+      Description=wst notification queue dispatcher (host-side notify-send + tmux focus)
+      After=default.target
+
+      [Service]
+      Type=simple
+      Restart=on-failure
+      RestartSec=3
+      Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+      ExecStart=%h/.local/bin/wst-notify-dispatcher
+
+      [Install]
+      WantedBy=default.target
+    mode: "0644"
+  register: wst_notify_unit
+
+- name: Reload systemd user units if changed
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    scope: user
+  when: wst_notify_unit.changed
+
+- name: Enable wst-notify-dispatcher user service
+  ansible.builtin.systemd:
+    name: wst-notify-dispatcher
+    scope: user
+    enabled: yes
+    state: started
