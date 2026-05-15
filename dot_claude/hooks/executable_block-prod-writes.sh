@@ -121,15 +121,12 @@ def is_readonly(cmd):
         return True
 
     if binary == "gt":
-        if sub in {"log", "ls", "status", "up", "down", "trunk", "branch", "info"}:
-            return True
-        if sub in {"create", "modify", "restack", "sync"}:
-            return True
-        if sub == "submit":
-            return "--force" not in raw
-        if sub == "repo":
-            return sub2 != "init" or "--force" not in raw
-        return False
+        raw = tokens[1:]
+        if sub == "submit" and "--force" in raw:
+            return False
+        if sub == "repo" and sub2 == "init" and "--force" in raw:
+            return False
+        return True
 
     if binary == "az":
         return bool(re.search(r"\b(list|show|get)\b", cmd))
