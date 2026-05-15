@@ -596,10 +596,12 @@ tmux_create_window() {
     tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
   fi
   # Pass the command as the new-window argument so the pane's process IS the
-  # devcontainer exec — same pattern as wst-tmux-split for pane splits, and
-  # avoids leaving the launch command visible in the pane's scrollback.
+  # devcontainer exec — avoids leaving the launch command visible in the
+  # pane's scrollback. Drop straight into Claude Code; when it exits, fall
+  # back to an interactive login shell so the pane stays usable. Pane splits
+  # (wst-tmux-split) still open in zsh, so you can split for shell work.
   tmux new-window -t "$session:" -n "$slug" -c "$target" \
-    "devcontainer exec --workspace-folder '$target' zsh"
+    "devcontainer exec --workspace-folder '$target' zsh -l -c 'claude; exec zsh -l'"
   tmux set-option -w -t "$session:$slug" @wst-project "$proj"
   tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
   tmux set-option -w -t "$session:$slug" @wst-workdir "$target"
