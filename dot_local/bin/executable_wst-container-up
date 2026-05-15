@@ -1,19 +1,13 @@
 #!/usr/bin/env bash
 # wst-container-up — invoke `devcontainer up` for a stream.
 #
-# Background: in @devcontainers/cli 0.87.0+, `--override-config` *replaces*
-# the project's devcontainer.json rather than merging on top. So if we hand it
-# a config that only sets mounts/remoteEnv/runArgs, the project's image/build
-# directive vanishes and devcontainer up errors with "missing image/dockerFile/
-# dockerComposeFile".
-#
-# Workaround:
-#   - Mounts and remoteEnv go through additive --mount / --remote-env CLI
-#     flags, so the project's own mounts/env survive untouched.
-#   - runArgs has no CLI flag, so we still need an override config. We build
-#     it by starting from the project's devcontainer.json, appending our
-#     runArgs, and rewriting relative build paths to absolute (the override
-#     lives outside .devcontainer/).
+# In @devcontainers/cli 0.87.0+ `--override-config` *replaces* the project's
+# devcontainer.json (it used to merge). We work around this by pre-merging:
+# read the project's config, append our mounts/remoteEnv/runArgs onto whatever
+# the project already has, resolve any relative build paths to absolute (the
+# override lives outside .devcontainer/), and hand the merged result to
+# --override-config. The CLI's --mount flag would have been simpler but its
+# parser rejects `readonly`, so we keep mounts in the JSON form instead.
 #
 # Required env (set by wst orchestrator):
 #   WST_PROJECT    project name
@@ -46,7 +40,7 @@ project_dc="$WST_TARGET/.devcontainer/devcontainer.json"
 [[ -f "$project_dc" ]] || die "no devcontainer.json found in $WST_TARGET"
 project_dc_dir="$(dirname "$project_dc")"
 
-# devcontainer.json allows comments; strip them defensively before piping to jq
+# devcontainer.json is JSONC; strip comments defensively before handing to jq
 project_json=$(sed 's|//.*$||; s|/\*.*\*/||' "$project_dc")
 
 # Default GITHUB_TOKEN from `gh auth token` if the shell env doesn't set it
@@ -65,44 +59,18 @@ container_port="${container_port:-$DEFAULT_CONTAINER_PORT}"
 chrome_volume="wst-chrome-$WST_PROJECT"
 override="$OVERRIDES_DIR/$WST_PROJECT-$WST_SLUG.json"
 
-# Build merged override: project config + wst runArgs appended, with relative
-# build paths resolved to absolute (the override lives in ~/.cache/, outside
-# the project's .devcontainer/ dir).
-printf '%s' "$project_json" | jq \
-  --arg host_port "$WST_HOST_PORT" \
-  --arg cport "$container_port" \
-  --arg dc_dir "$project_dc_dir" \
-  '
-  def abs($p):
-    if ($p | startswith("/")) then $p else $dc_dir + "/" + $p end;
-
-  .runArgs = ((.runArgs // []) + [
-    "--add-host=host.docker.internal:host-gateway",
-    "-p", ($host_port + ":" + $cport)
-  ])
-  | if .build?.dockerfile  then .build.dockerfile  = abs(.build.dockerfile)  else . end
-  | if .build?.context     then .build.context     = abs(.build.context)     else . end
-  | if .dockerFile?        then .dockerFile        = abs(.dockerFile)        else . end
-  | if .dockerComposeFile? then
-      if (.dockerComposeFile | type) == "string" then
-        .dockerComposeFile = abs(.dockerComposeFile)
-      else
-        .dockerComposeFile = (.dockerComposeFile | map(abs(.)))
-      end
-    else . end
-  ' > "$override"
-
-# Compose additive --mount flags. Skip mounts whose host source doesn't exist.
-mount_args=()
+# Collect wst mounts as devcontainer.json-style mount strings. Skip any whose
+# host source doesn't exist (e.g. no ssh key set up yet).
+wst_mounts=()
 add_bind_ro() {
   local src="$1" dest="$2"
   [[ -e "$src" ]] || return 0
-  mount_args+=(--mount "type=bind,source=$src,target=$dest,readonly")
+  wst_mounts+=("source=$src,target=$dest,type=bind,readonly")
 }
 add_bind_rw() {
   local src="$1" dest="$2"
   [[ -e "$src" ]] || return 0
-  mount_args+=(--mount "type=bind,source=$src,target=$dest")
+  wst_mounts+=("source=$src,target=$dest,type=bind")
 }
 add_bind_ro "$HOME/.ssh/id_ed25519"      "/home/vscode/.ssh/id_ed25519"
 add_bind_ro "$HOME/.ssh/id_ed25519.pub"  "/home/vscode/.ssh/id_ed25519.pub"
@@ -115,23 +83,54 @@ add_bind_ro "$HOME/.config/graphite"     "/home/vscode/.config/graphite"
 # working tree resolves on both sides — see `wst gtinit`.
 add_bind_ro "$HOME/.local/share/claude-rules" "$HOME/.local/share/claude-rules"
 # Claude.ai-subscription OAuth credentials (RW so refresh-token writes propagate).
-# If the user has an Anthropic API key instead, ANTHROPIC_API_KEY in --remote-env covers it.
+# If the user has an Anthropic API key instead, ANTHROPIC_API_KEY in remoteEnv covers it.
 add_bind_rw "$HOME/.claude/.credentials.json" "/home/vscode/.claude/.credentials.json"
-mount_args+=(--mount "type=volume,source=$chrome_volume,target=/home/vscode/.config/chromium")
+wst_mounts+=("source=$chrome_volume,target=/home/vscode/.config/chromium,type=volume")
 
-# Compose additive --remote-env flags
-env_args=(
-  --remote-env "GITHUB_TOKEN=${GITHUB_TOKEN:-}"
-  --remote-env "ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}"
-  --remote-env "ADB_SERVER_SOCKET=tcp:host.docker.internal:5037"
-  --remote-env "WST_PORT=$container_port"
-  --remote-env "WST_HOST_PORT=$WST_HOST_PORT"
-  --remote-env "WST_PROJECT=$WST_PROJECT"
-  --remote-env "WST_STREAM=$WST_BRANCH"
-)
+# Encode wst mounts as a JSON array for jq to splice into the merged config.
+wst_mounts_json=$(printf '%s\n' "${wst_mounts[@]}" | jq -R . | jq -s .)
+
+# Build the merged override: project's full config + wst additions, with
+# relative build paths resolved to absolute (override lives in ~/.cache/).
+printf '%s' "$project_json" | jq \
+  --arg host_port "$WST_HOST_PORT" \
+  --arg cport "$container_port" \
+  --arg dc_dir "$project_dc_dir" \
+  --arg github_token "${GITHUB_TOKEN:-}" \
+  --arg anthropic_key "${ANTHROPIC_API_KEY:-}" \
+  --arg project "$WST_PROJECT" \
+  --arg branch "$WST_BRANCH" \
+  --argjson wst_mounts "$wst_mounts_json" \
+  '
+  def abs($p):
+    if ($p | startswith("/")) then $p else $dc_dir + "/" + $p end;
+
+  .mounts = ((.mounts // []) + $wst_mounts)
+  | .remoteEnv = ((.remoteEnv // {}) + {
+      GITHUB_TOKEN: $github_token,
+      ANTHROPIC_API_KEY: $anthropic_key,
+      ADB_SERVER_SOCKET: "tcp:host.docker.internal:5037",
+      WST_PORT: $cport,
+      WST_HOST_PORT: $host_port,
+      WST_PROJECT: $project,
+      WST_STREAM: $branch
+    })
+  | .runArgs = ((.runArgs // []) + [
+      "--add-host=host.docker.internal:host-gateway",
+      "-p", ($host_port + ":" + $cport)
+    ])
+  | if .build?.dockerfile  then .build.dockerfile  = abs(.build.dockerfile)  else . end
+  | if .build?.context     then .build.context     = abs(.build.context)     else . end
+  | if .dockerFile?        then .dockerFile        = abs(.dockerFile)        else . end
+  | if .dockerComposeFile? then
+      if (.dockerComposeFile | type) == "string" then
+        .dockerComposeFile = abs(.dockerComposeFile)
+      else
+        .dockerComposeFile = (.dockerComposeFile | map(abs(.)))
+      end
+    else . end
+  ' > "$override"
 
 exec devcontainer up \
   --workspace-folder "$WST_TARGET" \
-  --override-config "$override" \
-  "${mount_args[@]}" \
-  "${env_args[@]}"
+  --override-config "$override"
