@@ -1,5 +1,6 @@
 ---
 - name: Install @devcontainers/cli globally
+  become: yes
   community.general.npm:
     name: "@devcontainers/cli"
     global: true
