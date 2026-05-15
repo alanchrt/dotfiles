@@ -9,7 +9,9 @@ export PATH="$PATH:$HOME/.local/bin:$HOME/.pyenv/bin:/usr/local/go/bin:$HOME/.go
 export GOPATH=$HOME/.go
 
 {{ if eq .chezmoi.os "linux" -}}
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+# JDK 17 for Expo/Gradle (hardcoded JAVA_HOME expectation). The android role
+# uses JDK 21 internally for sdkmanager/avdmanager via inline per-task env.
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
 export ANDROID_HOME="$HOME/.local/share/android-sdk"
 export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator"
 {{ end -}}
