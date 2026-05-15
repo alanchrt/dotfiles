@@ -87,6 +87,10 @@ add_bind_ro "$HOME/.local/share/claude-rules" "$HOME/.local/share/claude-rules"
 # settings.json, CLAUDE.md, hooks/, agents/, commands/, plans/, etc. Includes
 # .credentials.json — refresh-token writes propagate back to the host.
 add_bind_rw "$HOME/.claude" "/home/vscode/.claude"
+# Claude Code user-level state file (sibling of .claude/ at $HOME). Stores
+# theme, firstStartTime, project history, cached experiment features, etc.
+# Without it every fresh container shows onboarding again.
+add_bind_rw "$HOME/.claude.json" "/home/vscode/.claude.json"
 # Notify queue: in-container Claude hooks write JSON here; the host-side
 # wst-notify-dispatcher service watches the dir and dispatches via
 # notify-send + tmux focus + wmctrl.
@@ -112,7 +116,7 @@ printf '%s' "$project_json" | jq \
     if ($p | startswith("/")) then $p else $dc_dir + "/" + $p end;
 
   .mounts = ((.mounts // []) + $wst_mounts)
-  | .remoteEnv = ((.remoteEnv // {}) + {
+  | .remoteEnv = ((.remoteEnv // {}) + ({
       GITHUB_TOKEN: $github_token,
       ANTHROPIC_API_KEY: $anthropic_key,
       ADB_SERVER_SOCKET: "tcp:host.docker.internal:5037",
@@ -120,7 +124,7 @@ printf '%s' "$project_json" | jq \
       WST_HOST_PORT: $host_port,
       WST_PROJECT: $project,
       WST_STREAM: $branch
-    })
+    } | with_entries(select(.value != "" and .value != null))))
   | .runArgs = ((.runArgs // []) + [
       "--add-host=host.docker.internal:host-gateway",
       "-p", ($host_port + ":" + $cport)

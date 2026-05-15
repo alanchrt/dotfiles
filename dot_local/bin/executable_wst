@@ -502,6 +502,14 @@ elif command -v apk >/dev/null 2>&1; then PM=apk
 elif command -v dnf >/dev/null 2>&1; then PM=dnf
 else PM=""; fi
 
+# devcontainer up creates bind-mount parent dirs as root (e.g. ~/.cache/ so
+# that ~/.cache/wst/notify-queue/ can be mounted under it). Reclaim the
+# intermediates so the unprivileged user can write siblings (~/.cache/claude/,
+# ~/.config/<tool>/, etc.).
+for d in "$HOME/.cache" "$HOME/.cache/wst" "$HOME/.config" "$HOME/.ssh"; do
+  [ -d "$d" ] && sudo chown "$USER" "$d" 2>/dev/null || true
+done
+
 inst() {
   case "$PM" in
     apt-get) sudo apt-get update -qq && sudo apt-get install -y -qq "$@" ;;
