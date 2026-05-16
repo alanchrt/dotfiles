@@ -76,11 +76,36 @@ add_bind_rw() {
 add_bind_ro "$HOME/.ssh/id_ed25519"      "/home/vscode/.ssh/id_ed25519"
 add_bind_ro "$HOME/.ssh/id_ed25519.pub"  "/home/vscode/.ssh/id_ed25519.pub"
 add_bind_ro "$HOME/.ssh/known_hosts"     "/home/vscode/.ssh/known_hosts"
-add_bind_ro "$HOME/.gitconfig"           "/home/vscode/.gitconfig"
+# Host gitconfig is mounted at .host-gitconfig and included by the wst layer
+# config below — this leaves room for our credential helper + URL rewrite to
+# sit on top without touching the host's gitconfig.
+add_bind_ro "$HOME/.gitconfig"           "/home/vscode/.host-gitconfig"
+# Wst layer gitconfig: rewrites SSH-style github remotes to HTTPS and routes
+# auth through `gh auth git-credential`. `gh` inside the container uses the
+# forwarded GITHUB_TOKEN, so `git push` and `gt submit` work without an SSH
+# agent or keyring access. The empty `helper =` line is the standard idiom
+# for clearing any inherited credential helpers before appending ours.
+container_gitconfig="$STATE_DIR/container-gitconfig"
+cat > "$container_gitconfig" <<'GITCONFIG'
+[include]
+	path = ~/.host-gitconfig
+
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+	insteadOf = ssh://git@github.com/
+
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+GITCONFIG
+add_bind_ro "$container_gitconfig"       "/home/vscode/.gitconfig"
 # Share only the auth-relevant files (not the whole config dir) so each
 # container can still manage its own per-repo gh/gt state without the
-# host's RO mount blocking writes.
-add_bind_ro "$HOME/.config/gh/hosts.yml"     "/home/vscode/.config/gh/hosts.yml"
+# host's RO mount blocking writes. NOTE: hosts.yml is NOT bind-mounted —
+# on hosts where gh stores its token in the keyring (secure_storage),
+# gh inside the container tries to migrate it on first read and spawns
+# dbus-launch, which isn't present. provision_container in `wst` writes
+# a fresh container-local hosts.yml from GITHUB_TOKEN instead.
 add_bind_ro "$HOME/.config/graphite/auth"    "/home/vscode/.config/graphite/auth"
 add_bind_ro "$HOME/.config/graphite/aliases" "/home/vscode/.config/graphite/aliases"
 # Shared Claude rule files (e.g. graphite.md). Mounted at the same literal path
