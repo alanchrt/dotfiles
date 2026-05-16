@@ -144,7 +144,12 @@ def main():
     except (json.JSONDecodeError, ValueError):
         sys.exit(0)
 
-    command = data.get("tool_input", {}).get("command", "")
+    if not isinstance(data, dict):
+        sys.exit(0)
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        sys.exit(0)
+    command = tool_input.get("command") or ""
 
     if not command:
         sys.exit(0)
@@ -181,4 +186,10 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        # Fail open on unexpected errors so a hook bug never blocks the
+        # user's tool call. One-line stderr summary instead of a traceback.
+        print(f"block-prod-writes hook error: {type(e).__name__}: {e}", file=sys.stderr)
+        sys.exit(0)

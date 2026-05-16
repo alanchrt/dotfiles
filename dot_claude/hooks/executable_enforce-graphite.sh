@@ -76,10 +76,13 @@ def main():
     except (json.JSONDecodeError, ValueError):
         sys.exit(0)
 
-    if data.get("tool_name") != "Bash":
+    if not isinstance(data, dict) or data.get("tool_name") != "Bash":
         sys.exit(0)
 
-    command = data.get("tool_input", {}).get("command", "")
+    tool_input = data.get("tool_input") or {}
+    if not isinstance(tool_input, dict):
+        sys.exit(0)
+    command = tool_input.get("command") or ""
     if not command:
         sys.exit(0)
 
@@ -115,4 +118,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        # Fail open (exit 0) on any unexpected error so a hook bug never
+        # blocks the user's tool call. Print a one-line stderr summary
+        # instead of letting a multi-line traceback spam the UI.
+        print(f"enforce-graphite hook error: {type(e).__name__}: {e}", file=sys.stderr)
+        sys.exit(0)
