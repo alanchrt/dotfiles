@@ -31,6 +31,7 @@ Run `gt` inside the stream's devcontainer (the pane you land in after `wa <branc
 
 ## Submitting for review
 
+- **Always run `gt sync` before `gt submit`** — pulls latest trunk and restacks your branches against it, so you don't push branches that conflict with main or sit on a stale base.
 - `gt submit --stack` — create/update PRs for the entire stack.
 - `gt submit` (no `--stack`) — submit only the current branch.
 
