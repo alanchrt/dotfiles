@@ -44,6 +44,12 @@ def check_segment(cmd):
     binary = os.path.basename(tokens[0])
     rest = tokens[1:]
 
+    # `gt` is always allowed. Graphite intentionally rewrites history
+    # (`gt modify`, `gt restack`, `gt absorb`, `gt squash`) — this hook must
+    # never stand in its way. Only raw `git`/`gh` invocations are gated.
+    if binary == "gt":
+        return None
+
     if binary == "git":
         if not rest:
             return None
