@@ -30,6 +30,8 @@ DEFAULT_CONTAINER_PORT=3000
 
 STATE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/wst"
 OVERRIDES_DIR="$STATE_DIR/overrides"
+WST_DEV_IMAGE="${WST_DEV_IMAGE:-wst-dev:latest}"
+WST_CHROMIUM_VOLUME="${WST_CHROMIUM_VOLUME:-wst-chromium-profile}"
 NOTIFY_QUEUE_DIR="$STATE_DIR/notify-queue"
 mkdir -p "$OVERRIDES_DIR" "$NOTIFY_QUEUE_DIR"
 
@@ -130,6 +132,28 @@ add_bind_rw "$HOME/.claude.json" "/home/vscode/.claude.json"
 # notify-send + tmux focus + wmctrl.
 add_bind_rw "$NOTIFY_QUEUE_DIR" "/home/vscode/.cache/wst/notify-queue"
 wst_mounts+=("source=$chrome_volume,target=/home/vscode/.config/chromium,type=volume")
+# wst-dev shared resources:
+# - Dotfiles source so the entrypoint's `chezmoi apply` finds it at the
+#   path `dot_config/chezmoi/chezmoi.toml.tmpl` configures.
+# - Shared dir between host and all containers.
+# - mise install cache shared across every stream so installing node@20
+#   in one stream is instantly available in the others.
+# - docker socket for sibling compose stacks (microservice projects).
+add_bind_rw "$HOME/Projects/dotfiles/master" "/home/vscode/Projects/dotfiles/master"
+add_bind_rw "$HOME/Projects/Shared"          "/home/vscode/Shared"
+add_bind_rw "$HOME/.local/share/wst/mise"    "/home/vscode/.local/share/mise"
+add_bind_rw "/var/run/docker.sock"           "/var/run/docker.sock"
+# Persistent Chromium profile (SSO/cookies) — single volume shared by every
+# stream. `wst chrome` opens a headed Chromium against this profile so a
+# one-time SSO bootstrap carries auth into headless MCP sessions.
+wst_mounts+=("source=$WST_CHROMIUM_VOLUME,target=/home/vscode/.config/chromium-wst,type=volume")
+# Wayland socket forwarding for headed Chromium handoff. The host's vscode
+# user (uid 1000) matches the container user, so socket access works.
+if [[ -n "${WAYLAND_DISPLAY:-}" && -n "${XDG_RUNTIME_DIR:-}" && \
+      -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]]; then
+  add_bind_rw "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" \
+              "/run/user/1000/$WAYLAND_DISPLAY"
+fi
 
 # Encode wst mounts as a JSON array for jq to splice into the merged config.
 wst_mounts_json=$(printf '%s\n' "${wst_mounts[@]}" | jq -R . | jq -s .)
@@ -145,11 +169,34 @@ printf '%s' "$project_json" | jq \
   --arg project "$WST_PROJECT" \
   --arg branch "$WST_BRANCH" \
   --argjson wst_mounts "$wst_mounts_json" \
+  --arg wst_dev_image "$WST_DEV_IMAGE" \
+  --arg wayland_display "${WAYLAND_DISPLAY:-}" \
   '
   def abs($p):
     if ($p | startswith("/")) then $p else $dc_dir + "/" + $p end;
 
-  .mounts = ((.mounts // []) + $wst_mounts)
+  # Mega-image swap: discard the project image/build/features so every
+  # stream boots wst-dev:latest. We keep mounts/ports/env/runArgs/
+  # postCreateCommand from the project so the rest of the contract holds.
+  .image = $wst_dev_image
+  | del(.build)
+  | del(.dockerFile)
+  | del(.features)
+  # devcontainer-cli overrides the image ENTRYPOINT with its own
+  # (`docker-init.sh ... sleep infinity`), so our setup script must be
+  # injected via the devcontainer spec lifecycle. postStartCommand runs on
+  # every container boot (creation + subsequent starts), keeping dotfiles
+  # in sync with the bind-mounted source. Prepend ours to any project-set
+  # postStartCommand so both run.
+  | .postStartCommand = (
+      if (.postStartCommand // null) == null
+      then "/usr/local/bin/wst-dev-entrypoint"
+      elif (.postStartCommand | type) == "string"
+      then "/usr/local/bin/wst-dev-entrypoint; " + .postStartCommand
+      else "/usr/local/bin/wst-dev-entrypoint"
+      end
+    )
+  | .mounts = ((.mounts // []) + $wst_mounts)
   | .remoteEnv = ((.remoteEnv // {}) + ({
       GITHUB_TOKEN: $github_token,
       ANTHROPIC_API_KEY: $anthropic_key,
@@ -159,7 +206,15 @@ printf '%s' "$project_json" | jq \
       WST_PORT: $cport,
       WST_HOST_PORT: $host_port,
       WST_PROJECT: $project,
-      WST_STREAM: $branch
+      WST_STREAM: $branch,
+      WST_DOTFILES_SRC: "/home/vscode/Projects/dotfiles/master",
+      WST_SHARED_DIR: "/home/vscode/Shared",
+      WST_BROWSER_PROFILE: "/home/vscode/.config/chromium-wst",
+      SHELL: "/usr/bin/zsh",
+      WAYLAND_DISPLAY: $wayland_display,
+      XDG_RUNTIME_DIR: "/run/user/1000",
+      MOZ_ENABLE_WAYLAND: "1",
+      PLAYWRIGHT_BROWSERS_PATH: "/opt/playwright-browsers"
     } | with_entries(select(.value != "" and .value != null))))
   | .runArgs = ((.runArgs // []) + [
       "--add-host=host.docker.internal:host-gateway",

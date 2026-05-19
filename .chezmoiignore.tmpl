@@ -20,3 +20,10 @@ roles/
 .config/karabiner/
 .hammerspoon/
 {{ end -}}
+
+{{/* Inside a wst-dev stream container: wst-container-up bind-mounts a
+     container-specific .gitconfig (RO) at ~/.gitconfig, which blocks
+     chezmoi from rewriting it ("device or resource busy"). Skip. */}}
+{{ if env "WST_DOTFILES_SRC" -}}
+.gitconfig
+{{ end -}}

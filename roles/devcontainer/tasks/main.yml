@@ -55,3 +55,35 @@
     scope: user
     enabled: yes
     state: started
+
+# ----- wst-dev mega image -----
+# One image, all streams. See dot_local/share/wst/README.md.
+
+- name: Ensure shared host dirs for wst-dev exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ ansible_env.HOME }}/Projects/Shared"
+    - "{{ ansible_env.HOME }}/.local/share/wst/mise"
+  tags: [wst-dev]
+
+- name: Ensure shared chromium-profile docker volume exists
+  community.docker.docker_volume:
+    name: wst-chromium-profile
+    state: present
+  tags: [wst-dev]
+
+- name: Build {{ wst_dev_image }}
+  community.docker.docker_image:
+    name: "{{ wst_dev_image }}"
+    source: build
+    state: present
+    force_source: "{{ wst_dev_force_rebuild }}"
+    build:
+      path: "{{ role_path }}/files"
+      dockerfile: wst-dev.Dockerfile
+      pull: yes
+      nocache: "{{ wst_dev_force_rebuild }}"
+  tags: [wst-dev]

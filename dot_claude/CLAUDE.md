@@ -55,6 +55,8 @@ wst doctor                         # diagnostics
 
 **Android emulator:** the emulator runs on host (KVM access). Containers reach it through `ADB_SERVER_SOCKET=tcp:host.docker.internal:5037` (set automatically by `wst-container-up`). Host adb listens on all interfaces via the `adb-bridge` systemd user service. Run `adb devices` inside the container to verify the host emulator is visible.
 
+**Chromium / Playwright MCP handoff:** Chromium runs inside the wst-dev container with a persistent profile at `$WST_BROWSER_PROFILE` (Docker volume `wst-chromium-profile`, shared across every stream). When you're driving the browser via `@playwright/mcp` and hit an SSO / MFA / captcha / consent flow you can't complete on your own, **stop and ask the user to run `wst chrome` in a sibling tmux pane** — that opens a headed Wayland Chromium against the same profile, the user clicks through, closes the window, and the auth state now persists for your headless session. Tell them the exact URL and what they need to do. After they confirm, retry the navigation. See `~/.local/share/wst/README.md` for the full workflow.
+
 # Production Safety
 
 The following commands interact with production systems: heroku, railway, gcloud, gh, terraform, kubectl, k9s, ssh.

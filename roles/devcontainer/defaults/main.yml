@@ -1,0 +1,3 @@
+---
+wst_dev_image: "wst-dev:latest"
+wst_dev_force_rebuild: false

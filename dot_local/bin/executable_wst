@@ -480,6 +480,29 @@ cmd_doctor() {
   printf '\nOrphaned chrome volumes (wst-chrome-*):\n'
   docker volume ls --filter 'name=wst-chrome-' --format '  {{.Name}}' 2>/dev/null || true
 
+  printf '\nwst-dev mega image:\n'
+  local wst_dev="${WST_DEV_IMAGE:-wst-dev:latest}"
+  if docker image inspect "$wst_dev" >/dev/null 2>&1; then
+    local meta built age
+    meta=$(docker run --rm --entrypoint cat "$wst_dev" /etc/wst/wst-dev.json 2>/dev/null || true)
+    built=$(printf '%s' "$meta" | sed -n 's/.*"built_at": *"\([^"]*\)".*/\1/p')
+    if [[ -n "$built" ]]; then
+      age=$(( ($(date +%s) - $(date -d "$built" +%s)) / 86400 ))
+      printf '  %s (built %s, %d days ago)\n' "$wst_dev" "$built" "$age"
+      (( age > 30 )) && printf '  STALE — refresh: ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev -e wst_dev_force_rebuild=true\n'
+    else
+      printf '  %s exists but metadata unreadable\n' "$wst_dev"
+    fi
+  else
+    printf '  %s not built — run: ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev\n' "$wst_dev"
+    ok=false
+  fi
+  if docker volume inspect wst-chromium-profile >/dev/null 2>&1; then
+    printf '  shared chromium profile volume: present\n'
+  else
+    printf '  shared chromium profile volume: missing (will be created on next ansible run)\n'
+  fi
+
   $ok || exit 1
 }
 
@@ -492,104 +515,67 @@ cmd_migrate() {
 # ---- helpers ----
 
 provision_container() {
+  # wst-dev-entrypoint runs chezmoi apply, gh auth, mise install, gt repo
+  # init, and ADB smoke test on container start. All that remains is
+  # registering the Playwright MCP server with the user-level Claude
+  # config — pointed at the persistent Chromium profile shared across
+  # streams (see WST_BROWSER_PROFILE). Because ~/.claude/ is bind-mounted
+  # from the host, this also "leaks" the config back to the host —
+  # intentional: any wst-dev container reads the same mcp_servers.json.
   local target="$1"
   local provision_script
   provision_script=$(cat <<'SH'
 set -e
-# pkg manager detection
-if command -v apt-get >/dev/null 2>&1; then PM=apt-get
-elif command -v apk >/dev/null 2>&1; then PM=apk
-elif command -v dnf >/dev/null 2>&1; then PM=dnf
-else PM=""; fi
-
-# devcontainer up creates bind-mount parent dirs as root (e.g. ~/.cache/ so
-# that ~/.cache/wst/notify-queue/ can be mounted under it). Reclaim the
-# intermediates so the unprivileged user can write siblings (~/.cache/claude/,
-# ~/.config/graphite/repo-state, etc.).
-for d in \
-    "$HOME/.cache" "$HOME/.cache/wst" \
-    "$HOME/.config" "$HOME/.config/gh" "$HOME/.config/graphite" \
-    "$HOME/.ssh"; do
-  [ -d "$d" ] && sudo chown "$USER" "$d" 2>/dev/null || true
-done
-
-inst() {
-  case "$PM" in
-    apt-get) sudo apt-get update -qq && sudo apt-get install -y -qq "$@" ;;
-    apk)     sudo apk add --no-cache "$@" ;;
-    dnf)     sudo dnf install -y -q "$@" ;;
-    *)       echo "no supported package manager" >&2; return 1 ;;
-  esac
-}
-
-# gh — not in stock Debian/Ubuntu repos; add the official apt source first
-if ! command -v gh >/dev/null 2>&1; then
-  case "$PM" in
-    apt-get)
-      if [ ! -f /etc/apt/sources.list.d/github-cli.list ]; then
-        sudo apt-get update -qq >/dev/null 2>&1 || true
-        sudo apt-get install -y -qq curl ca-certificates >/dev/null 2>&1 || true
-        sudo install -d -m 0755 /etc/apt/keyrings
-        sudo curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-          -o /etc/apt/keyrings/githubcli-archive-keyring.gpg
-        sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
-          | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
-        sudo apt-get update -qq >/dev/null 2>&1 || true
-      fi
-      sudo apt-get install -y -qq gh || true
-      ;;
-    *)
-      inst gh || true
-      ;;
-  esac
-fi
-if command -v gh >/dev/null 2>&1 && [ -n "${GITHUB_TOKEN:-}" ]; then
-  gh auth status >/dev/null 2>&1 || printf '%s' "$GITHUB_TOKEN" | gh auth login --with-token >/dev/null 2>&1 || true
-fi
-
-# Claude Code (the host's ~/.claude/ config is bind-mounted in, but the CLI
-# itself has to be installed inside the container)
-if ! command -v claude >/dev/null 2>&1; then
-  curl -fsSL https://claude.ai/install.sh | bash >/dev/null 2>&1 || true
-fi
-
-# graphite if project is opted in (presence of the .claude/rules/graphite.md rule)
-if [ -f ".claude/rules/graphite.md" ]; then
-  command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1 || true
-  if command -v gt >/dev/null 2>&1; then
-    _trunk=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||')
-    [ -n "$_trunk" ] || _trunk=$(git branch --show-current)
-    gt repo init --trunk "$_trunk" >/dev/null 2>&1 || true
-  fi
-fi
-
-# playwright MCP (only fetches once; idempotent)
-command -v npx >/dev/null 2>&1 && {
-  npm install -g @playwright/mcp >/dev/null 2>&1 || true
-  npx -y playwright install chromium >/dev/null 2>&1 || true
-}
-
-# register Playwright MCP for in-container Claude Code
 mkdir -p "$HOME/.claude"
 cat > "$HOME/.claude/mcp_servers.json" <<JSON
 {
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": ["@playwright/mcp@latest"]
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir", "/home/vscode/.config/chromium-wst",
+        "--browser", "chromium"
+      ]
     }
   }
 }
 JSON
-
-# sanity: ADB bridge reachable (non-fatal)
-if [ -n "${ADB_SERVER_SOCKET:-}" ] && command -v adb >/dev/null 2>&1; then
-  adb devices >/dev/null 2>&1 || true
-fi
 SH
 )
-  devcontainer exec --workspace-folder "$target" bash -c "$provision_script" || warn "post-up provisioning had non-fatal errors (continuing)"
+  devcontainer exec --workspace-folder "$target" bash -c "$provision_script" \
+    || warn "post-up MCP registration had non-fatal errors (continuing)"
+}
+
+cmd_chrome() {
+  # Open headed Chromium inside the current stream's container against the
+  # shared persistent profile. Use this when Claude is driving the browser
+  # via @playwright/mcp and asks you to complete SSO / MFA / a captcha —
+  # see ~/.local/share/wst/README.md (Browser handoff workflow).
+  #
+  # Detect the stream via the tmux window option set by tmux_create_window.
+  local proj branch target slug session
+  proj=$(tmux show-options -wqv @wst-project 2>/dev/null || true)
+  branch=$(tmux show-options -wqv @wst-stream 2>/dev/null || true)
+  target=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
+  if [[ -z "$proj" || -z "$branch" || -z "$target" ]]; then
+    die "not inside a wst stream tmux window (use \`wa <branch>\` first)"
+  fi
+  if [[ -z "${WAYLAND_DISPLAY:-}" ]]; then
+    warn "WAYLAND_DISPLAY is empty on the host — headed Chromium will fail to connect"
+  fi
+  info "opening headed Chromium for stream $proj/$branch"
+  # The Playwright-bundled chromium ships at a versioned path; resolve at
+  # runtime so we don't pin a version here.
+  devcontainer exec --workspace-folder "$target" bash -lc '
+    chrome=$(ls -1 /opt/playwright-browsers/chromium-*/chrome-linux/chrome 2>/dev/null | head -1)
+    [ -n "$chrome" ] || { echo "wst chrome: no chromium binary found under /opt/playwright-browsers" >&2; exit 1; }
+    exec "$chrome" \
+      --ozone-platform=wayland --enable-features=UseOzonePlatform \
+      --user-data-dir="$WST_BROWSER_PROFILE" \
+      --no-first-run --no-default-browser-check \
+      "$@"
+  ' bash "$@"
 }
 
 tmux_create_window() {
@@ -625,6 +611,7 @@ usage:
   wst ls [--all]                                        list streams                             (alias: wls)
   wst rm <branch> [--force]                             tear down stream
   wst gtinit [--project <name>]                         enable Graphite in canonical + all streams
+  wst chrome [-- <url> ...]                             open headed Chromium for SSO/MFA handoff
   wst doctor                                            diagnostics
   wst migrate                                           one-shot canonical relocation
 EOF
@@ -638,6 +625,7 @@ case "${1:-}" in
   ls)      shift; cmd_ls "$@" ;;
   rm)      shift; cmd_rm "$@" ;;
   gtinit)  shift; cmd_gtinit "$@" ;;
+  chrome)  shift; cmd_chrome "$@" ;;
   doctor)  shift; cmd_doctor "$@" ;;
   migrate) shift; cmd_migrate "$@" ;;
   -h|--help|help|"") usage ;;
