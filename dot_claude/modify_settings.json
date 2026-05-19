@@ -17,7 +17,10 @@ managed=$(cat <<'MANAGED'
       "Bash(sudo *)", "Bash(shutdown*)", "Bash(reboot*)",
       "Bash(poweroff*)", "Bash(halt*)", "Bash(mkfs*)", "Bash(dd *)",
       "Bash(crontab -r*)", "Bash(truncate *)",
-      "Bash(rm -rf*)", "Bash(rm -fr*)"
+      "Bash(rm -rf /)", "Bash(rm -fr /)",
+      "Bash(rm -rf /\\*)", "Bash(rm -fr /\\*)",
+      "Bash(rm -rf ~)", "Bash(rm -fr ~)",
+      "Bash(rm -rf ~/\\*)", "Bash(rm -fr ~/\\*)"
     ],
     "deny": [
       "Read(~/.ssh/**)", "Read(~/.gnupg/**)", "Read(~/.gpg/**)", "Read(~/.aws/**)",
