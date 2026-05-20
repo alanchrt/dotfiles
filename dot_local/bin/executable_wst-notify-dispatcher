@@ -99,9 +99,14 @@ dispatch_one() {
       [[ -n "$state_file" ]] && printf '%s\n' "$new_id" > "$state_file"
     fi
 
+    # Cap the wait for a click — without a timeout the subshell hangs as
+    # long as notify-send runs, which can be forever on notification daemons
+    # that don't auto-expire. 10 minutes is well past any realistic
+    # acknowledge window and prevents leaked subshells from piling up in
+    # the service's cgroup.
     local action=""
     if [[ -n "$pane_target" ]]; then
-      IFS= read -r -u 3 action 2>/dev/null || true
+      IFS= read -t 600 -r -u 3 action 2>/dev/null || true
     fi
     exec 3<&-
 
@@ -135,8 +140,11 @@ for f in "$queue_dir"/*.json; do
 done
 
 # Watch for new files. close_write + moved_to covers atomic writes
-# (the hook uses .tmp + mv).
-exec inotifywait -m -e close_write,moved_to --format '%w%f' "$queue_dir" \
+# (the hook uses .tmp + mv). `stdbuf -oL` forces inotifywait's stdout to
+# line-buffer — without it glibc auto-selects 4KB block buffering when
+# stdout is a pipe, and individual events sit in the buffer for seconds
+# (or longer) before being delivered to the while-read loop.
+exec stdbuf -oL inotifywait -m -e close_write,moved_to --format '%w%f' "$queue_dir" \
   | while read -r path; do
       [[ "$path" == *.json ]] && dispatch_one "$path"
     done
