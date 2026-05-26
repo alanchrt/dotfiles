@@ -31,6 +31,9 @@ PROJECT=""
 PROJECT="${PROJECT:-Claude Code}"
 
 # --- Git / stream context ---
+# WORKSTREAM is set only when we're inside a wst stream (branch goes in the
+# title). GIT_INFO is the body line for the non-stream branch case.
+WORKSTREAM=""
 GIT_INFO=""
 if [[ -n "$CWD" ]] && command -v git >/dev/null 2>&1; then
   BRANCH=$(git -C "$CWD" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
@@ -38,9 +41,9 @@ if [[ -n "$CWD" ]] && command -v git >/dev/null 2>&1; then
     SLUG=$(basename "$CWD")
     PARENT=$(dirname "$CWD")
     if [[ -n "${WST_STREAM:-}" ]]; then
-      GIT_INFO="stream: $BRANCH"
+      WORKSTREAM="${WST_STREAM}"
     elif [[ "$PARENT" == "$HOME/Projects/"* && "$SLUG" != "main" && -d "$CWD/.git" ]]; then
-      GIT_INFO="stream: $BRANCH"
+      WORKSTREAM="$BRANCH"
     else
       GIT_INFO="branch: $BRANCH"
     fi
@@ -59,6 +62,7 @@ fi
 
 # --- Compose ---
 TITLE="Claude Code — $PROJECT"
+[[ -n "$WORKSTREAM" ]] && TITLE+=" [$WORKSTREAM]"
 BODY=""
 [[ -n "$GIT_INFO" ]] && BODY+="$GIT_INFO"
 if [[ -n "$SUMMARY" ]]; then

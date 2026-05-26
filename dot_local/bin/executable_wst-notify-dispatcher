@@ -77,40 +77,43 @@ dispatch_one() {
     fi
   fi
 
-  # Dispatch in a backgrounded subshell so multiple notifications can be
-  # waiting on user click concurrently.
+  # Compose notify-send args. -p prints the new notification id; -r replaces
+  # any existing notification from the same Claude session.
+  local -a notify_args
+  notify_args=(-i dialog-information -p)
+  [[ -n "$pane_target" ]] && notify_args+=(-A "default=Focus")
+  [[ -n "$prev_id" ]]     && notify_args+=(-r "$prev_id")
+
+  # Launch notify-send and capture the new id SYNCHRONOUSLY in the foreground
+  # before processing the next queue entry. If we backgrounded this, a
+  # second notification arriving within ~2s could read prev_id before the
+  # first dispatch had written the new id, breaking the single-notification
+  # guarantee. stdbuf -oL forces line buffering so the id flushes immediately.
+  exec 3< <(stdbuf -oL notify-send "${notify_args[@]}" "$title" "$body" 2>/dev/null || true)
+
+  local new_id=""
+  if IFS= read -t 2 -r -u 3 new_id 2>/dev/null && [[ -n "$new_id" ]]; then
+    [[ -n "$state_file" ]] && printf '%s\n' "$new_id" > "$state_file"
+  fi
+
+  # No click action possible without a pane to focus — close the pipe and bail.
+  if [[ -z "$pane_target" ]]; then
+    exec 3<&-
+    return 0
+  fi
+
+  # Background only the click handler so subsequent queue entries process
+  # immediately. Cap the wait at 10 minutes — without a timeout the subshell
+  # hangs as long as notify-send runs, which can be forever on notification
+  # daemons that don't auto-expire. 10 minutes is well past any realistic
+  # acknowledge window and prevents leaked subshells from piling up in
+  # the service's cgroup.
   (
-    # Compose notify-send args. -p prints the new notification id; -r replaces
-    # any existing notification from the same Claude session.
-    local -a notify_args
-    notify_args=(-i dialog-information -p)
-    [[ -n "$pane_target" ]] && notify_args+=(-A "default=Focus")
-    [[ -n "$prev_id" ]]     && notify_args+=(-r "$prev_id")
-
-    # Read notify-send's stdout eagerly via process substitution so we can
-    # capture the new id and write it to the state file BEFORE the user
-    # interacts (otherwise a second notification arriving while this one is
-    # still showing wouldn't have the new id to replace against). stdbuf -oL
-    # forces line buffering so the id flushes to the pipe immediately.
-    exec 3< <(stdbuf -oL notify-send "${notify_args[@]}" "$title" "$body" 2>/dev/null || true)
-
-    local new_id=""
-    if IFS= read -t 2 -r -u 3 new_id 2>/dev/null && [[ -n "$new_id" ]]; then
-      [[ -n "$state_file" ]] && printf '%s\n' "$new_id" > "$state_file"
-    fi
-
-    # Cap the wait for a click — without a timeout the subshell hangs as
-    # long as notify-send runs, which can be forever on notification daemons
-    # that don't auto-expire. 10 minutes is well past any realistic
-    # acknowledge window and prevents leaked subshells from piling up in
-    # the service's cgroup.
     local action=""
-    if [[ -n "$pane_target" ]]; then
-      IFS= read -t 600 -r -u 3 action 2>/dev/null || true
-    fi
+    IFS= read -t 600 -r -u 3 action 2>/dev/null || true
     exec 3<&-
 
-    if [[ "$action" == "default" && -n "$pane_target" ]]; then
+    if [[ "$action" == "default" ]]; then
       local win="${pane_target%.*}"
       tmux select-window -t "$win" 2>/dev/null || true
       tmux select-pane  -t "$pane_target" 2>/dev/null || true
