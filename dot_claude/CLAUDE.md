@@ -5,9 +5,7 @@
 - Once you begin working, be independent until finished. Do not ask unnecessary questions mid-task.
 - Make small, focused commits as you work unless explicitly told not to commit.
   - If `.claude/rules/graphite.md` exists in the project, use `gt create -m "..."` instead of `git commit`. Same swaps: `gt modify` for `git commit --amend`, `gt create <name>` for `git checkout -b <name>`, `gt restack` for `git rebase`, `gt submit` for `gh pr create`. A PreToolUse hook will block the raw `git`/`gh` form in these projects — see `.claude/rules/graphite.md` for the full verb table.
-- Before committing, make a small effort to verify changes work when reasonable (e.g., run a linter, execute a relevant command, check syntax). Don't skip this just to move faster.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
-- When finished, summarize what was done so the work can be reviewed in a pull request.
 
 # Shared host files
 
@@ -20,18 +18,7 @@ Both mounts are read-only inside containers — read freely, but don't try to mo
 
 # Workstream Workflow
 
-Streams are isolated parallel development environments — each one is its own git clone in its own devcontainer with its own port. Stream layout: `~/Projects/<project>/main/` is the canonical, `~/Projects/<project>/<branch>/` are streams.
-
-**Use a stream when:**
-- On `main`/`master` and the task is more than a trivial change
-- The task is unrelated to the current branch's purpose
-- The task would benefit from an isolated PR
-- Multiple features need to be developed in parallel
-
-**Don't use a stream when:**
-- Small, quick fixes (typos, single-line changes) — edit in `<project>/main/` and ask for confirmation before committing to main
-- Already inside an existing stream window (you're attached if `tmux show-options -wqv @wst-stream` returns a value)
-- The user explicitly says to work on the current branch
+Streams are isolated parallel development environments — each one is its own git clone in its own devcontainer with its own port. Stream layout: `~/Projects/<project>/main/` is the canonical, `~/Projects/<project>/<branch>/` are streams. The user manages stream lifecycle manually; don't propose creating or tearing down streams unsolicited.
 
 **Commands** (the host `wst` script — see `~/.local/bin/wst`; chezmoi source: `dot_local/bin/executable_wst`):
 
