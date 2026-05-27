@@ -98,9 +98,10 @@ managed=$(cat <<'MANAGED'
   },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  }
+  },
+  "fastMode": {{ dig "fast_mode" false . }}
 }
 MANAGED
 )
 
-printf '%s' "$current" | jq --argjson m "$managed" '. + {permissions: $m.permissions, hooks: $m.hooks, env: $m.env}'
+printf '%s' "$current" | jq --argjson m "$managed" '. + {permissions: $m.permissions, hooks: $m.hooks, env: $m.env, fastMode: $m.fastMode}'
