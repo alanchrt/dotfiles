@@ -8,9 +8,6 @@
 	navigate = true
 	line-numbers = true
 	syntax-theme = Dracula
-	# Pad +/- backgrounds to full pane width so the colored edges line up
-	# instead of jagging behind each line's text length.
-	line-fill-method = spaces
 
 # Note: side-by-side is not set globally — it wraps in any moderate-width
 # pane (lazygit, splits, etc.). Opt in per invocation when you want it:
