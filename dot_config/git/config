@@ -1,0 +1,15 @@
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	line-numbers = true
+	syntax-theme = Dracula
+
+# Note: side-by-side is not set globally — it wraps in any moderate-width
+# pane (lazygit, splits, etc.). Opt in per invocation when you want it:
+#   git -c delta.side-by-side=true diff
+# or define a shell alias.

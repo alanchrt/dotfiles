@@ -1,0 +1,24 @@
+# Suppress the "Thanks for using lazygit!" popup on each new release.
+disableStartupPopups: true
+# Ask before quitting so a stray `q` in a wst pane doesn't kill the session.
+confirmOnQuit: true
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --paging=never
+
+gui:
+  # Hide the command-log panel by default; toggle with ` (backtick) when
+  # debugging what git commands lazygit is running.
+  showCommandLog: false
+  theme:
+    lightTheme: false
+    activeBorderColor:         ['#ff79c6', bold]
+    inactiveBorderColor:       ['#6272a4']
+    optionsTextColor:          ['#bd93f9']
+    selectedLineBgColor:       ['#44475a']
+    selectedRangeBgColor:      ['#44475a']
+    cherryPickedCommitBgColor: ['#44475a']
+    cherryPickedCommitFgColor: ['#bd93f9']
+    unstagedChangesColor:      ['#ff5555']

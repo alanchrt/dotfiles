@@ -21,6 +21,7 @@
       - diceware
       - ripgrep
       - python3-ipython
+      - git-delta
 
 - name: Configure ddterm
   ansible.builtin.shell: "dconf load /com/github/amezin/ddterm/ < {{ role_path }}/files/ddterm.conf"
@@ -53,6 +54,16 @@
     extra_opts:
       - --strip-components=1
       - doggo_1.0.5_Linux_x86_64/doggo
+
+- name: Install lazygit
+  ansible.builtin.unarchive:
+    src: https://github.com/jesseduffield/lazygit/releases/download/v0.62.0/lazygit_0.62.0_Linux_x86_64.tar.gz
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    remote_src: yes
+    mode: +x
+    extra_opts:
+      - lazygit
+    creates: "{{ ansible_env.HOME }}/.local/bin/lazygit"
 
 - name: Create local src directory
   ansible.builtin.file:

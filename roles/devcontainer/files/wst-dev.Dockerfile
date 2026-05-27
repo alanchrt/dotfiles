@@ -6,7 +6,7 @@
 # `image`/`build`/`features` for this image while preserving mounts, ports,
 # env, runArgs, and postCreateCommand.
 #
-# Refresh: ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev -e wst_dev_force_rebuild=true
+# Refresh: ansible-playbook -c local -K -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags devcontainer -e wst_dev_force_rebuild=true
 
 FROM mcr.microsoft.com/devcontainers/base:bookworm
 
@@ -81,6 +81,8 @@ ARG LF_VERSION=r33
 ARG DOGGO_VERSION=1.0.5
 ARG DUST_VERSION=1.1.1
 ARG DIFFTASTIC_VERSION=0.61.0
+ARG DELTA_VERSION=0.19.2
+ARG LAZYGIT_VERSION=0.62.0
 RUN set -eux; \
     tmp=$(mktemp -d); \
     # format: <install-name>|<binary-name-inside-tarball>|<url>
@@ -89,6 +91,8 @@ RUN set -eux; \
       "doggo|doggo|https://github.com/mr-karan/doggo/releases/download/v${DOGGO_VERSION}/doggo_${DOGGO_VERSION}_Linux_x86_64.tar.gz" \
       "dust|dust|https://github.com/bootandy/dust/releases/download/v${DUST_VERSION}/dust-v${DUST_VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
       "difft|difft|https://github.com/Wilfred/difftastic/releases/download/${DIFFTASTIC_VERSION}/difft-x86_64-unknown-linux-gnu.tar.gz" \
+      "delta|delta|https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/delta-${DELTA_VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
+      "lazygit|lazygit|https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz" \
     ; do \
       IFS='|' read -r name bin url <<< "$spec"; \
       d="$tmp/$name"; mkdir -p "$d"; \

@@ -65,4 +65,37 @@ if [[ -n "${ADB_SERVER_SOCKET:-}" ]] && command -v adb >/dev/null 2>&1; then
   adb devices >/dev/null 2>&1 || true
 fi
 
+# 6. Auto-trust the workspace dir for Claude Code so the trust dialog doesn't
+#    pop on every fresh stream. ~/.claude.json is bind-mounted RW from host;
+#    /workspaces/* paths are container-only (they don't exist on host), so
+#    this is effectively container-scoped — host trust prompts are unaffected.
+#    Atomic write via tempfile + rename to avoid partial writes if Claude is
+#    concurrently touching the file elsewhere.
+if [[ "$PWD" == /workspaces/* ]] && command -v python3 >/dev/null 2>&1; then
+  python3 - "$PWD" <<'PY' || note "claude auto-trust had errors (non-fatal)"
+import json, os, sys, tempfile
+p = os.path.expanduser("~/.claude.json")
+path = sys.argv[1]
+try:
+    with open(p) as f: d = json.load(f)
+except FileNotFoundError:
+    d = {}
+except Exception:
+    sys.exit(0)
+proj = d.setdefault("projects", {}).setdefault(path, {})
+if proj.get("hasTrustDialogAccepted"):
+    sys.exit(0)
+proj["hasTrustDialogAccepted"] = True
+fd, tmp = tempfile.mkstemp(prefix=".claude.json.", dir=os.path.dirname(p))
+try:
+    with os.fdopen(fd, "w") as f:
+        json.dump(d, f, indent=2)
+    os.replace(tmp, p)
+except Exception:
+    try: os.unlink(tmp)
+    except Exception: pass
+    sys.exit(0)
+PY
+fi
+
 exit 0
