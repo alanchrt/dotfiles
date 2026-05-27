@@ -1,0 +1,81 @@
+#!/bin/bash
+# chezmoi modify script for ~/.codex/config.toml. Codex writes runtime
+# state to this file (trust entries under [projects.*], TUI onboarding
+# under [tui.*]) so a static-template replacement would clobber those.
+# Strategy: strip the keys / sections WE manage from the current file,
+# then emit our managed content followed by everything codex added.
+set -euo pipefail
+
+current=$(cat)
+
+# Preserve everything in the current file EXCEPT our managed top-level
+# keys (only valid before the first section header) and our managed
+# sections ([features], [mcp_servers.playwright]).
+preserved=$(printf '%s' "$current" | python3 -c '
+import re, sys
+managed_keys = {"sandbox_mode", "approval_policy", "service_tier"}
+managed_sections = {"features", "mcp_servers.playwright"}
+out = []
+in_drop = False
+in_any_section = False
+for line in sys.stdin.read().splitlines(keepends=True):
+    stripped = line.strip()
+    if stripped.startswith("[") and stripped.endswith("]") and not stripped.startswith("[["):
+        section = stripped[1:-1].strip()
+        in_drop = section in managed_sections
+        in_any_section = True
+        if not in_drop:
+            out.append(line)
+        continue
+    if in_drop:
+        continue
+    if not in_any_section:
+        # Leading area before any section header is owned by this script —
+        # drop managed keys and any blank/comment lines so the output stays
+        # tidy across apply cycles.
+        if stripped == "" or stripped.startswith("#"):
+            continue
+        m = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=", line)
+        if m and m.group(1) in managed_keys:
+            continue
+    out.append(line)
+text = "".join(out).rstrip()
+sys.stdout.write(text + "\n" if text else "")
+')
+
+# Emit our managed content first (top-level keys, then managed sections),
+# then the preserved bits (codex's runtime tables, anything else).
+{
+  cat <<'MANAGED'
+# Match Claude Code's broadly-permissive default with on-request approval
+# for things outside the workspace.
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+MANAGED
+
+{{ if dig "fast_mode" false . -}}
+  # service_tier is REQUIRED alongside [features].fast_mode = true to
+  # actually persist fast mode as the default — service_tier sets the
+  # API tier; fast_mode = true is the TUI toggle that /fast flips.
+  echo 'service_tier = "fast"'
+{{ end -}}
+
+  cat <<'MANAGED'
+
+[features]
+fast_mode = {{ dig "fast_mode" false . }}
+
+# Playwright MCP — model-agnostic browser automation. The wst-dev image
+# installs @playwright/mcp globally so `npx` resolves it quickly. Same
+# server, same Chromium ($WST_BROWSER_PROFILE) you used from Claude.
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]
+startup_timeout_sec = 120
+MANAGED
+
+  if [ -n "$preserved" ]; then
+    echo
+    printf '%s' "$preserved"
+  fi
+}
