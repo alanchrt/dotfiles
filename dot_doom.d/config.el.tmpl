@@ -122,3 +122,9 @@
 ;; Ruff formatter for Python (replaces black)
 (after! python
   (set-formatter! 'ruff-format "ruff format -" :modes '(python-mode python-ts-mode)))
+
+;; Live-refresh buffers when files change on disk (e.g. Claude Code edits).
+;; Pair with `:ui vc-gutter` to get live fringe markers without manual revert.
+(setq auto-revert-verbose nil
+      auto-revert-use-notify t)
+(global-auto-revert-mode 1)
