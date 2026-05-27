@@ -269,19 +269,36 @@ cmd_gtinit() {
 # git-ignore the path. The symlink target is an absolute host path; combined
 # with the matching bind-mount in wst-container-up, it resolves on host AND
 # inside the container.
-seed_graphite_rule() {
-  local clone="$1"
-  local rules_src="$HOME/.local/share/claude-rules/graphite.md"
-  [[ -f "$rules_src" ]] || return 0
-  mkdir -p "$clone/.claude/rules"
-  ln -sfn "$rules_src" "$clone/.claude/rules/graphite.md"
+_add_to_git_exclude() {
+  local clone="$1" rel="$2"
   local exclude_file="$clone/.git/info/exclude"
   if [[ ! -f "$exclude_file" ]]; then
     mkdir -p "$(dirname "$exclude_file")"
     : > "$exclude_file"
   fi
-  grep -qxF ".claude/rules/graphite.md" "$exclude_file" \
-    || echo ".claude/rules/graphite.md" >> "$exclude_file"
+  grep -qxF "$rel" "$exclude_file" || echo "$rel" >> "$exclude_file"
+}
+
+seed_graphite_rule() {
+  local clone="$1"
+
+  # Claude: link the shared rule into .claude/rules/graphite.md
+  local claude_src="$HOME/.local/share/claude-rules/graphite.md"
+  if [[ -f "$claude_src" ]]; then
+    mkdir -p "$clone/.claude/rules"
+    ln -sfn "$claude_src" "$clone/.claude/rules/graphite.md"
+    _add_to_git_exclude "$clone" ".claude/rules/graphite.md"
+  fi
+
+  # Codex: link the shared rule into AGENTS.override.md at the repo root.
+  # Codex's AGENTS discovery walks cwd up to the git root checking
+  # AGENTS.override.md first, then AGENTS.md — using .override.md keeps
+  # the project's committed AGENTS.md (if any) untouched.
+  local codex_src="$HOME/.local/share/codex-rules/graphite.md"
+  if [[ -f "$codex_src" ]]; then
+    ln -sfn "$codex_src" "$clone/AGENTS.override.md"
+    _add_to_git_exclude "$clone" "AGENTS.override.md"
+  fi
 }
 
 # ---- subcommand: attach ----
@@ -586,14 +603,14 @@ tmux_create_window() {
   fi
   # Pass the command as the new-window argument so the pane's process IS the
   # devcontainer exec — avoids leaving the launch command visible in the
-  # pane's scrollback. Drop straight into `claude agents` so you can spawn
-  # and switch between multiple background sessions per stream; when it
-  # exits, fall back to an interactive login shell so the pane stays usable.
+  # pane's scrollback. Drop straight into Codex (multi-session is via
+  # `/agent` and `/resume` slash commands once inside); when it exits,
+  # fall back to an interactive login shell so the pane stays usable.
   # Pane splits (wst-tmux-split) still open in zsh, so you can split for
   # shell work.
   tmux new-window -t "$session:" -n "$slug" -c "$target" \
-    "devcontainer exec --workspace-folder '$target' zsh -l -c 'claude agents; exec zsh -l'"
-  # 3-pane layout: claude (left ~60%), lazygit (top-right), spare zsh
+    "devcontainer exec --workspace-folder '$target' zsh -l -c 'codex; exec zsh -l'"
+  # 3-pane layout: agent (left ~60%), lazygit (top-right), spare zsh
   # (bottom-right). All panes share the stream's devcontainer. Set
   # WST_PANES=1 to skip the splits and keep the single-pane layout.
   if [[ "${WST_PANES:-}" != 1 ]]; then
