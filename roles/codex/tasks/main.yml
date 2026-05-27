@@ -1,5 +1,10 @@
 ---
-- name: Install Codex CLI
-  ansible.builtin.shell: "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
-  args:
-    creates: "{{ ansible_env.HOME }}/.local/bin/codex"
+# @openai/codex via npm — the standalone install.sh (chatgpt.com/codex/install.sh)
+# is currently broken on glibc Linux (it resolves a musl variant that isn't in
+# the release SHA256SUMS). The npm package works cleanly.
+- name: Install Codex CLI (npm global)
+  become: yes
+  community.general.npm:
+    name: "@openai/codex"
+    global: true
+    state: present
