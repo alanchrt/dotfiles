@@ -6,7 +6,7 @@
 # `image`/`build`/`features` for this image while preserving mounts, ports,
 # env, runArgs, and postCreateCommand.
 #
-# Refresh: ansible-playbook -c local -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags devcontainer -e wst_dev_force_rebuild=true
+# Refresh: ansible-playbook -c local -K -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags devcontainer -e wst_dev_force_rebuild=true
 
 FROM mcr.microsoft.com/devcontainers/base:bookworm
 
