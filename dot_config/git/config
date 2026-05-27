@@ -7,10 +7,9 @@
 [delta]
 	navigate = true
 	line-numbers = true
-	side-by-side = true
 	syntax-theme = Dracula
 
-# Named feature: unified (non-side-by-side) for narrow panels like
-# lazygit's diff pane. Activate with `delta --features=narrow`.
-[delta "narrow"]
-	side-by-side = false
+# Note: side-by-side is not set globally — it wraps in any moderate-width
+# pane (lazygit, splits, etc.). Opt in per invocation when you want it:
+#   git -c delta.side-by-side=true diff
+# or define a shell alias.
