@@ -1,0 +1,5 @@
+---
+- name: Install Codex CLI
+  ansible.builtin.shell: "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/bin/codex"

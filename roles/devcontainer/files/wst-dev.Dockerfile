@@ -144,6 +144,16 @@ USER root
 RUN ln -sf /home/vscode/.local/bin/claude /usr/local/bin/claude \
  && test -x /usr/local/bin/claude
 
+# 8a. Codex CLI — same pattern as Claude. Installer puts the launcher at
+# ~/.local/bin/codex; ~/.codex is bind-mounted at runtime so auth state
+# (OAuth tokens) is shared with the host. ~/.local/share/codex (versioned
+# files) is NOT bind-mounted so the install survives container restart.
+USER vscode
+RUN curl -fsSL https://chatgpt.com/codex/install.sh | sh
+USER root
+RUN ln -sf /home/vscode/.local/bin/codex /usr/local/bin/codex \
+ && test -x /usr/local/bin/codex
+
 # 8b. Shell environment — powerlevel10k, zsh plugins, tmux tpm.
 # devcontainers/base ships oh-my-zsh already at ~/.oh-my-zsh — only add the
 # custom theme + plugins + tpm. Each clone is idempotent so the layer is
