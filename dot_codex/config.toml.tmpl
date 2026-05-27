@@ -7,11 +7,17 @@
 sandbox_mode = "workspace-write"
 approval_policy = "on-request"
 
+# Persistent fast mode requires BOTH `service_tier = "fast"` (the actual
+# tier for API calls) AND `[features].fast_mode = true` (the TUI toggle
+# `/fast` flips). Both are gated by the .chezmoidata.toml `fast_mode`
+# variable that also drives Claude's fastMode — set `fast_mode = true`
+# in .chezmoidata.toml on machines that want fast tier on by default;
+# omit it on others.
+{{ if dig "fast_mode" false . -}}
+service_tier = "fast"
+{{ end -}}
+
 [features]
-# Gated by the same .chezmoidata.toml `fast_mode` variable as Claude's
-# fastMode key — set `fast_mode = true` in .chezmoidata.toml on work
-# machines that want fast tier on by default. Falls back to false if the
-# variable isn't set (e.g., personal machine).
 fast_mode = {{ dig "fast_mode" false . }}
 
 # Playwright MCP — model-agnostic browser automation. The wst-dev image
