@@ -586,11 +586,13 @@ tmux_create_window() {
   fi
   # Pass the command as the new-window argument so the pane's process IS the
   # devcontainer exec — avoids leaving the launch command visible in the
-  # pane's scrollback. Drop straight into Claude Code; when it exits, fall
-  # back to an interactive login shell so the pane stays usable. Pane splits
-  # (wst-tmux-split) still open in zsh, so you can split for shell work.
+  # pane's scrollback. Drop straight into `claude agents` so you can spawn
+  # and switch between multiple background sessions per stream; when it
+  # exits, fall back to an interactive login shell so the pane stays usable.
+  # Pane splits (wst-tmux-split) still open in zsh, so you can split for
+  # shell work.
   tmux new-window -t "$session:" -n "$slug" -c "$target" \
-    "devcontainer exec --workspace-folder '$target' zsh -l -c 'claude; exec zsh -l'"
+    "devcontainer exec --workspace-folder '$target' zsh -l -c 'claude agents; exec zsh -l'"
   # 3-pane layout: claude (left ~60%), lazygit (top-right), spare zsh
   # (bottom-right). All panes share the stream's devcontainer. Set
   # WST_PANES=1 to skip the splits and keep the single-pane layout.
