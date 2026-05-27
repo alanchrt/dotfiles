@@ -1,0 +1,23 @@
+# Codex CLI configuration. Deployed by chezmoi to ~/.codex/config.toml on
+# host and visible inside every wst stream container via the bind-mount of
+# ~/.codex/ from host (see executable_wst-container-up).
+
+# Match Claude Code's broadly-permissive default with on-request approval
+# for things outside the workspace.
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+
+[features]
+# Gated by the same .chezmoidata.toml `fast_mode` variable as Claude's
+# fastMode key — set `fast_mode = true` in .chezmoidata.toml on work
+# machines that want fast tier on by default. Falls back to false if the
+# variable isn't set (e.g., personal machine).
+fast_mode = {{ dig "fast_mode" false . }}
+
+# Playwright MCP — model-agnostic browser automation. The wst-dev image
+# installs @playwright/mcp globally so `npx` resolves it quickly. Same
+# server, same Chromium ($WST_BROWSER_PROFILE) you used from Claude.
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]
+startup_timeout_sec = 120
