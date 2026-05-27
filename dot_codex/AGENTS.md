@@ -7,6 +7,14 @@
   - If `AGENTS.override.md` exists at the repo root with Graphite verbs, use `gt create -m "..."` instead of `git commit`. Same swaps: `gt modify` for `git commit --amend`, `gt create <name>` for `git checkout -b <name>`, `gt restack` for `git rebase`, `gt submit` for `gh pr create`. See the override for the full verb table.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
 
+# Commit / push review gate
+
+Codex is configured with `approval_policy = "never"` and full autonomy by default — that's intentional. But the user wants to *review the diff before any commit or push lands*. So:
+
+- Before running `git commit`, `git commit --amend`, `gt create -m`, or `gt modify`: run `git diff --cached` (or `git diff` if nothing is staged yet) and print the output. Stop and wait for the user to confirm before running the actual commit verb.
+- Before running `git push`, `git push --force-with-lease`, or `gt submit`: run `git log @{upstream}..HEAD --oneline` and `git diff @{upstream}..HEAD` and print both. Stop and wait for confirmation before pushing.
+- This applies whether or not other approvals would have fired. It's the one gate the harness doesn't enforce for us.
+
 # Shared host files
 
 When the user refers to "the screenshot", "that file I downloaded", or otherwise points to a file by description without a path, check these locations first:

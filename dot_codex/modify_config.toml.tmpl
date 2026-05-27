@@ -47,10 +47,15 @@ sys.stdout.write(text + "\n" if text else "")
 # then the preserved bits (codex's runtime tables, anything else).
 {
   cat <<'MANAGED'
-# Match Claude Code's broadly-permissive default with on-request approval
-# for things outside the workspace.
-sandbox_mode = "workspace-write"
-approval_policy = "on-request"
+# Autonomous-first stance: codex doesn't have a Claude-style command-pattern
+# allowlist (no equivalent of permissions.ask = ["Bash(git push*)"]). So
+# instead of mixing sandbox + on-request prompts (which fires on every
+# read-only command when the in-container sandbox can't initialize), drop
+# codex's own sandboxing and never-prompt. The commit/push review gate
+# lives in AGENTS.md as a prose instruction. Container isolation (Docker)
+# and host filesystem layout are the real security boundary.
+sandbox_mode = "danger-full-access"
+approval_policy = "never"
 MANAGED
 
 {{ if dig "fast_mode" false . -}}
