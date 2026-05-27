@@ -76,6 +76,8 @@ MANAGED
 
   if [ -n "$preserved" ]; then
     echo
-    printf '%s' "$preserved"
+    # Trailing newline matches codex's own write convention so chezmoi
+    # doesn't see a one-byte diff each cycle.
+    printf '%s\n' "$preserved"
   fi
 }
