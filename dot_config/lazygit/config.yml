@@ -6,7 +6,10 @@ confirmOnQuit: true
 git:
   paging:
     colorArg: always
-    pager: delta --paging=never
+    # Activate the `[delta "narrow"]` feature from ~/.config/git/config
+    # to override the global side-by-side — lazygit's diff panel is too
+    # narrow for two columns.
+    pager: delta --paging=never --features=narrow
 
 gui:
   theme:

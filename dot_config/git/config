@@ -9,3 +9,8 @@
 	line-numbers = true
 	side-by-side = true
 	syntax-theme = Dracula
+
+# Named feature: unified (non-side-by-side) for narrow panels like
+# lazygit's diff pane. Activate with `delta --features=narrow`.
+[delta "narrow"]
+	side-by-side = false
