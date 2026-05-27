@@ -9,6 +9,9 @@ git:
     pager: delta --paging=never
 
 gui:
+  # Hide the command-log panel by default; toggle with ` (backtick) when
+  # debugging what git commands lazygit is running.
+  showCommandLog: false
   theme:
     lightTheme: false
     activeBorderColor:         ['#ff79c6', bold]
