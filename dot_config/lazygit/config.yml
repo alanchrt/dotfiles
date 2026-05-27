@@ -1,5 +1,5 @@
 # Suppress the "Thanks for using lazygit!" popup on each new release.
-startupPopupVersion: 9999
+disableStartupPopups: true
 # Ask before quitting so a stray `q` in a wst pane doesn't kill the session.
 confirmOnQuit: true
 
