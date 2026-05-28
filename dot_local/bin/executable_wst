@@ -610,14 +610,21 @@ tmux_create_window() {
   # shell work.
   tmux new-window -t "$session:" -n "$slug" -c "$target" \
     "devcontainer exec --workspace-folder '$target' zsh -l -c 'codex; exec zsh -l'"
-  # 3-pane layout: agent (left ~60%), lazygit (top-right), spare zsh
-  # (bottom-right). All panes share the stream's devcontainer. Set
-  # WST_PANES=1 to skip the splits and keep the single-pane layout.
+  # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
+  # lazygit (bottom, full width, ~33% height). All panes share the
+  # stream's devcontainer. Set WST_PANES=1 to skip the splits and keep
+  # the single-pane layout.
   if [[ "${WST_PANES:-}" != 1 ]]; then
-    tmux split-window -h -l 40% -t "$session:$slug" -c "$target" \
+    # 1. Carve off the bottom third for lazygit (splits the active pane —
+    #    the just-created codex pane — vertically).
+    tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
       "devcontainer exec --workspace-folder '$target' zsh -l -c 'lazygit'"
-    tmux split-window -v -l 50% -t "$session:$slug" -c "$target" \
+    # 2. Focus the top (codex) pane so the next split lands there.
+    tmux select-pane -t "$session:$slug.0"
+    # 3. Split the top pane horizontally for the spare zsh on the right.
+    tmux split-window -h -l 40% -t "$session:$slug" -c "$target" \
       "devcontainer exec --workspace-folder '$target' zsh -l"
+    # 4. Return focus to codex (top-left).
     tmux select-pane -t "$session:$slug.0"
   fi
   tmux set-option -w -t "$session:$slug" @wst-project "$proj"
