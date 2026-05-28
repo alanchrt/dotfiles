@@ -18,7 +18,7 @@ bind-key a send-prefix
 # custom shell bindings
 bind P new-window -n ipy ipython3 --no-banner --nosep --no-confirm-exit
 bind B new-window -n bib $HOME/.local/bin/bib
-bind g display-popup -E -w 90% -h 85% -T "Codex side quest" "$HOME/.local/bin/wst-codex-popup"
+bind g run-shell "$HOME/.local/bin/wst-codex-popup"
 
 # stream-aware split bindings: if the current window has @wst-workdir set
 # (created by `wst new`/`wa`), the new pane auto-execs into the devcontainer.
