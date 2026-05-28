@@ -7,13 +7,20 @@
   - If `AGENTS.override.md` exists at the repo root with Graphite verbs, use `gt create -m "..."` instead of `git commit`. Same swaps: `gt modify` for `git commit --amend`, `gt create <name>` for `git checkout -b <name>`, `gt restack` for `git rebase`, `gt submit` for `gh pr create`. See the override for the full verb table.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
 
-# Commit / push review gate
+# Commit + push flow
 
-Codex is configured with `approval_policy = "never"` and full autonomy by default — that's intentional. But the user wants to *review the diff before any commit or push lands*. So:
+Codex is configured for autonomy with one review gate, at staging. The flow is **one confirmation, then commit and push happen back-to-back with no further prompts**:
 
-- Before running `git commit`, `git commit --amend`, `gt create -m`, or `gt modify`: run `git diff --cached` (or `git diff` if nothing is staged yet) and print the output. Stop and wait for the user to confirm before running the actual commit verb.
-- Before running `git push`, `git push --force-with-lease`, or `gt submit`: run `git log @{upstream}..HEAD --oneline` and `git diff @{upstream}..HEAD` and print both. Stop and wait for confirmation before pushing.
-- This applies whether or not other approvals would have fired. It's the one gate the harness doesn't enforce for us.
+1. When a chunk of work feels wrapped up — feature complete, bug fixed, refactor consolidated, a single coherent change ready — stage the relevant files (`git add ...`).
+2. Print `git diff --cached` so the user can review what's about to land.
+3. Propose a commit message and ask **once** for confirmation to commit + push.
+4. On confirmation, run commit and push back-to-back without further prompts:
+   - Plain git: `git commit -m "..." && git push -u origin HEAD`
+   - Graphite (when `AGENTS.override.md` is at the repo root): `gt create -m "..." && gt submit`
+
+**Lean toward more frequent, smaller commits.** If you've finished a discrete piece of work — even a small one — propose a commit instead of accumulating changes. Don't wait for a "perfect" stopping point that may not come. Wrapping a feature, fixing a typo, finishing a refactor on one file, getting tests green — each of those is a reasonable trigger.
+
+The separate "ask before committing to main/master" rule above still applies; that case is unusual and out-of-band.
 
 # Shared host files
 
