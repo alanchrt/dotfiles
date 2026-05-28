@@ -6,7 +6,12 @@ confirmOnQuit: true
 git:
   paging:
     colorArg: always
-    pager: delta --paging=never
+    # Pipe through lazygit-pad-lines so +/- backgrounds extend to the right
+    # edge of the diff pane. Lazygit's TUI doesn't honor ANSI [0K (erase-to-
+    # EOL) for background extension, so we materialize the fill as literal
+    # space chars in delta's output. 250 is deliberately wider than typical
+    # diff-pane widths; lazygit truncates the overflow without wrapping.
+    pager: delta --paging=never | lazygit-pad-lines 250
 
 gui:
   # Hide the command-log panel by default; toggle with ` (backtick) when

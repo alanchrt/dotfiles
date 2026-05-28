@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Pad each input line with trailing spaces to a fixed column width.
+
+ANSI-aware: visible width is measured after stripping SGR/EOL escape codes.
+Trailing `ESC[0K` (erase-to-EOL) and a preceding `ESC[0m` reset are stripped
+so the padding spaces inherit the line's current background color; a fresh
+`ESC[0m` is appended at the end.
+
+Used as a post-pager in lazygit so delta's +/- backgrounds extend to the
+full pane width instead of stopping at end-of-text. Lazygit's TUI doesn't
+honor `[0K` background extension, so we materialize the padding as literal
+spaces here.
+
+Usage: <something-emitting-ansi> | lazygit-pad-lines [WIDTH]
+       WIDTH defaults to 250 (deliberately over-wide; lazygit truncates at
+       the diff-pane edge without wrapping by default).
+"""
+from __future__ import annotations
+
+import re
+import sys
+
+# SGR + EOL escape sequences (used to measure visible length only)
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*[mK]")
+
+
+def visible_len(s: str) -> int:
+    return len(_ANSI_RE.sub("", s))
+
+
+def pad_line(line: str, width: int) -> str:
+    line = line.rstrip("\n")
+    # Strip everything from the first ESC[0K (erase-to-EOL) onward. We'll
+    # reproduce its effect with literal spaces. Anything before [0K is kept
+    # verbatim so the current SGR state (background color) carries into the
+    # padding. Delta typically emits "...text[0m[bg-code][0K[0m"; after this
+    # strip the line ends with the re-applied bg code so spaces inherit it.
+    idx = line.find("\x1b[0K")
+    if idx != -1:
+        line = line[:idx]
+    pad = width - visible_len(line)
+    if pad > 0:
+        line += " " * pad
+    # Always reset at line end so bg state doesn't bleed into the next line.
+    line += "\x1b[0m"
+    return line
+
+
+def main() -> int:
+    width = int(sys.argv[1]) if len(sys.argv) > 1 else 250
+    for raw in sys.stdin:
+        print(pad_line(raw, width))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
