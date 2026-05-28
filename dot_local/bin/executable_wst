@@ -33,6 +33,10 @@ session_name() {
   printf '%s' "$1" | sed -r 's/\./_/g'
 }
 
+emacs_daemon_name() {
+  printf 'wst-%s-%s' "$(slugify "$1")" "$(slugify "$2")"
+}
+
 # Resolve the project directory (~/Projects/<project>/) from cwd or --project flag.
 # Echoes the project name on stdout.
 resolve_project() {
@@ -443,6 +447,12 @@ cmd_rm() {
     tmux kill-window -t "$session:$slug" || true
   fi
 
+  local emacs_daemon; emacs_daemon=$(emacs_daemon_name "$proj" "$slug")
+  if emacsclient -s "$emacs_daemon" --eval t >/dev/null 2>&1; then
+    info "Stopping Emacs daemon $emacs_daemon"
+    emacsclient -s "$emacs_daemon" --eval '(kill-emacs)' >/dev/null 2>&1 || true
+  fi
+
   info "Removing $target"
   rm -rf "$target"
   port_free "$proj/$slug"
@@ -548,11 +558,10 @@ cat > "$HOME/.claude/mcp_servers.json" <<JSON
 {
   "mcpServers": {
     "playwright": {
-      "command": "npx",
+      "command": "bash",
       "args": [
-        "@playwright/mcp@latest",
-        "--user-data-dir", "/home/vscode/.config/chromium-wst",
-        "--browser", "chromium"
+        "-lc",
+        "chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); [ -n \"$chrome\" ] || { echo 'Claude Playwright MCP: Chromium not found under /opt/playwright-browsers' >&2; exit 1; }; exec playwright-mcp --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-/home/vscode/.config/chromium-wst}\""
       ]
     }
   }
@@ -585,7 +594,7 @@ cmd_chrome() {
   # The Playwright-bundled chromium ships at a versioned path; resolve at
   # runtime so we don't pin a version here.
   devcontainer exec --workspace-folder "$target" bash -lc '
-    chrome=$(ls -1 /opt/playwright-browsers/chromium-*/chrome-linux/chrome 2>/dev/null | head -1)
+    chrome=$(find /opt/playwright-browsers -path "*/chromium-*/chrome-linux*/chrome" -type f -executable 2>/dev/null | head -1)
     [ -n "$chrome" ] || { echo "wst chrome: no chromium binary found under /opt/playwright-browsers" >&2; exit 1; }
     exec "$chrome" \
       --ozone-platform=wayland --enable-features=UseOzonePlatform \
@@ -611,14 +620,30 @@ tmux_create_window() {
   tmux new-window -t "$session:" -n "$slug" -c "$target" \
     "devcontainer exec --workspace-folder '$target' zsh -l -c 'codex; exec zsh -l'"
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
-  # lazygit (bottom, full width, ~33% height). All panes share the
-  # stream's devcontainer. Set WST_PANES=1 to skip the splits and keep
-  # the single-pane layout.
+  # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
+  # the splits and keep the single-pane layout. The default Magit pane
+  # runs on the host in a stream-specific Emacs daemon, so it edits host
+  # paths without sharing buffers with other streams. Set
+  # WST_GIT_PANE=lazygit to use lazygit in the devcontainer instead.
   if [[ "${WST_PANES:-}" != 1 ]]; then
-    # 1. Carve off the bottom third for lazygit (splits the active pane —
-    #    the just-created codex pane — vertically).
-    tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
-      "devcontainer exec --workspace-folder '$target' zsh -l -c 'lazygit'"
+    case "${WST_GIT_PANE:-magit}" in
+      magit|emacs)
+        local emacs_daemon; emacs_daemon=$(emacs_daemon_name "$proj" "$slug")
+        tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
+          "if ! emacsclient -s '$emacs_daemon' --eval t >/dev/null 2>&1; then emacs --daemon='$emacs_daemon'; fi; emacsclient -t -s '$emacs_daemon' --eval '(my/wst-open-stream-pane \"$target\")'; exec zsh -l"
+        ;;
+      lazygit)
+        tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
+          "devcontainer exec --workspace-folder '$target' zsh -l -c 'lazygit; exec zsh -l'"
+        ;;
+      shell|zsh)
+        tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
+          "devcontainer exec --workspace-folder '$target' zsh -l"
+        ;;
+      *)
+        die "unknown WST_GIT_PANE='${WST_GIT_PANE}' (expected: magit, lazygit, shell)"
+        ;;
+    esac
     # 2. Focus the top (codex) pane so the next split lands there.
     tmux select-pane -t "$session:$slug.0"
     # 3. Split the top pane horizontally for the spare zsh on the right.

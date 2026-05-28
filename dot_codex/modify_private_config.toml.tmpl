@@ -74,8 +74,11 @@ fast_mode = {{ dig "fast_mode" false . }}
 # installs @playwright/mcp globally so `npx` resolves it quickly. Same
 # server, same Chromium ($WST_BROWSER_PROFILE) you used from Claude.
 [mcp_servers.playwright]
-command = "npx"
-args = ["@playwright/mcp@latest"]
+command = "bash"
+args = [
+  "-lc",
+  "chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); [ -n \"$chrome\" ] || { echo 'Codex Playwright MCP: Chromium not found under /opt/playwright-browsers' >&2; exit 1; }; exec playwright-mcp --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-/home/vscode/.config/chromium-wst}\""
+]
 startup_timeout_sec = 120
 MANAGED
 

@@ -126,5 +126,137 @@
 ;; Live-refresh buffers when files change on disk (e.g. Claude Code edits).
 ;; Pair with `:ui vc-gutter` to get live fringe markers without manual revert.
 (setq auto-revert-verbose nil
-      auto-revert-use-notify t)
+      auto-revert-use-notify t
+      auto-revert-avoid-polling t
+      auto-revert-interval 2
+      auto-revert-stop-on-user-input nil)
 (global-auto-revert-mode 1)
+
+;; Show git state in Treemacs for both files and parent directories. Doom's
+;; default is `simple', which only decorates file nodes.
+(setq +treemacs-git-mode 'deferred)
+
+(after! treemacs
+  (setq treemacs-silent-filewatch t
+        treemacs-silent-refresh t)
+  (treemacs-filewatch-mode 1))
+
+;; Keep Magit status useful as a passive worktree monitor. File buffers use
+;; notifications above; only Magit status buffers opt back into timer checks.
+(after! magit
+  (setq magit-auto-revert-immediately t)
+  (add-hook! 'magit-status-mode-hook
+    (defun my/magit-status-auto-refresh-h ()
+      (setq-local auto-revert-avoid-polling nil)
+      (auto-revert-mode 1))))
+
+(defvar-local my/wst-magit-refresh-timer nil)
+(defvar-local my/wst-magit-refresh-state nil)
+(defvar my/wst-dirty-tree-root nil)
+(defvar my/wst-dirty-tree-paths (make-hash-table :test #'equal))
+
+(defun my/wst-git-status-state (dir)
+  "Return a stable hash for DIR's worktree state."
+  (let ((default-directory dir))
+    (with-temp-buffer
+      (when (zerop (call-process "git" nil t nil
+                                 "status" "--porcelain=v1" "-z"
+                                 "--untracked-files=normal"))
+        (secure-hash 'sha1 (current-buffer))))))
+
+(defun my/wst-git-dirty-paths (dir)
+  "Return a hash table of dirty files and ancestor directories in DIR."
+  (let ((root (file-name-as-directory (expand-file-name dir)))
+        (paths (make-hash-table :test #'equal)))
+    (cl-labels
+        ((mark-path (relative)
+           (let ((path (directory-file-name (expand-file-name relative root))))
+             (puthash path t paths)
+             (let ((parent (file-name-directory path)))
+               (while (and parent
+                           (file-in-directory-p parent root)
+                           (not (equal (directory-file-name parent)
+                                       (directory-file-name root))))
+                 (puthash (directory-file-name parent) t paths)
+                 (setq parent (file-name-directory
+                               (directory-file-name parent))))))))
+      (with-temp-buffer
+        (when (zerop (let ((default-directory root))
+                       (call-process "git" nil t nil
+                                     "status" "--porcelain=v1" "-z"
+                                     "--untracked-files=normal")))
+          (dolist (entry (split-string (buffer-string) "\0" t))
+            (when (string-match-p "\\`[ MADRCU?!][ MADRCU?!] " entry)
+              (mark-path (substring entry 3)))))))
+    paths))
+
+(defun my/wst-refresh-dirty-tree-paths (dir)
+  (setq my/wst-dirty-tree-root (file-name-as-directory (expand-file-name dir))
+        my/wst-dirty-tree-paths (my/wst-git-dirty-paths dir)))
+
+(defun my/wst-treemacs-hide-clean-path-p (path _git-info)
+  "Hide clean PATHs in the wst stream Treemacs pane."
+  (and my/wst-dirty-tree-root
+       (file-in-directory-p path my/wst-dirty-tree-root)
+       (not (gethash (directory-file-name (expand-file-name path))
+                     my/wst-dirty-tree-paths))))
+
+(defun my/wst-refresh-treemacs-project (dir)
+  "Force Treemacs to rebuild the project containing DIR."
+  (when (require 'treemacs nil t)
+    (treemacs-run-in-every-buffer
+     (when-let ((project (treemacs--find-project-for-path dir)))
+       (treemacs--do-refresh (current-buffer) project)))))
+
+(defun my/wst-stop-magit-refresh-h ()
+  (when (timerp my/wst-magit-refresh-timer)
+    (cancel-timer my/wst-magit-refresh-timer)
+    (setq my/wst-magit-refresh-timer nil)))
+
+(defun my/wst-refresh-treemacs-git-state ()
+  "Refresh Treemacs git decorations for the current Magit repository."
+  (when (require 'treemacs-magit nil t)
+    (treemacs-magit--schedule-update)))
+
+(defun my/wst-refresh-magit-status-if-changed (buffer dir)
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (when (and (derived-mode-p 'magit-status-mode)
+                 (get-buffer-window buffer t))
+        (let ((state (my/wst-git-status-state dir)))
+          (unless (equal state my/wst-magit-refresh-state)
+            (setq my/wst-magit-refresh-state state)
+            (my/wst-refresh-dirty-tree-paths dir)
+            (magit-refresh-buffer)
+            (my/wst-refresh-treemacs-project dir)
+            (my/wst-refresh-treemacs-git-state)))))))
+
+(defun my/wst-enable-magit-status-refresh (dir)
+  "Refresh the current Magit status buffer when visible worktree state changes."
+  (my/wst-stop-magit-refresh-h)
+  (setq-local my/wst-magit-refresh-state (my/wst-git-status-state dir)
+              my/wst-magit-refresh-timer
+              (run-at-time 2 2 #'my/wst-refresh-magit-status-if-changed
+                           (current-buffer)
+                           (file-name-as-directory (expand-file-name dir))))
+  (add-hook 'kill-buffer-hook #'my/wst-stop-magit-refresh-h nil t))
+
+(defun my/wst-open-stream-pane (dir)
+  "Open a stream-scoped Treemacs + Magit layout for DIR."
+  (interactive "DStream directory: ")
+  (let ((dir (file-name-as-directory (expand-file-name dir))))
+    (my/wst-refresh-dirty-tree-paths dir)
+    (add-hook 'treemacs-pre-file-insert-predicates
+              #'my/wst-treemacs-hide-clean-path-p)
+    (delete-other-windows)
+    (magit-status dir)
+    (my/wst-enable-magit-status-refresh dir)
+    (let ((magit-buffer (current-buffer)))
+      (when (fboundp 'treemacs-add-and-display-current-project-exclusively)
+        (treemacs-add-and-display-current-project-exclusively))
+      (when (fboundp 'treemacs-select-window)
+        (treemacs-select-window))
+      (when (get-buffer-window magit-buffer t)
+        (select-window (get-buffer-window magit-buffer t)))
+      (my/wst-refresh-treemacs-git-state)
+      (switch-to-buffer magit-buffer))))
