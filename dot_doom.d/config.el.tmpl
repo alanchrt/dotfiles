@@ -139,6 +139,11 @@
 (after! treemacs
   (setq treemacs-silent-filewatch t
         treemacs-silent-refresh t)
+  (add-hook! 'treemacs-mode-hook
+    (defun my/disable-line-numbers-in-treemacs-h ()
+      (setq-local display-line-numbers nil
+                  display-line-numbers-type nil)
+      (display-line-numbers-mode -1)))
   (treemacs-filewatch-mode 1))
 
 ;; Keep Magit status useful as a passive worktree monitor. File buffers use
@@ -152,8 +157,12 @@
 
 (defvar-local my/wst-magit-refresh-timer nil)
 (defvar-local my/wst-magit-refresh-state nil)
+(defvar my/wst-stream-refresh-timer nil)
+(defvar my/wst-stream-refresh-state nil)
+(defvar my/wst-stream-refresh-dir nil)
 (defvar my/wst-dirty-tree-root nil)
 (defvar my/wst-dirty-tree-paths (make-hash-table :test #'equal))
+(defvar my/wst-dirty-tree-statuses (make-hash-table :test #'equal))
 (defvar my/wst-next-stream-pane-dir nil)
 (defvar my/wst-confirming-exit nil)
 
@@ -166,14 +175,46 @@
                                  "--untracked-files=normal"))
         (secure-hash 'sha1 (current-buffer))))))
 
-(defun my/wst-git-dirty-paths (dir)
+(defun my/wst-git-status-kind (status)
+  "Return a compact status kind for a porcelain STATUS."
+  (cond
+   ((string= status "??") 'untracked)
+   ((string-match-p "U" status) 'conflict)
+   ((string-match-p "D" status) 'deleted)
+   ((string-match-p "A" status) 'added)
+   ((string-match-p "R" status) 'renamed)
+   (t 'modified)))
+
+(defun my/wst-git-status-label (kind)
+  "Return a short label for git status KIND."
+  (pcase kind
+    ('added "A")
+    ('deleted "D")
+    ('renamed "R")
+    ('untracked "?")
+    ('conflict "!")
+    (_ "M")))
+
+(defun my/wst-git-status-face (kind)
+  "Return a Treemacs git face for git status KIND."
+  (pcase kind
+    ('added 'treemacs-git-added-face)
+    ('deleted 'treemacs-git-conflict-face)
+    ('renamed 'treemacs-git-renamed-face)
+    ('untracked 'treemacs-git-untracked-face)
+    ('conflict 'treemacs-git-conflict-face)
+    (_ 'treemacs-git-modified-face)))
+
+(defun my/wst-git-dirty-paths (dir &optional statuses)
   "Return a hash table of dirty files and ancestor directories in DIR."
   (let ((root (file-name-as-directory (expand-file-name dir)))
         (paths (make-hash-table :test #'equal)))
     (cl-labels
-        ((mark-path (relative)
+        ((mark-path (relative &optional status)
            (let ((path (directory-file-name (expand-file-name relative root))))
              (puthash path t paths)
+             (when (and statuses status)
+               (puthash path (my/wst-git-status-kind status) statuses))
              (let ((parent (file-name-directory path)))
                (while (and parent
                            (file-in-directory-p parent root)
@@ -189,12 +230,34 @@
                                      "--untracked-files=normal")))
           (dolist (entry (split-string (buffer-string) "\0" t))
             (when (string-match-p "\\`[ MADRCU?!][ MADRCU?!] " entry)
-              (mark-path (substring entry 3)))))))
+              (mark-path (substring entry 3) (substring entry 0 2)))))))
     paths))
 
 (defun my/wst-refresh-dirty-tree-paths (dir)
-  (setq my/wst-dirty-tree-root (file-name-as-directory (expand-file-name dir))
-        my/wst-dirty-tree-paths (my/wst-git-dirty-paths dir)))
+  (let ((statuses (make-hash-table :test #'equal)))
+    (setq my/wst-dirty-tree-root (file-name-as-directory (expand-file-name dir))
+          my/wst-dirty-tree-paths (my/wst-git-dirty-paths dir statuses)
+          my/wst-dirty-tree-statuses statuses))
+  (my/wst-apply-dirty-status-annotations))
+
+(defun my/wst-apply-dirty-status-annotations ()
+  "Apply WST git status suffixes to visible Treemacs nodes."
+  (when (and (require 'treemacs nil t)
+             (fboundp 'treemacs-set-annotation-suffix)
+             (fboundp 'treemacs-set-annotation-face))
+    (treemacs-clear-annotation-suffixes "wst-git-status")
+    (treemacs-clear-annotation-faces "wst-git-status")
+    (maphash
+     (lambda (path kind)
+       (let* ((face (my/wst-git-status-face kind))
+              (suffix (propertize (concat " " (my/wst-git-status-label kind))
+                                  'face face)))
+         (treemacs-set-annotation-suffix path suffix "wst-git-status")
+         (treemacs-set-annotation-face path face "wst-git-status")))
+     my/wst-dirty-tree-statuses)
+    (treemacs-run-in-every-buffer
+     (when (fboundp 'treemacs-apply-annotations-in-buffer)
+       (treemacs-apply-annotations-in-buffer (current-buffer))))))
 
 (defun my/wst-treemacs-hide-clean-path-p (path _git-info)
   "Hide clean PATHs in the wst stream Treemacs pane."
@@ -239,10 +302,44 @@
     (cancel-timer my/wst-magit-refresh-timer)
     (setq my/wst-magit-refresh-timer nil)))
 
+(defun my/wst-stop-stream-refresh ()
+  (when (timerp my/wst-stream-refresh-timer)
+    (cancel-timer my/wst-stream-refresh-timer))
+  (setq my/wst-stream-refresh-timer nil
+        my/wst-stream-refresh-state nil
+        my/wst-stream-refresh-dir nil))
+
 (defun my/wst-refresh-treemacs-git-state ()
   "Refresh Treemacs git decorations for the current Magit repository."
   (when (require 'treemacs-magit nil t)
     (treemacs-magit--schedule-update)))
+
+(defun my/wst-refresh-stream-if-changed (dir)
+  "Refresh WST Magit and Treemacs state when DIR's worktree changes."
+  (let ((state (my/wst-git-status-state dir)))
+    (unless (equal state my/wst-stream-refresh-state)
+      (setq my/wst-stream-refresh-state state)
+      (my/wst-refresh-dirty-tree-paths dir)
+      (dolist (buffer (buffer-list))
+        (with-current-buffer buffer
+          (when (and (derived-mode-p 'magit-status-mode)
+                     (equal (file-name-as-directory (expand-file-name default-directory))
+                            (file-name-as-directory (expand-file-name dir))))
+            (setq-local my/wst-magit-refresh-state state)
+            (magit-refresh-buffer))))
+      (my/wst-refresh-treemacs-project dir)
+      (my/wst-refresh-treemacs-git-state))))
+
+(defun my/wst-enable-stream-refresh (dir)
+  "Keep WST Magit and Treemacs dirty state current for DIR."
+  (my/wst-stop-stream-refresh)
+  (setq my/wst-stream-refresh-dir (file-name-as-directory (expand-file-name dir))
+        my/wst-stream-refresh-state (my/wst-git-status-state dir)
+        my/wst-stream-refresh-timer
+        (run-at-time 2 2 #'my/wst-refresh-stream-if-changed
+                     my/wst-stream-refresh-dir))
+  (my/wst-refresh-dirty-tree-paths my/wst-stream-refresh-dir)
+  (add-hook 'kill-emacs-hook #'my/wst-stop-stream-refresh))
 
 (defun my/wst-refresh-magit-status-if-changed (buffer dir)
   (when (buffer-live-p buffer)
@@ -272,7 +369,7 @@
   (interactive "DStream directory: ")
   (let ((dir (file-name-as-directory (expand-file-name dir))))
     (set-frame-parameter nil 'my/wst-stream-pane t)
-    (my/wst-refresh-dirty-tree-paths dir)
+    (my/wst-enable-stream-refresh dir)
     (add-hook 'treemacs-pre-file-insert-predicates
               #'my/wst-treemacs-hide-clean-path-p)
     (delete-other-windows)
