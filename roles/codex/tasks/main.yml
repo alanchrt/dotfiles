@@ -1,0 +1,10 @@
+---
+# @openai/codex via npm — the standalone install.sh (chatgpt.com/codex/install.sh)
+# is currently broken on glibc Linux (it resolves a musl variant that isn't in
+# the release SHA256SUMS). The npm package works cleanly.
+- name: Install Codex CLI (npm global)
+  become: yes
+  community.general.npm:
+    name: "@openai/codex"
+    global: true
+    state: present

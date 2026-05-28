@@ -121,11 +121,14 @@ RUN set -eux; \
       "platform-tools" "platforms;android-34" "build-tools;34.0.0" "emulator"; \
     chown -R vscode:vscode $ANDROID_HOME
 
-# 6. Global npm tools
+# 6. Global npm tools (includes @openai/codex — its standalone install.sh
+# is broken on Debian/glibc because it resolves a musl variant that isn't
+# in the release SHA256SUMS; the npm package works cleanly).
 RUN npm install -g --no-fund --no-audit \
       @withgraphite/graphite-cli \
       @playwright/mcp \
-      @devcontainers/cli
+      @devcontainers/cli \
+      @openai/codex
 
 # 7. Playwright Chromium (system-wide; readable by any container user)
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright-browsers
@@ -143,6 +146,7 @@ RUN curl -fsSL https://claude.ai/install.sh | bash
 USER root
 RUN ln -sf /home/vscode/.local/bin/claude /usr/local/bin/claude \
  && test -x /usr/local/bin/claude
+
 
 # 8b. Shell environment — powerlevel10k, zsh plugins, tmux tpm.
 # devcontainers/base ships oh-my-zsh already at ~/.oh-my-zsh — only add the

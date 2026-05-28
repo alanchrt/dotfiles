@@ -127,6 +127,14 @@ add_bind_rw "$HOME/.claude" "/home/vscode/.claude"
 # theme, firstStartTime, project history, cached experiment features, etc.
 # Without it every fresh container shows onboarding again.
 add_bind_rw "$HOME/.claude.json" "/home/vscode/.claude.json"
+# Codex CLI: same pattern. Full ~/.codex/ (RW) so the in-container Codex
+# sees host's config.toml, AGENTS.md, and the OAuth auth state — log in
+# once on the host (`codex` then sign in) and every stream inherits it.
+add_bind_rw "$HOME/.codex" "/home/vscode/.codex"
+# Shared codex rule files (e.g. graphite.md). Mounted at the same literal
+# path host→container so `wst gtinit`'s AGENTS.override.md symlinks resolve
+# inside the container.
+add_bind_ro "$HOME/.local/share/codex-rules" "$HOME/.local/share/codex-rules"
 # Notify queue: in-container Claude hooks write JSON here; the host-side
 # wst-notify-dispatcher service watches the dir and dispatches via
 # notify-send + tmux focus + wmctrl.
