@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Open a short-lived Codex session in a tmux popup. In wst stream windows, run
+# inside the stream devcontainer; elsewhere, run on the host.
+
+set -euo pipefail
+
+workdir=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
+
+if [[ -n "$workdir" && -d "$workdir" ]]; then
+  exec devcontainer exec --workspace-folder "$workdir" zsh -l -c codex
+fi
+
+exec codex
