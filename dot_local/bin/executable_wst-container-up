@@ -37,10 +37,15 @@ mkdir -p "$OVERRIDES_DIR" "$NOTIFY_QUEUE_DIR"
 
 die() { printf 'wst-container-up: %s\n' "$*" >&2; exit 1; }
 
-# Locate the project's devcontainer.json
+# Locate the project's devcontainer.json. If the project does not provide one,
+# use WST's central fallback config so generic repos can still become streams.
 project_dc="$WST_TARGET/.devcontainer/devcontainer.json"
 [[ -f "$project_dc" ]] || project_dc="$WST_TARGET/.devcontainer.json"
-[[ -f "$project_dc" ]] || die "no devcontainer.json found in $WST_TARGET"
+if [[ ! -f "$project_dc" ]]; then
+  project_dc="${WST_DEFAULT_DEVCONTAINER:-$HOME/.local/share/wst/default-devcontainer/devcontainer.json}"
+  [[ -f "$project_dc" ]] || die "no devcontainer.json found in $WST_TARGET and fallback missing at $project_dc"
+  printf 'wst-container-up: no project devcontainer found; using fallback %s\n' "$project_dc" >&2
+fi
 project_dc_dir="$(dirname "$project_dc")"
 
 # devcontainer.json is JSONC; strip comments defensively before handing to jq

@@ -19,6 +19,11 @@ The image swap is performed in `wst-container-up`: the project's
 `runArgs`, and `postCreateCommand` — but `image`, `build`, and `features`
 are replaced with `image: wst-dev:latest`.
 
+Projects without a devcontainer use the central fallback config at
+`~/.local/share/wst/default-devcontainer/devcontainer.json`. It is intentionally
+minimal and generic; `wst-container-up` still injects the usual mounts, env,
+port forwarding, and `wst-dev-entrypoint`.
+
 ## Build / refresh
 
 ```bash

@@ -240,8 +240,16 @@
           my/wst-dirty-tree-statuses statuses))
   (my/wst-apply-dirty-status-annotations))
 
+(defun my/wst-ensure-dirty-tree-tables ()
+  "Ensure WST dirty-tree hash tables exist after config reloads."
+  (unless (hash-table-p my/wst-dirty-tree-paths)
+    (setq my/wst-dirty-tree-paths (make-hash-table :test #'equal)))
+  (unless (hash-table-p my/wst-dirty-tree-statuses)
+    (setq my/wst-dirty-tree-statuses (make-hash-table :test #'equal))))
+
 (defun my/wst-apply-dirty-status-annotations ()
   "Apply WST git status suffixes to visible Treemacs nodes."
+  (my/wst-ensure-dirty-tree-tables)
   (when (and (require 'treemacs nil t)
              (fboundp 'treemacs-set-annotation-suffix)
              (fboundp 'treemacs-set-annotation-face))
@@ -261,6 +269,7 @@
 
 (defun my/wst-treemacs-hide-clean-path-p (path _git-info)
   "Hide clean PATHs in the wst stream Treemacs pane."
+  (my/wst-ensure-dirty-tree-tables)
   (and my/wst-dirty-tree-root
        (file-in-directory-p path my/wst-dirty-tree-root)
        (not (gethash (directory-file-name (expand-file-name path))
@@ -280,22 +289,23 @@
   (when (and (require 'treemacs nil t)
              (fboundp 'treemacs-project->position)
              (fboundp 'treemacs--expand-root-node))
-    (when-let ((pos (treemacs-project->position project)))
-      (when (eq 'root-node-closed (treemacs-button-get pos :state))
-        (treemacs--expand-root-node pos))
-      (let ((changed t)
-            (passes 0))
-        (while (and changed (< passes 50))
-          (setq changed nil
-                passes (1+ passes))
-          (save-excursion
-            (goto-char (point-min))
-            (while-let ((button (next-button (point))))
-              (goto-char (button-start button))
-              (when (eq 'dir-node-closed (treemacs-button-get button :state))
-                (treemacs--expand-dir-node button)
-                (setq changed t))
-              (goto-char (button-end button)))))))))
+    (treemacs-run-in-every-buffer
+     (when-let ((pos (treemacs-project->position project)))
+       (when (eq 'root-node-closed (treemacs-button-get pos :state))
+         (treemacs--expand-root-node pos))
+       (let ((changed t)
+             (passes 0))
+         (while (and changed (< passes 50))
+           (setq changed nil
+                 passes (1+ passes))
+           (save-excursion
+             (goto-char (point-min))
+             (while-let ((button (next-button (point))))
+               (goto-char (button-start button))
+               (when (eq 'dir-node-closed (treemacs-button-get button :state))
+                 (treemacs--expand-dir-node button)
+                 (setq changed t))
+               (goto-char (button-end button))))))))))
 
 (defun my/wst-stop-magit-refresh-h ()
   (when (timerp my/wst-magit-refresh-timer)

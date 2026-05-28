@@ -157,8 +157,6 @@ cmd_new() {
   local proj; proj=$(resolve_project "$project")
   local canonical; canonical=$(canonical_dir "$proj")
   [[ -d "$canonical/.git" ]] || die "canonical '$canonical' is not a git repo (run: wst migrate)"
-  [[ -f "$canonical/.devcontainer/devcontainer.json" ]] \
-    || die "no .devcontainer/ in $canonical — add one (https://containers.dev/) before using wst"
 
   local slug; slug=$(slugify "$branch")
   local target; target=$(stream_dir "$proj" "$slug")
@@ -263,7 +261,7 @@ cmd_gtinit() {
       continue
     fi
     info "Running gt repo init in $slug (trunk: $trunk)"
-    devcontainer exec --workspace-folder "$sdir_clean" bash -lc \
+    "$HOME/.local/bin/wst-devcontainer-exec" "$sdir_clean" bash -lc \
       "command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1; gt repo init --trunk $trunk" \
       || warn "gt repo init reported errors for $slug (continuing)"
   done
@@ -569,7 +567,7 @@ cat > "$HOME/.claude/mcp_servers.json" <<JSON
 JSON
 SH
 )
-  devcontainer exec --workspace-folder "$target" bash -c "$provision_script" \
+  "$HOME/.local/bin/wst-devcontainer-exec" "$target" bash -c "$provision_script" \
     || warn "post-up MCP registration had non-fatal errors (continuing)"
 }
 
@@ -593,7 +591,7 @@ cmd_chrome() {
   info "opening headed Chromium for stream $proj/$branch"
   # The Playwright-bundled chromium ships at a versioned path; resolve at
   # runtime so we don't pin a version here.
-  devcontainer exec --workspace-folder "$target" bash -lc '
+  "$HOME/.local/bin/wst-devcontainer-exec" "$target" bash -lc '
     chrome=$(find /opt/playwright-browsers -path "*/chromium-*/chrome-linux*/chrome" -type f -executable 2>/dev/null | head -1)
     [ -n "$chrome" ] || { echo "wst chrome: no chromium binary found under /opt/playwright-browsers" >&2; exit 1; }
     exec "$chrome" \
@@ -618,7 +616,7 @@ tmux_create_window() {
   # Pane splits (wst-tmux-split) still open in zsh, so you can split for
   # shell work.
   tmux new-window -t "$session:" -n "$slug" -c "$target" \
-    "devcontainer exec --workspace-folder '$target' zsh -l -c 'codex; exec zsh -l'"
+    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'codex; exec zsh -l'"
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
   # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
   # the splits and keep the single-pane layout. The default Magit pane
@@ -634,11 +632,11 @@ tmux_create_window() {
         ;;
       lazygit)
         tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
-          "devcontainer exec --workspace-folder '$target' zsh -l -c 'lazygit; exec zsh -l'"
+          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'lazygit; exec zsh -l'"
         ;;
       shell|zsh)
         tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
-          "devcontainer exec --workspace-folder '$target' zsh -l"
+          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l"
         ;;
       *)
         die "unknown WST_GIT_PANE='${WST_GIT_PANE}' (expected: magit, lazygit, shell)"
@@ -648,7 +646,7 @@ tmux_create_window() {
     tmux select-pane -t "$session:$slug.0"
     # 3. Split the top pane horizontally for the spare zsh on the right.
     tmux split-window -h -l 40% -t "$session:$slug" -c "$target" \
-      "devcontainer exec --workspace-folder '$target' zsh -l"
+      "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l"
     # 4. Return focus to codex (top-left).
     tmux select-pane -t "$session:$slug.0"
   fi

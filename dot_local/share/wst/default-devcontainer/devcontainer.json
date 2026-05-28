@@ -1,0 +1,11 @@
+{
+  "name": "wst-default",
+  "image": "wst-dev:latest",
+  "remoteUser": "vscode",
+  "forwardPorts": [3000],
+  "customizations": {
+    "vscode": {
+      "extensions": []
+    }
+  }
+}

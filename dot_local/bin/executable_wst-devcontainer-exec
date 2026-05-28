@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Run `devcontainer exec` for a WST workspace, reusing WST's generated override
+# config when the project relies on the central fallback devcontainer.
+
+set -euo pipefail
+
+projects_root="${WST_PROJECTS_ROOT:-$HOME/Projects}"
+state_dir="${XDG_CACHE_HOME:-$HOME/.cache}/wst"
+
+usage() {
+  printf 'usage: wst-devcontainer-exec <workspace-folder> <command> [args...]\n' >&2
+  exit 2
+}
+
+[[ $# -ge 2 ]] || usage
+
+workspace="$1"
+shift
+
+workspace_abs=$(realpath "$workspace")
+exec_args=(--workspace-folder "$workspace_abs")
+project=""
+slug=""
+branch=""
+
+case "$workspace_abs" in
+  "$projects_root"/*/*)
+    rel="${workspace_abs#"$projects_root"/}"
+    project="${rel%%/*}"
+    rest="${rel#*/}"
+    slug="${rest%%/*}"
+    branch=$(git -C "$workspace_abs" branch --show-current 2>/dev/null || true)
+    branch="${branch:-$slug}"
+    override="$state_dir/overrides/$project-$slug.json"
+    if [[ ! -f "$override" ]]; then
+      host_port=$(jq -r --arg k "$project/$slug" '.assignments[$k] // empty' \
+        "$state_dir/ports.json" 2>/dev/null || true)
+      if [[ -n "$host_port" ]]; then
+        WST_PROJECT="$project" WST_BRANCH="$branch" WST_SLUG="$slug" \
+          WST_TARGET="$workspace_abs" WST_HOST_PORT="$host_port" \
+          "$HOME/.local/bin/wst-container-up" >/dev/null
+      fi
+    fi
+    if [[ -f "$override" ]]; then
+      exec_args+=(--override-config "$override")
+    fi
+    ;;
+esac
+
+exec devcontainer exec "${exec_args[@]}" "$@"

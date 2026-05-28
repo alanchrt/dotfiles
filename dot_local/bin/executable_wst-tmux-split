@@ -11,7 +11,7 @@ flag="-v"
 dir=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
 
 if [[ -n "$dir" && -d "$dir" ]]; then
-  tmux split-window "$flag" -c "$dir" "cd '$dir' && devcontainer exec --workspace-folder . zsh"
+  tmux split-window "$flag" -c "$dir" "$HOME/.local/bin/wst-devcontainer-exec '$dir' zsh"
 else
   tmux split-window "$flag"
 fi

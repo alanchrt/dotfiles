@@ -26,8 +26,8 @@ workdir=$("${tmux_cmd[@]}" show-options -wqv @wst-workdir 2>/dev/null || true)
 if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
   session="wst-codex-popup-$(slugify "$project")-$(slugify "$stream")"
   if ! "${tmux_cmd[@]}" has-session -t "$session" 2>/dev/null; then
-    printf -v command 'devcontainer exec --workspace-folder %q zsh -l -c %q' \
-      "$workdir" 'codex; exec zsh -l'
+    printf -v command '%q %q zsh -l -c %q' \
+      "$HOME/.local/bin/wst-devcontainer-exec" "$workdir" 'codex; exec zsh -l'
     "${tmux_cmd[@]}" new-session -d -s "$session" -c "$workdir" "$command"
   fi
 else
