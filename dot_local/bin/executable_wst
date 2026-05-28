@@ -630,7 +630,7 @@ tmux_create_window() {
       magit|emacs)
         local emacs_daemon; emacs_daemon=$(emacs_daemon_name "$proj" "$slug")
         tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
-          "if ! emacsclient -s '$emacs_daemon' --eval t >/dev/null 2>&1; then emacs --daemon='$emacs_daemon'; fi; emacsclient -t -s '$emacs_daemon' --eval '(my/wst-open-stream-pane \"$target\")'; exec zsh -l"
+          "if ! emacsclient -s '$emacs_daemon' --eval t >/dev/null 2>&1; then emacs --daemon='$emacs_daemon'; fi; emacsclient -s '$emacs_daemon' --eval '(setq my/wst-next-stream-pane-dir \"$target\")' >/dev/null; emacsclient -t -s '$emacs_daemon' '$target'; exec zsh -l"
         ;;
       lazygit)
         tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \

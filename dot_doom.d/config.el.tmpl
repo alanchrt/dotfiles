@@ -154,6 +154,8 @@
 (defvar-local my/wst-magit-refresh-state nil)
 (defvar my/wst-dirty-tree-root nil)
 (defvar my/wst-dirty-tree-paths (make-hash-table :test #'equal))
+(defvar my/wst-next-stream-pane-dir nil)
+(defvar my/wst-confirming-exit nil)
 
 (defun my/wst-git-status-state (dir)
   "Return a stable hash for DIR's worktree state."
@@ -206,7 +208,31 @@
   (when (require 'treemacs nil t)
     (treemacs-run-in-every-buffer
      (when-let ((project (treemacs--find-project-for-path dir)))
-       (treemacs--do-refresh (current-buffer) project)))))
+       (treemacs--do-refresh (current-buffer) project)
+       (my/wst-expand-treemacs-project project)
+       (run-at-time 0.2 nil #'my/wst-expand-treemacs-project project)))))
+
+(defun my/wst-expand-treemacs-project (project)
+  "Expand PROJECT recursively in the WST Treemacs pane."
+  (when (and (require 'treemacs nil t)
+             (fboundp 'treemacs-project->position)
+             (fboundp 'treemacs--expand-root-node))
+    (when-let ((pos (treemacs-project->position project)))
+      (when (eq 'root-node-closed (treemacs-button-get pos :state))
+        (treemacs--expand-root-node pos))
+      (let ((changed t)
+            (passes 0))
+        (while (and changed (< passes 50))
+          (setq changed nil
+                passes (1+ passes))
+          (save-excursion
+            (goto-char (point-min))
+            (while-let ((button (next-button (point))))
+              (goto-char (button-start button))
+              (when (eq 'dir-node-closed (treemacs-button-get button :state))
+                (treemacs--expand-dir-node button)
+                (setq changed t))
+              (goto-char (button-end button)))))))))
 
 (defun my/wst-stop-magit-refresh-h ()
   (when (timerp my/wst-magit-refresh-timer)
@@ -245,6 +271,7 @@
   "Open a stream-scoped Treemacs + Magit layout for DIR."
   (interactive "DStream directory: ")
   (let ((dir (file-name-as-directory (expand-file-name dir))))
+    (set-frame-parameter nil 'my/wst-stream-pane t)
     (my/wst-refresh-dirty-tree-paths dir)
     (add-hook 'treemacs-pre-file-insert-predicates
               #'my/wst-treemacs-hide-clean-path-p)
@@ -256,7 +283,48 @@
         (treemacs-add-and-display-current-project-exclusively))
       (when (fboundp 'treemacs-select-window)
         (treemacs-select-window))
+      (when-let ((project (treemacs--find-project-for-path dir)))
+        (my/wst-expand-treemacs-project project)
+        (run-at-time 0.2 nil #'my/wst-expand-treemacs-project project)
+        (run-at-time 1 nil #'my/wst-expand-treemacs-project project))
       (when (get-buffer-window magit-buffer t)
         (select-window (get-buffer-window magit-buffer t)))
       (my/wst-refresh-treemacs-git-state)
       (switch-to-buffer magit-buffer))))
+
+(defun my/wst-open-next-stream-pane-h ()
+  "Open a pending WST stream layout in a new server frame."
+  (when my/wst-next-stream-pane-dir
+    (let ((dir my/wst-next-stream-pane-dir))
+      (setq my/wst-next-stream-pane-dir nil)
+      (run-at-time 0 nil #'my/wst-open-stream-pane dir))))
+
+(add-hook 'server-after-make-frame-hook #'my/wst-open-next-stream-pane-h)
+
+(defun my/wst-stream-pane-frame-p (&optional frame)
+  (frame-parameter frame 'my/wst-stream-pane))
+
+(defun my/wst-confirm-stream-pane-exit ()
+  (or my/wst-confirming-exit
+      (let ((my/wst-confirming-exit t))
+        (y-or-n-p "Close this WST Emacs pane? "))))
+
+(defun my/wst-confirm-save-buffers-kill-terminal-a (fn &rest args)
+  (when (or (not (my/wst-stream-pane-frame-p))
+            (my/wst-confirm-stream-pane-exit))
+    (apply fn args)))
+
+(defun my/wst-confirm-delete-frame-a (fn &optional frame force)
+  (when (or force
+            (not (my/wst-stream-pane-frame-p frame))
+            (my/wst-confirm-stream-pane-exit))
+    (funcall fn frame force)))
+
+(advice-remove #'save-buffers-kill-terminal
+               #'my/wst-confirm-save-buffers-kill-terminal-a)
+(advice-remove #'delete-frame
+               #'my/wst-confirm-delete-frame-a)
+(advice-add #'save-buffers-kill-terminal
+            :around #'my/wst-confirm-save-buffers-kill-terminal-a)
+(advice-add #'delete-frame
+            :around #'my/wst-confirm-delete-frame-a)
