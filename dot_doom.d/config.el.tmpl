@@ -136,22 +136,32 @@
 ;; default is `simple', which only decorates file nodes.
 (setq +treemacs-git-mode 'deferred)
 
+(defun my/disable-line-numbers-in-special-buffer-h ()
+  "Keep special tool buffers from briefly showing Doom line numbers."
+  (setq-local display-line-numbers nil
+              display-line-numbers-type nil)
+  (when (bound-and-true-p display-line-numbers-mode)
+    (display-line-numbers-mode -1)))
+
 (after! treemacs
   (setq treemacs-silent-filewatch t
         treemacs-silent-refresh t)
-  (add-hook! 'treemacs-mode-hook
-    (defun my/disable-line-numbers-in-treemacs-h ()
-      (setq-local display-line-numbers nil
-                  display-line-numbers-type nil)
-      (display-line-numbers-mode -1)))
+  (add-hook 'treemacs-mode-hook #'my/disable-line-numbers-in-special-buffer-h)
   (treemacs-filewatch-mode 1))
 
 ;; Keep Magit status useful as a passive worktree monitor. File buffers use
 ;; notifications above; only Magit status buffers opt back into timer checks.
 (after! magit
   (setq magit-auto-revert-immediately t)
+  (add-hook 'magit-mode-hook #'my/disable-line-numbers-in-special-buffer-h)
+  (add-hook 'magit-post-refresh-hook #'my/disable-line-numbers-in-special-buffer-h)
+  (add-hook 'window-selection-change-functions
+            (defun my/disable-line-numbers-in-selected-magit-window-h (_frame)
+              (when (derived-mode-p 'magit-mode)
+                (my/disable-line-numbers-in-special-buffer-h))))
   (add-hook! 'magit-status-mode-hook
     (defun my/magit-status-auto-refresh-h ()
+      (my/disable-line-numbers-in-special-buffer-h)
       (setq-local auto-revert-avoid-polling nil)
       (auto-revert-mode 1))))
 
