@@ -25,7 +25,7 @@ Run `gt` inside the stream's devcontainer (the pane you land in after `wa <branc
 
 ## Creating changes
 
-- `gt create -m "description"` — create a new branch with staged changes; each `gt create` becomes one PR in the stack, so keep changes small and focused.
+- `gt create -m "description"` — create a new branch with staged changes; each `gt create` becomes one PR in the stack, so prefer coherent review-sized changes over tiny slices.
 - `gt modify -m "updated description"` — amend the current branch.
 - `gt restack` — update branches above after modifying a lower branch.
 

@@ -3,7 +3,7 @@
 - For any non-trivial implementation, **start in plan mode** (`/plan`) and produce a plan before writing code. Codex doesn't default to plan mode at startup the way Claude Code does — entering it explicitly is on you (and on the agent if it's reading this).
 - In plan mode, do not Edit/Write or run state-mutating Bash (no installs, commits, pushes, file moves, network writes). If a real change is needed to validate the plan, ask first.
 - Once you begin implementation, be independent until finished. Do not ask unnecessary questions mid-task.
-- Make small, focused commits as you work unless explicitly told not to commit.
+- Group work into coherent, reviewable PR-sized changes unless explicitly told to split smaller.
   - If `AGENTS.override.md` exists at the repo root with Graphite verbs, use `gt create -m "..."` instead of `git commit`. Same swaps: `gt modify` for `git commit --amend`, `gt create <name>` for `git checkout -b <name>`, `gt restack` for `git rebase`, `gt submit` for `gh pr create`. See the override for the full verb table.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
 
@@ -11,14 +11,14 @@
 
 Codex is configured for autonomy with one review gate, at staging. The flow is **one confirmation, then commit and push happen back-to-back with no further prompts**:
 
-1. When a chunk of work feels wrapped up — feature complete, bug fixed, refactor consolidated, a single coherent change ready — stage the relevant files (`git add ...`).
+1. When a coherent body of work is ready for review — feature complete, bug fixed, or refactor consolidated with its tests/docs — stage the relevant files (`git add ...`).
 2. Print `git diff --cached` so the user can review what's about to land.
 3. Propose a commit message and ask **once** for confirmation to commit + push.
 4. On confirmation, run commit and push back-to-back without further prompts:
    - Plain git: `git commit -m "..." && git push -u origin HEAD`
    - Graphite (when `AGENTS.override.md` is at the repo root): `gt create -m "..." && gt submit`
 
-**Lean toward more frequent, smaller commits.** If you've finished a discrete piece of work — even a small one — propose a commit instead of accumulating changes. Don't wait for a "perfect" stopping point that may not come. Wrapping a feature, fixing a typo, finishing a refactor on one file, getting tests green — each of those is a reasonable trigger.
+Prefer one coherent PR over many tiny PRs. Accumulate related edits until the change has a clear review boundary, while avoiding unrelated work in the same PR.
 
 The separate "ask before committing to main/master" rule above still applies; that case is unusual and out-of-band.
 

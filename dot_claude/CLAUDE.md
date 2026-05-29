@@ -3,7 +3,7 @@
 - Always draft a plan before starting implementation work.
 - In plan mode, the only writable target is the harness-allocated plan file at `~/.claude/plans/<slug>.md`. Do not Edit/Write/NotebookEdit anywhere else, and do not run Bash commands that mutate state (no installs, commits, pushes, file moves, network writes). If you think a real change is needed to validate the plan, ask via `AskUserQuestion`. Plan mode ends only via `ExitPlanMode`.
 - Once you begin working, be independent until finished. Do not ask unnecessary questions mid-task.
-- Make small, focused commits as you work unless explicitly told not to commit.
+- Group work into coherent, reviewable PR-sized changes unless explicitly told to split smaller.
   - If `.claude/rules/graphite.md` exists in the project, use `gt create -m "..."` instead of `git commit`. Same swaps: `gt modify` for `git commit --amend`, `gt create <name>` for `git checkout -b <name>`, `gt restack` for `git rebase`, `gt submit` for `gh pr create`. A PreToolUse hook will block the raw `git`/`gh` form in these projects — see `.claude/rules/graphite.md` for the full verb table.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
 
