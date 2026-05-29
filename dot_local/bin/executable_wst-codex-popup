@@ -13,29 +13,59 @@ if [[ -n "${TMUX:-}" ]]; then
   tmux_cmd=(tmux -S "${TMUX%%,*}")
 fi
 
-current_session=$("${tmux_cmd[@]}" display-message -p '#{client_session}' 2>/dev/null || true)
-if [[ "$current_session" == wst-codex-popup-* ]]; then
-  exec "${tmux_cmd[@]}" detach-client
-fi
+configure_popup_session() {
+  "${popup_tmux[@]}" set-option -g status off
+  "${popup_tmux[@]}" set-option -g prefix C-a
+  "${popup_tmux[@]}" set-option -g prefix2 None
+  "${popup_tmux[@]}" set-option -g pane-border-status off
+  "${popup_tmux[@]}" set-option -g mouse off
+  "${popup_tmux[@]}" set-option -g set-titles off
 
-socket_path=$("${tmux_cmd[@]}" display-message -p '#{socket_path}')
+  # This is a separate tmux server/socket from the main session, so clearing
+  # its prefix table cannot affect the user's real tmux bindings.
+  "${popup_tmux[@]}" unbind-key -T prefix -a
+  "${popup_tmux[@]}" bind-key -T prefix g detach-client
+  "${popup_tmux[@]}" bind-key -T prefix C-a send-prefix
+}
+
 project=$("${tmux_cmd[@]}" show-options -wqv @wst-project 2>/dev/null || true)
 stream=$("${tmux_cmd[@]}" show-options -wqv @wst-stream 2>/dev/null || true)
 workdir=$("${tmux_cmd[@]}" show-options -wqv @wst-workdir 2>/dev/null || true)
 
 if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
   session="wst-codex-popup-$(slugify "$project")-$(slugify "$stream")"
-  if ! "${tmux_cmd[@]}" has-session -t "$session" 2>/dev/null; then
-    printf -v command '%q %q zsh -l -c %q' \
-      "$HOME/.local/bin/wst-devcontainer-exec" "$workdir" 'codex; exec zsh -l'
-    "${tmux_cmd[@]}" new-session -d -s "$session" -c "$workdir" "$command"
-  fi
 else
   session="wst-codex-popup-host"
-  if ! "${tmux_cmd[@]}" has-session -t "$session" 2>/dev/null; then
-    "${tmux_cmd[@]}" new-session -d -s "$session" 'codex; exec "${SHELL:-zsh}" -l'
+fi
+
+popup_dir="${XDG_CACHE_HOME:-$HOME/.cache}/wst/popups"
+mkdir -p "$popup_dir"
+popup_socket="$popup_dir/$(slugify "$session").sock"
+popup_tmux=(tmux -S "$popup_socket")
+
+if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
+  if ! "${popup_tmux[@]}" has-session -t "$session" 2>/dev/null; then
+    printf -v command '%q %q zsh -l -c %q' \
+      "$HOME/.local/bin/wst-devcontainer-exec" "$workdir" 'codex; exec zsh -l'
+    "${popup_tmux[@]}" new-session -d -s "$session" -c "$workdir" "$command"
+  fi
+  # Clean up the old same-server popup session from earlier versions, if it
+  # exists and has no attached clients.
+  if "${tmux_cmd[@]}" has-session -t "$session" 2>/dev/null \
+      && [[ "$("${tmux_cmd[@]}" list-clients -t "$session" 2>/dev/null | wc -l)" -eq 0 ]]; then
+    "${tmux_cmd[@]}" kill-session -t "$session" 2>/dev/null || true
+  fi
+else
+  if ! "${popup_tmux[@]}" has-session -t "$session" 2>/dev/null; then
+    "${popup_tmux[@]}" new-session -d -s "$session" 'codex; exec "${SHELL:-zsh}" -l'
+  fi
+  if "${tmux_cmd[@]}" has-session -t "$session" 2>/dev/null \
+      && [[ "$("${tmux_cmd[@]}" list-clients -t "$session" 2>/dev/null | wc -l)" -eq 0 ]]; then
+    "${tmux_cmd[@]}" kill-session -t "$session" 2>/dev/null || true
   fi
 fi
 
+configure_popup_session
+
 exec "${tmux_cmd[@]}" display-popup -E -w 90% -h 85% -T "Codex side quest" \
-  "env -u TMUX tmux -S '$socket_path' attach-session -t '$session'"
+  "env -u TMUX tmux -S '$popup_socket' attach-session -t '$session'"
