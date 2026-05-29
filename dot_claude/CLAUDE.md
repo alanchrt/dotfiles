@@ -16,6 +16,10 @@ When the user refers to "the screenshot", "that file I downloaded", or otherwise
 
 Both mounts are read-only inside containers — read freely, but don't try to modify them in place.
 
+# TypeScript
+
+When working in TypeScript or JavaScript, use the TypeScript MCP server for type-aware navigation and edits: diagnostics, definitions, references, hover/type info, rename, organize imports, and code actions. Use `rg` and file reads for broad text search, repository exploration, and non-code files. Always verify meaningful TypeScript changes with the project's normal typecheck/test/lint commands when available. If the MCP server is unavailable, stale, or slow, fall back to shell tools.
+
 # Workstream Workflow
 
 Streams are isolated parallel development environments — each one is its own git clone in its own devcontainer with its own port. Stream layout: `~/Projects/<project>/main/` is the canonical, `~/Projects/<project>/<branch>/` are streams. The user manages stream lifecycle manually; don't propose creating or tearing down streams unsolicited.

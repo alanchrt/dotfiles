@@ -10,11 +10,11 @@ current=$(cat)
 
 # Preserve everything in the current file EXCEPT our managed top-level
 # keys (only valid before the first section header) and our managed
-# sections ([features], [mcp_servers.playwright]).
+# sections ([features], [mcp_servers.playwright], [mcp_servers.typescript]).
 preserved=$(printf '%s' "$current" | python3 -c '
 import re, sys
 managed_keys = {"sandbox_mode", "approval_policy", "service_tier"}
-managed_sections = {"features", "mcp_servers.playwright"}
+managed_sections = {"features", "mcp_servers.playwright", "mcp_servers.typescript"}
 out = []
 in_drop = False
 in_any_section = False
@@ -79,6 +79,14 @@ args = [
   "-lc",
   "chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); [ -n \"$chrome\" ] || { echo 'Codex Playwright MCP: Chromium not found under /opt/playwright-browsers' >&2; exit 1; }; exec playwright-mcp --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-/home/vscode/.config/chromium-wst}\""
 ]
+startup_timeout_sec = 120
+
+# TypeScript MCP — tsserver-backed code intelligence and refactoring. Run via
+# npx inside the active container/session so it sees the same workspace,
+# tsconfig, node_modules, and generated files as Codex.
+[mcp_servers.typescript]
+command = "npx"
+args = ["-y", "ts-mcp-server"]
 startup_timeout_sec = 120
 MANAGED
 
