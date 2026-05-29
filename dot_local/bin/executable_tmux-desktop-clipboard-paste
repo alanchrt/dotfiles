@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+tmux_cmd=(tmux)
+if [[ -n "${TMUX:-}" ]]; then
+  tmux_cmd=(tmux -S "${TMUX%%,*}")
+fi
+
+target=()
+if [[ -n "${TMUX_PANE:-}" ]]; then
+  target=(-t "$TMUX_PANE")
+fi
+
+"${HOME}/.local/bin/desktop-clipboard-paste" | "${tmux_cmd[@]}" load-buffer -
+"${tmux_cmd[@]}" paste-buffer "${target[@]}"

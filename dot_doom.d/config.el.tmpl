@@ -44,6 +44,55 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
+;; Terminal Emacs frames (including WST tmux panes) don't get GUI clipboard
+;; integration automatically, even though the daemon is running on the host.
+;; Bridge kill/yank through the host clipboard tools when available.
+(defun my/clipboard-command-p (command)
+  (and command (executable-find command)))
+
+(defun my/clipboard-copy-with (command text)
+  (with-temp-buffer
+    (insert text)
+    (call-process-region (point-min) (point-max) command nil nil nil)))
+
+(defun my/clipboard-paste-with (command)
+  (with-temp-buffer
+    (when (zerop (call-process command nil t nil))
+      (buffer-string))))
+
+(defun my/clipboard-copy (text)
+  (cond
+   ((my/clipboard-command-p "desktop-clipboard-copy")
+    (my/clipboard-copy-with "desktop-clipboard-copy" text))
+   ((my/clipboard-command-p "wl-copy")
+    (my/clipboard-copy-with "wl-copy" text))
+   ((my/clipboard-command-p "pbcopy")
+    (my/clipboard-copy-with "pbcopy" text))
+   ((my/clipboard-command-p "xclip")
+    (with-temp-buffer
+      (insert text)
+      (call-process-region (point-min) (point-max) "xclip" nil nil nil
+                           "-selection" "clipboard")))))
+
+(defun my/clipboard-paste ()
+  (cond
+   ((my/clipboard-command-p "desktop-clipboard-paste")
+    (my/clipboard-paste-with "desktop-clipboard-paste"))
+   ((my/clipboard-command-p "wl-paste")
+    (my/clipboard-paste-with "wl-paste"))
+   ((my/clipboard-command-p "pbpaste")
+    (my/clipboard-paste-with "pbpaste"))
+   ((my/clipboard-command-p "xclip")
+    (with-temp-buffer
+      (when (zerop (call-process "xclip" nil t nil
+                                 "-selection" "clipboard" "-out"))
+        (buffer-string))))))
+
+(setq select-enable-clipboard t
+      save-interprogram-paste-before-kill t
+      interprogram-cut-function #'my/clipboard-copy
+      interprogram-paste-function #'my/clipboard-paste)
+
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Documents/Notes")

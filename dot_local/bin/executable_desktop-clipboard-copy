@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if command -v wl-copy >/dev/null 2>&1 && [[ -n "${WAYLAND_DISPLAY:-}" || -n "${WAYLAND_SOCKET:-}" ]]; then
+  exec wl-copy
+fi
+
+if command -v pbcopy >/dev/null 2>&1; then
+  exec pbcopy
+fi
+
+if command -v xclip >/dev/null 2>&1; then
+  exec xclip -selection clipboard
+fi
+
+if command -v xsel >/dev/null 2>&1; then
+  exec xsel --clipboard --input
+fi
+
+cat >/dev/null
+echo "desktop-clipboard-copy: no supported clipboard tool found" >&2
+exit 1
