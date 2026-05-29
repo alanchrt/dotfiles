@@ -151,10 +151,14 @@ wst_mounts+=("source=$chrome_volume,target=/home/vscode/.config/chromium,type=vo
 # - Shared dir between host and all containers.
 # - mise install cache shared across every stream so installing node@20
 #   in one stream is instantly available in the others.
+# - powerlevel10k/gitstatus cache so fresh pane shells don't print
+#   gitstatusd download progress before the first prompt.
 # - docker socket for sibling compose stacks (microservice projects).
+mkdir -p "$HOME/.cache/gitstatus"
 add_bind_rw "$HOME/Projects/dotfiles/master" "/home/vscode/Projects/dotfiles/master"
 add_bind_rw "$HOME/Projects/Shared"          "/home/vscode/Shared"
 add_bind_rw "$HOME/.local/share/wst/mise"    "/home/vscode/.local/share/mise"
+add_bind_rw "$HOME/.cache/gitstatus"         "/home/vscode/.cache/gitstatus"
 add_bind_rw "/var/run/docker.sock"           "/var/run/docker.sock"
 # Persistent Chromium profile (SSO/cookies) — single volume shared by every
 # stream. `wst chrome` opens a headed Chromium against this profile so a

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Cycle WST layout panes in workflow order; fall back to tmux's default order.
+
+set -euo pipefail
+
+default_next() {
+  exec tmux select-pane -t :.+
+}
+
+pane_exists() {
+  local pane="$1"
+  [[ -n "$pane" ]] || return 1
+  tmux list-panes -F '#{pane_id}' | grep -qxF "$pane"
+}
+
+infer_standard_layout() {
+  local pane_count
+  pane_count=$(tmux list-panes | wc -l)
+  (( pane_count >= 3 )) || return 1
+
+  codex=$(tmux list-panes -F '#{pane_id} #{pane_top} #{pane_left}' \
+    | sort -k2,2n -k3,3n | awk 'NR == 1 {print $1}')
+  git=$(tmux list-panes -F '#{pane_id} #{pane_top} #{pane_left}' \
+    | sort -k2,2nr -k3,3n | awk 'NR == 1 {print $1}')
+  shell=$(tmux list-panes -F '#{pane_id} #{pane_top} #{pane_left}' \
+    | sort -k2,2n -k3,3nr | awk 'NR == 1 {print $1}')
+
+  [[ -n "$codex" && -n "$git" && -n "$shell" ]] || return 1
+  [[ "$codex" != "$git" && "$codex" != "$shell" && "$git" != "$shell" ]]
+}
+
+workdir=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
+[[ -n "$workdir" ]] || default_next
+
+current=$(tmux display-message -p '#{pane_id}')
+codex=$(tmux show-options -wqv @wst-codex-pane 2>/dev/null || true)
+git=$(tmux show-options -wqv @wst-git-pane 2>/dev/null || true)
+shell=$(tmux show-options -wqv @wst-shell-pane 2>/dev/null || true)
+
+if ! pane_exists "$codex" || ! pane_exists "$git" || ! pane_exists "$shell"; then
+  infer_standard_layout || default_next
+fi
+
+case "$current" in
+  "$codex") exec tmux select-pane -t "$git" ;;
+  "$git")   exec tmux select-pane -t "$shell" ;;
+  "$shell") exec tmux select-pane -t "$codex" ;;
+  *)        exec tmux select-pane -t "$codex" ;;
+esac

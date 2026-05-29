@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Launch the stream-specific Emacs terminal client with a calm startup screen.
+
+set -euo pipefail
+
+daemon="${1:-}"
+target="${2:-}"
+display="${3:-}"
+
+if [[ -z "$daemon" || -z "$target" ]]; then
+  printf 'usage: wst-emacs-pane <daemon-name> <workspace> [display-name]\n' >&2
+  exit 2
+fi
+display="${display:-${daemon#wst-}}"
+
+log_dir="${XDG_CACHE_HOME:-$HOME/.cache}/wst/emacs"
+mkdir -p "$log_dir"
+log="$log_dir/$daemon.log"
+loading_drawn=false
+loading_last_frame_row=0
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+color() {
+  local code="$1"
+  [[ -t 1 && -z "${NO_COLOR:-}" ]] && printf '\033[%sm' "$code"
+}
+
+reset_color() { color 0; }
+cyan() { color '1;36'; }
+green() { color '1;32'; }
+blue() { color '1;34'; }
+dim() { color 2; }
+
+render_loading() {
+  local frame="$1"
+  local message="$2"
+  local cols rows top pad title detail hint line
+
+  cols=$(tput cols 2>/dev/null || printf '80')
+  rows=$(tput lines 2>/dev/null || printf '24')
+  top=$(( rows / 2 - 4 ))
+  (( top < 1 )) && top=1
+
+  title="$display"
+  detail="$message"
+  hint="$target"
+  line="━━━━━━━━━━━━━━━━━━━━"
+
+  if [[ "$loading_drawn" != true ]]; then
+    printf '\033[2J\033[H'
+    printf '\n%.0s' $(seq 1 "$top")
+    pad=$(( (cols - ${#title}) / 2 ))
+    (( pad < 0 )) && pad=0
+    printf '%*s' "$pad" ''
+    cyan
+    printf '%s\n' "$title"
+    reset_color
+    pad=$(( (cols - ${#line}) / 2 ))
+    (( pad < 0 )) && pad=0
+    printf '%*s' "$pad" ''
+    blue
+    printf '%s\n\n' "$line"
+    reset_color
+    loading_drawn=true
+  fi
+
+  loading_last_frame_row=$(( top + 4 ))
+  printf '\033[%s;1H\033[K' "$loading_last_frame_row"
+  pad=$(( (cols - ${#detail}) / 2 - 1 ))
+  (( pad < 0 )) && pad=0
+  printf '%*s' "$pad" ''
+  green
+  printf '%s' "$frame"
+  reset_color
+  printf ' %s\n\n' "$detail"
+  if (( ${#hint} > cols - 4 )); then
+    hint="...${hint: -$((cols - 7))}"
+  fi
+  printf '\033[K'
+  pad=$(( (cols - ${#hint}) / 2 ))
+  (( pad < 0 )) && pad=0
+  printf '%*s' "$pad" ''
+  dim
+  printf '%s\n' "$hint"
+  reset_color
+}
+
+wait_for_daemon() {
+  local message="$1"
+  local frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+  local i=0
+
+  while ! emacsclient -s "$daemon" --eval t >/dev/null 2>&1; do
+    if [[ -t 1 ]]; then
+      render_loading "${frames[i % ${#frames[@]}]}" "$message"
+    fi
+    i=$((i + 1))
+    sleep 0.15
+  done
+}
+
+elisp_string() {
+  local value="$1"
+  value=${value//\\/\\\\}
+  value=${value//\"/\\\"}
+  printf '"%s"' "$value"
+}
+
+if ! have emacsclient; then
+  printf 'emacsclient not found; install Emacs or set WST_GIT_PANE=lazygit\n' >&2
+  exec zsh -l
+fi
+
+if ! emacsclient -s "$daemon" --eval t >/dev/null 2>&1; then
+  if ! have emacs; then
+    printf 'emacs not found; install Emacs or set WST_GIT_PANE=lazygit\n' >&2
+    exec zsh -l
+  fi
+
+  : > "$log"
+  if [[ -t 1 ]]; then
+    tput civis 2>/dev/null || true
+  fi
+  emacs --daemon="$daemon" >"$log" 2>&1 &
+  emacs_pid=$!
+  frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+  i=0
+
+  while ! emacsclient -s "$daemon" --eval t >/dev/null 2>&1; do
+    if ! kill -0 "$emacs_pid" 2>/dev/null; then
+      if wait "$emacs_pid"; then
+        status=0
+      else
+        status=$?
+      fi
+      if (( status != 0 )); then
+        [[ -t 1 ]] && { tput cnorm 2>/dev/null || true; clear; }
+        printf 'Emacs pane failed for %s; full log follows from %s\n\n' "$display" "$log" >&2
+        cat "$log" >&2
+        exit "$status"
+      fi
+    fi
+    if [[ -t 1 ]]; then
+      render_loading "${frames[i % ${#frames[@]}]}" "Starting Emacs"
+    fi
+    i=$((i + 1))
+    sleep 0.15
+  done
+
+  wait "$emacs_pid" 2>/dev/null || true
+  [[ -t 1 ]] && tput cnorm 2>/dev/null || true
+fi
+
+if [[ -t 1 ]]; then
+  tput civis 2>/dev/null || true
+  wait_for_daemon "Opening stream"
+  tput cnorm 2>/dev/null || true
+fi
+
+emacsclient -s "$daemon" --eval "(setq my/wst-next-stream-pane-dir $(elisp_string "$target"))" >/dev/null
+emacsclient -t -s "$daemon" "$target"
+exec zsh -l

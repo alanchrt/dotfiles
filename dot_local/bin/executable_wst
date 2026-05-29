@@ -19,6 +19,74 @@ info() { printf '==> %s\n' "$*"; }
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+ui_color() {
+  local code="$1"
+  [[ -t 1 && -z "${NO_COLOR:-}" ]] && printf '\033[%sm' "$code"
+}
+
+ui_reset() { ui_color 0; }
+ui_dim() { ui_color 2; }
+ui_green() { ui_color '1;32'; }
+ui_red() { ui_color '1;31'; }
+ui_cyan() { ui_color '1;36'; }
+
+ui_step() {
+  local label="$1"
+  shift
+
+  local log_dir="${WST_STEP_LOG_DIR:-}"
+  if [[ -z "$log_dir" ]]; then
+    log_dir=$(mktemp -d "${TMPDIR:-/tmp}/wst.XXXXXX")
+    WST_STEP_LOG_DIR="$log_dir"
+  fi
+  mkdir -p "$log_dir"
+
+  local log="$log_dir/$(slugify "$label").log"
+  local interactive=false
+  [[ -t 1 && -z "${WST_PLAIN_LOGS:-}" ]] && interactive=true
+
+  if ! $interactive; then
+    info "$label"
+    "$@"
+    return
+  fi
+
+  local frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+  local i=0 pid status
+  "$@" >"$log" 2>&1 &
+  pid=$!
+
+  while kill -0 "$pid" 2>/dev/null; do
+    printf '\r\033[K  '
+    ui_cyan
+    printf '%s' "${frames[i % ${#frames[@]}]}"
+    ui_reset
+    printf ' %s' "$label"
+    i=$((i + 1))
+    sleep 0.12
+  done
+
+  if wait "$pid"; then
+    printf '\r\033[K  '
+    ui_green
+    printf '✓'
+    ui_reset
+    printf ' %s\n' "$label"
+    return 0
+  else
+    status=$?
+  fi
+
+  printf '\r\033[K  '
+  ui_red
+  printf '✕'
+  ui_reset
+  printf ' %s\n\n' "$label"
+  printf 'stream: %s failed; full log follows from %s\n\n' "$label" "$log" >&2
+  cat "$log" >&2
+  return "$status"
+}
+
 require_tool() {
   have "$1" || die "$1 not found on PATH. Install it first (see roles/$2/)."
 }
@@ -168,13 +236,16 @@ cmd_new() {
     [[ -n "$base" ]] || base=$(git -C "$canonical" branch --show-current)
   fi
 
-  info "Cloning $canonical → $target (base: $base, branch: $branch)"
-  git clone --local "$canonical" "$target"
-  local origin_url
-  origin_url=$(git -C "$canonical" remote get-url origin)
-  git -C "$target" remote set-url origin "$origin_url"
-  git -C "$target" fetch origin
-  git -C "$target" checkout -B "$branch" "origin/$base"
+  local WST_STEP_LOG_DIR
+  WST_STEP_LOG_DIR=$(mktemp -d "${TMPDIR:-/tmp}/wst-new.XXXXXX")
+
+  ui_cyan
+  printf 'Creating stream'
+  ui_reset
+  printf ' %s/%s\n\n' "$proj" "$branch"
+
+  ui_step "Clone stream" git clone --local "$canonical" "$target"
+  ui_step "Checkout $branch from $base" cmd_new_checkout "$canonical" "$target" "$base" "$branch"
 
   # Propagate Graphite enablement from canonical (rule symlink + git exclude).
   # The matching in-container `gt repo init` runs during provision_container.
@@ -185,18 +256,17 @@ cmd_new() {
   local key="$proj/$slug"
   local host_port
   host_port=$(port_allocate "$key")
-  info "Allocated host port $host_port for $key"
+  [[ ! -t 1 || -n "${WST_PLAIN_LOGS:-}" ]] && info "Allocated host port $host_port for $key"
 
-  info "Bringing up devcontainer..."
-  WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
+  ui_step "Start devcontainer on :$host_port" env \
+    WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
     WST_HOST_PORT="$host_port" WST_TARGET="$target" \
     "$HOME/.local/bin/wst-container-up"
 
-  info "Provisioning in-container tooling..."
-  provision_container "$target"
+  ui_step "Provision agent tooling" provision_container "$target"
 
-  info "Creating tmux window..."
-  tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port"
+  ui_step "Open tmux workspace" tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port"
+  rm -rf "$WST_STEP_LOG_DIR"
 
   cat <<EOF
 
@@ -205,6 +275,15 @@ Stream '$branch' ready.
   Preview : http://localhost:$host_port/
   Attach  : wa $branch
 EOF
+}
+
+cmd_new_checkout() {
+  local canonical="$1" target="$2" base="$3" branch="$4"
+  local origin_url
+  origin_url=$(git -C "$canonical" remote get-url origin)
+  git -C "$target" remote set-url origin "$origin_url"
+  git -C "$target" fetch origin
+  git -C "$target" checkout -B "$branch" "origin/$base"
 }
 
 # ---- subcommand: gtinit ----
@@ -434,28 +513,55 @@ cmd_rm() {
 
   local cid
   cid=$(docker ps -aq --filter "label=devcontainer.local_folder=$target" 2>/dev/null || true)
-  if [[ -n "$cid" ]]; then
-    info "Removing container $cid"
-    docker rm -f "$cid" >/dev/null
-  fi
 
   local session; session=$(session_name "$proj")
-  if tmux has-session -t "$session" 2>/dev/null \
-       && tmux list-windows -t "$session" -F '#{window_name}' | grep -qx "$slug"; then
-    tmux kill-window -t "$session:$slug" || true
-  fi
 
   local emacs_daemon; emacs_daemon=$(emacs_daemon_name "$proj" "$slug")
-  if emacsclient -s "$emacs_daemon" --eval t >/dev/null 2>&1; then
-    info "Stopping Emacs daemon $emacs_daemon"
-    emacsclient -s "$emacs_daemon" --eval '(kill-emacs)' >/dev/null 2>&1 || true
-  fi
 
-  info "Removing $target"
-  rm -rf "$target"
-  port_free "$proj/$slug"
-  rm -f "$OVERRIDES_DIR/$proj-$slug.json"
-  info "Stream '$branch' removed"
+  local WST_STEP_LOG_DIR
+  WST_STEP_LOG_DIR=$(mktemp -d "${TMPDIR:-/tmp}/wst-rm.XXXXXX")
+
+  ui_cyan
+  printf 'Removing stream'
+  ui_reset
+  printf ' %s/%s\n\n' "$proj" "$branch"
+
+  [[ -z "$cid" ]] || ui_step "Remove devcontainer" cmd_rm_container "$cid"
+  ui_step "Close tmux workspace" cmd_rm_tmux_window "$session" "$slug"
+  ui_step "Stop Emacs pane" cmd_rm_emacs "$emacs_daemon"
+  ui_step "Remove stream files" rm -rf "$target"
+  ui_step "Release port and cache" cmd_rm_state "$proj/$slug" "$OVERRIDES_DIR/$proj-$slug.json"
+  rm -rf "$WST_STEP_LOG_DIR"
+
+  ui_green
+  printf '✓'
+  ui_reset
+  printf ' Removed %s/%s\n' "$proj" "$branch"
+}
+
+cmd_rm_container() {
+  docker rm -f "$1" >/dev/null
+}
+
+cmd_rm_tmux_window() {
+  local session="$1" slug="$2"
+  if tmux has-session -t "$session" 2>/dev/null \
+       && tmux list-windows -t "$session" -F '#{window_name}' | grep -qx "$slug"; then
+    tmux kill-window -t "$session:$slug"
+  fi
+}
+
+cmd_rm_emacs() {
+  local emacs_daemon="$1"
+  if emacsclient -s "$emacs_daemon" --eval t >/dev/null 2>&1; then
+    emacsclient -s "$emacs_daemon" --eval '(kill-emacs)' >/dev/null
+  fi
+}
+
+cmd_rm_state() {
+  local key="$1" override="$2"
+  port_free "$key"
+  rm -f "$override"
 }
 
 # ---- subcommand: doctor ----
@@ -565,6 +671,11 @@ cat > "$HOME/.claude/mcp_servers.json" <<JSON
   }
 }
 JSON
+# Prime the prompt helper during provisioning so fresh terminal panes don't
+# show powerlevel10k's first-run gitstatusd download message.
+if command -v zsh >/dev/null 2>&1; then
+  timeout 90 zsh -lic 'true' >/dev/null 2>&1 || true
+fi
 SH
 )
   "$HOME/.local/bin/wst-devcontainer-exec" "$target" bash -c "$provision_script" \
@@ -615,8 +726,11 @@ tmux_create_window() {
   # fall back to an interactive login shell so the pane stays usable.
   # Pane splits (wst-tmux-split) still open in zsh, so you can split for
   # shell work.
-  tmux new-window -t "$session:" -n "$slug" -c "$target" \
-    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'codex; exec zsh -l'"
+  local codex_pane=""
+  local git_pane=""
+  local shell_pane=""
+  codex_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
+    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'codex; exec zsh -l'")
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
   # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
   # the splits and keep the single-pane layout. The default Magit pane
@@ -627,16 +741,19 @@ tmux_create_window() {
     case "${WST_GIT_PANE:-magit}" in
       magit|emacs)
         local emacs_daemon; emacs_daemon=$(emacs_daemon_name "$proj" "$slug")
-        tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
-          "if ! emacsclient -s '$emacs_daemon' --eval t >/dev/null 2>&1; then emacs --daemon='$emacs_daemon'; fi; emacsclient -s '$emacs_daemon' --eval '(setq my/wst-next-stream-pane-dir \"$target\")' >/dev/null; emacsclient -t -s '$emacs_daemon' '$target'; exec zsh -l"
+        local emacs_command
+        printf -v emacs_command '%q %q %q %q' \
+          "$HOME/.local/bin/wst-emacs-pane" "$emacs_daemon" "$target" "$proj/$branch"
+        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
+          "$emacs_command")
         ;;
       lazygit)
-        tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
-          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'lazygit; exec zsh -l'"
+        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
+          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'lazygit; exec zsh -l'")
         ;;
       shell|zsh)
-        tmux split-window -v -l 33% -t "$session:$slug" -c "$target" \
-          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l"
+        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
+          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l")
         ;;
       *)
         die "unknown WST_GIT_PANE='${WST_GIT_PANE}' (expected: magit, lazygit, shell)"
@@ -645,8 +762,8 @@ tmux_create_window() {
     # 2. Focus the top (codex) pane so the next split lands there.
     tmux select-pane -t "$session:$slug.0"
     # 3. Split the top pane horizontally for the spare zsh on the right.
-    tmux split-window -h -l 40% -t "$session:$slug" -c "$target" \
-      "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l"
+    shell_pane=$(tmux split-window -P -F '#{pane_id}' -h -l 40% -t "$session:$slug" -c "$target" \
+      "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l")
     # 4. Return focus to codex (top-left).
     tmux select-pane -t "$session:$slug.0"
   fi
@@ -654,6 +771,9 @@ tmux_create_window() {
   tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
   tmux set-option -w -t "$session:$slug" @wst-workdir "$target"
   tmux set-option -w -t "$session:$slug" @wst-port    "$host_port"
+  tmux set-option -w -t "$session:$slug" @wst-codex-pane "$codex_pane"
+  tmux set-option -w -t "$session:$slug" @wst-git-pane   "$git_pane"
+  tmux set-option -w -t "$session:$slug" @wst-shell-pane "$shell_pane"
 }
 
 # ---- dispatch ----
@@ -675,7 +795,7 @@ usage:
   wst migrate                                           one-shot canonical relocation
 
 env:
-  WST_PANES=1                                           single-pane layout (default: claude + lazygit + zsh)
+  WST_PANES=1                                           single-pane layout (default: codex + magit + zsh)
 EOF
 }
 
