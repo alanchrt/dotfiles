@@ -18,14 +18,19 @@ configure_popup_session() {
   "${popup_tmux[@]}" set-option -g prefix C-a
   "${popup_tmux[@]}" set-option -g prefix2 None
   "${popup_tmux[@]}" set-option -g pane-border-status off
-  "${popup_tmux[@]}" set-option -g mouse off
+  "${popup_tmux[@]}" set-option -g mouse on
   "${popup_tmux[@]}" set-option -g set-titles off
+  "${popup_tmux[@]}" set-window-option -g mode-keys vi
 
   # This is a separate tmux server/socket from the main session, so clearing
   # its prefix table cannot affect the user's real tmux bindings.
   "${popup_tmux[@]}" unbind-key -T prefix -a
   "${popup_tmux[@]}" bind-key -T prefix g detach-client
+  "${popup_tmux[@]}" bind-key -T prefix '[' copy-mode
+  "${popup_tmux[@]}" bind-key -T prefix ']' run-shell "$HOME/.local/bin/tmux-desktop-clipboard-paste"
   "${popup_tmux[@]}" bind-key -T prefix C-a send-prefix
+  "${popup_tmux[@]}" bind-key -T copy-mode-vi v send-keys -X begin-selection
+  "${popup_tmux[@]}" bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "$HOME/.local/bin/desktop-clipboard-copy"
 }
 
 project=$("${tmux_cmd[@]}" show-options -wqv @wst-project 2>/dev/null || true)
