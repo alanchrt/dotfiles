@@ -89,7 +89,8 @@ dispatch_one() {
   # second notification arriving within ~2s could read prev_id before the
   # first dispatch had written the new id, breaking the single-notification
   # guarantee. stdbuf -oL forces line buffering so the id flushes immediately.
-  exec 3< <(stdbuf -oL notify-send "${notify_args[@]}" "$title" "$body" 2>/dev/null || true)
+  exec 3< <(timeout --kill-after=5s 600s \
+    stdbuf -oL notify-send "${notify_args[@]}" "$title" "$body" 2>/dev/null || true)
 
   local new_id=""
   if IFS= read -t 2 -r -u 3 new_id 2>/dev/null && [[ -n "$new_id" ]]; then
@@ -103,11 +104,8 @@ dispatch_one() {
   fi
 
   # Background only the click handler so subsequent queue entries process
-  # immediately. Cap the wait at 10 minutes — without a timeout the subshell
-  # hangs as long as notify-send runs, which can be forever on notification
-  # daemons that don't auto-expire. 10 minutes is well past any realistic
-  # acknowledge window and prevents leaked subshells from piling up in
-  # the service's cgroup.
+  # immediately. The notify-send process itself is capped above; otherwise
+  # action-capable notifications can linger forever in the service cgroup.
   (
     local action=""
     IFS= read -t 600 -r -u 3 action 2>/dev/null || true
