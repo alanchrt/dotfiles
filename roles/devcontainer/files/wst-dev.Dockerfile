@@ -67,12 +67,25 @@ RUN set -eux; \
     rm -rf /root/.local; \
     curl -fsSL https://get.chezmoi.io | sh -s -- -b /usr/local/bin
 
-# 4. Bun (pinned)
+# Trust stream workspaces and let mise read Bun's normal project pins
+# (`.bun-version` and package.json `packageManager`) without requiring every
+# repo to carry a mise-specific file.
+RUN set -eux; \
+    install -d -m 0755 /etc/mise; \
+    printf '%s\n' \
+      '[settings]' \
+      'idiomatic_version_file_enable_tools = ["bun"]' \
+      'trusted_config_paths = ["/workspaces"]' \
+      > /etc/mise/config.toml
+
+# 4. Bun fallback. Project-specific versions are managed by mise at runtime.
 RUN set -eux; \
     curl -fsSL https://bun.sh/install \
-      | BUN_INSTALL=/opt/bun bash -s "bun-v${BUN_VERSION}"; \
-    ln -s /opt/bun/bin/bun /usr/local/bin/bun; \
-    ln -s /opt/bun/bin/bunx /usr/local/bin/bunx
+      | BUN_INSTALL=/opt/bun bash -s "bun-v${BUN_VERSION}"
+COPY wst-bun-wrapper.sh /usr/local/bin/bun
+RUN set -eux; \
+    chmod +x /usr/local/bin/bun; \
+    ln -s /usr/local/bin/bun /usr/local/bin/bunx
 
 # 4b. Terminal extras from GitHub releases (the bits of roles/terminal/linux.yml
 # that aren't in Debian apt). Static binaries → /usr/local/bin. Tarball

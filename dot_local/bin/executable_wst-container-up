@@ -227,6 +227,8 @@ printf '%s' "$project_json" | jq \
       WST_DOTFILES_SRC: "/home/vscode/Projects/dotfiles/master",
       WST_SHARED_DIR: "/home/vscode/Shared",
       WST_BROWSER_PROFILE: "/home/vscode/.config/chromium-wst",
+      MISE_TRUSTED_CONFIG_PATHS: "/workspaces",
+      MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS: "bun",
       SHELL: "/usr/bin/zsh",
       WAYLAND_DISPLAY: $wayland_display,
       XDG_RUNTIME_DIR: "/run/user/1000",

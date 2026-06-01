@@ -44,12 +44,24 @@ if [[ -n "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/null 2>&1; then
 fi
 
 # 3. mise — activate the shim path; install project tools if the cwd has a
-#    .mise.toml or .tool-versions. The mise install cache lives in a host
-#    bind mount (~/.local/share/wst/mise) so it's shared across all streams.
+#    mise config or Bun's idiomatic pins. The mise install cache lives in a
+#    host bind mount (~/.local/share/wst/mise) so it's shared across streams.
 if command -v mise >/dev/null 2>&1; then
+  export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:-/workspaces}"
+  export MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS="${MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS:-bun}"
   eval "$(mise activate bash 2>/dev/null)" || true
-  if [[ -f "${PWD}/.mise.toml" || -f "${PWD}/.tool-versions" ]]; then
+  wants_bun=false
+  if [[ -f "${PWD}/.bun-version" ]]; then
+    wants_bun=true
+  elif [[ -f "${PWD}/package.json" ]] && command -v jq >/dev/null 2>&1; then
+    jq -e '.packageManager? | strings | test("^bun@")' "${PWD}/package.json" >/dev/null 2>&1 \
+      && wants_bun=true
+  fi
+
+  if [[ -f "${PWD}/.mise.toml" || -f "${PWD}/mise.toml" || -f "${PWD}/.tool-versions" ]]; then
     mise install --quiet 2>/dev/null || note "mise install had errors (non-fatal)"
+  elif [[ "$wants_bun" == true ]]; then
+    mise install --quiet bun 2>/dev/null || note "mise bun install had errors (non-fatal)"
   fi
 fi
 

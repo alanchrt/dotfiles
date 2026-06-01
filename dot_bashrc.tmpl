@@ -27,5 +27,17 @@ export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+# mise manages per-project tool versions. Keep this after legacy tool paths so
+# its shims win when a project pins a specific Bun/Node/etc. version.
+if command -v mise >/dev/null 2>&1; then
+    export MISE_TRUSTED_CONFIG_PATHS="${MISE_TRUSTED_CONFIG_PATHS:-/workspaces}"
+    export MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS="${MISE_IDIOMATIC_VERSION_FILE_ENABLE_TOOLS:-bun}"
+    if [ -n "${ZSH_VERSION:-}" ]; then
+        eval "$(mise activate zsh)"
+    else
+        eval "$(mise activate bash)"
+    fi
+fi
+
 # Use emacs as default editor
 export EDITOR="emacsclient -c"
