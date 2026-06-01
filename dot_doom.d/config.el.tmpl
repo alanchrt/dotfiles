@@ -194,7 +194,8 @@
 
 (after! treemacs
   (setq treemacs-silent-filewatch t
-        treemacs-silent-refresh t)
+        treemacs-silent-refresh t
+        treemacs-missing-project-action 'remove)
   (add-hook 'treemacs-mode-hook #'my/disable-line-numbers-in-special-buffer-h)
   (treemacs-filewatch-mode 1))
 
@@ -372,7 +373,8 @@
     (setq my/wst-magit-refresh-timer nil)))
 
 (defun my/wst-stop-stream-refresh ()
-  (when (timerp my/wst-stream-refresh-timer)
+  (when (and (boundp 'my/wst-stream-refresh-timer)
+             (timerp my/wst-stream-refresh-timer))
     (cancel-timer my/wst-stream-refresh-timer))
   (setq my/wst-stream-refresh-timer nil
         my/wst-stream-refresh-state nil
@@ -436,6 +438,8 @@
 (defun my/wst-open-stream-pane (dir)
   "Open a stream-scoped Treemacs + Magit layout for DIR."
   (interactive "DStream directory: ")
+  (my/wst-stop-stream-refresh)
+  (my/wst-ensure-dirty-tree-tables)
   (let ((dir (file-name-as-directory (expand-file-name dir))))
     (set-frame-parameter nil 'my/wst-stream-pane t)
     (my/wst-enable-stream-refresh dir)
