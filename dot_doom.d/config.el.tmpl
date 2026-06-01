@@ -300,6 +300,11 @@
           my/wst-dirty-tree-statuses statuses))
   (my/wst-apply-dirty-status-annotations))
 
+(defun my/wst-dirty-tree-has-files-p ()
+  "Return non-nil when WST dirty-tree state has file entries to display."
+  (and (hash-table-p my/wst-dirty-tree-statuses)
+       (> (hash-table-count my/wst-dirty-tree-statuses) 0)))
+
 (defun my/wst-ensure-dirty-tree-tables ()
   "Ensure WST dirty-tree hash tables exist after config reloads."
   (unless (hash-table-p my/wst-dirty-tree-paths)
@@ -335,14 +340,40 @@
        (not (gethash (directory-file-name (expand-file-name path))
                      my/wst-dirty-tree-paths))))
 
+(defun my/wst-show-treemacs-stream-project (dir &optional reset)
+  "Replace Treemacs' workspace with the explicit WST stream project DIR."
+  (when (and (require 'treemacs nil t)
+             (fboundp 'treemacs--show-single-project))
+    (when reset
+      (when-let ((buf (treemacs-get-local-buffer)))
+        (kill-buffer buf)))
+    (let* ((path (directory-file-name (expand-file-name dir)))
+           (name (file-name-nondirectory path)))
+      (treemacs--show-single-project path name)
+      (treemacs--find-project-for-path path))))
+
 (defun my/wst-refresh-treemacs-project (dir)
   "Force Treemacs to rebuild the project containing DIR."
   (when (require 'treemacs nil t)
     (treemacs-run-in-every-buffer
-     (when-let ((project (treemacs--find-project-for-path dir)))
+     (when-let ((project (or (treemacs--find-project-for-path dir)
+                             (my/wst-show-treemacs-stream-project dir :reset))))
        (treemacs--do-refresh (current-buffer) project)
-       (my/wst-expand-treemacs-project project)
-       (run-at-time 0.2 nil #'my/wst-expand-treemacs-project project)))))
+       (if (my/wst-dirty-tree-has-files-p)
+           (progn
+             (my/wst-expand-treemacs-project project)
+             (run-at-time 0.2 nil #'my/wst-expand-treemacs-project-for-dir dir))
+         (my/wst-collapse-treemacs-project project))))))
+
+(defun my/wst-collapse-treemacs-project (project)
+  "Collapse PROJECT recursively in the WST Treemacs pane."
+  (when (and (require 'treemacs nil t)
+             (fboundp 'treemacs-project->position)
+             (fboundp 'treemacs--collapse-root-node))
+    (treemacs-run-in-every-buffer
+     (when-let ((pos (treemacs-project->position project)))
+       (when (eq 'root-node-open (treemacs-button-get pos :state))
+         (treemacs--collapse-root-node pos :recursive))))))
 
 (defun my/wst-expand-treemacs-project (project)
   "Expand PROJECT recursively in the WST Treemacs pane."
@@ -366,6 +397,14 @@
                  (treemacs--expand-dir-node button)
                  (setq changed t))
                (goto-char (button-end button))))))))))
+
+(defun my/wst-expand-treemacs-project-for-dir (dir)
+  "Expand the Treemacs project for DIR using fresh Treemacs state."
+  (when (require 'treemacs nil t)
+    (treemacs-run-in-every-buffer
+     (when-let ((project (treemacs--find-project-for-path dir)))
+       (when (my/wst-dirty-tree-has-files-p)
+         (my/wst-expand-treemacs-project project))))))
 
 (defun my/wst-stop-magit-refresh-h ()
   (when (timerp my/wst-magit-refresh-timer)
@@ -449,14 +488,16 @@
     (magit-status dir)
     (my/wst-enable-magit-status-refresh dir)
     (let ((magit-buffer (current-buffer)))
-      (when (fboundp 'treemacs-add-and-display-current-project-exclusively)
-        (treemacs-add-and-display-current-project-exclusively))
+      (my/wst-show-treemacs-stream-project dir :reset)
       (when (fboundp 'treemacs-select-window)
         (treemacs-select-window))
       (when-let ((project (treemacs--find-project-for-path dir)))
-        (my/wst-expand-treemacs-project project)
-        (run-at-time 0.2 nil #'my/wst-expand-treemacs-project project)
-        (run-at-time 1 nil #'my/wst-expand-treemacs-project project))
+        (if (my/wst-dirty-tree-has-files-p)
+            (progn
+              (my/wst-expand-treemacs-project project)
+              (run-at-time 0.2 nil #'my/wst-expand-treemacs-project-for-dir dir)
+              (run-at-time 1 nil #'my/wst-expand-treemacs-project-for-dir dir))
+          (my/wst-collapse-treemacs-project project)))
       (when (get-buffer-window magit-buffer t)
         (select-window (get-buffer-window magit-buffer t)))
       (my/wst-refresh-treemacs-git-state)
