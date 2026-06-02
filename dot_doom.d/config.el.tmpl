@@ -215,6 +215,61 @@
       (setq-local auto-revert-avoid-polling nil)
       (auto-revert-mode 1))))
 
+(defun my/soften-ediff-faces-h ()
+  "Use muted Dracula-tinted Ediff backgrounds without hiding font-lock colors."
+  (dolist (spec '((ediff-current-diff-A . "#4a2f3a")
+                  (ediff-current-diff-B . "#2d4a3a")
+                  (ediff-current-diff-C . "#4a3f30")
+                  (ediff-current-diff-Ancestor . "#403650")
+                  (ediff-fine-diff-A . "#6b3345")
+                  (ediff-fine-diff-B . "#336b4a")
+                  (ediff-fine-diff-C . "#6b5733")
+                  (ediff-fine-diff-Ancestor . "#51406b")
+                  (ediff-even-diff-A . "#303241")
+                  (ediff-even-diff-B . "#303241")
+                  (ediff-even-diff-C . "#303241")
+                  (ediff-even-diff-Ancestor . "#303241")
+                  (ediff-odd-diff-A . "#282a36")
+                  (ediff-odd-diff-B . "#282a36")
+                  (ediff-odd-diff-C . "#282a36")
+                  (ediff-odd-diff-Ancestor . "#282a36")))
+    (when (facep (car spec))
+      (set-face-attribute (car spec) nil
+                          :background (cdr spec)
+                          :foreground 'unspecified
+                          :weight 'unspecified
+                          :slant 'unspecified
+                          :inverse-video nil
+                          :extend t))))
+
+(defun my/ediff-source-file-name ()
+  "Return a file name Ediff can use for mode detection."
+  (when-let* ((name (or buffer-file-name (buffer-name))))
+    (replace-regexp-in-string "\\.~[^~]+~\\'" "" name)))
+
+(defun my/ediff-set-source-mode (buffer)
+  "Make Magit Ediff revision buffers use the source file's major mode."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (when-let* ((source-file-name (my/ediff-source-file-name)))
+        (let ((buffer-file-name source-file-name))
+          (set-auto-mode t)
+          (when (bound-and-true-p font-lock-mode)
+            (font-lock-ensure)))))))
+
+(defun my/ediff-set-source-modes-h ()
+  "Apply source major modes to all Ediff comparison buffers."
+  (dolist (buffer (list (bound-and-true-p ediff-buffer-A)
+                        (bound-and-true-p ediff-buffer-B)
+                        (bound-and-true-p ediff-buffer-C)
+                        (bound-and-true-p ediff-ancestor-buffer)))
+    (my/ediff-set-source-mode buffer)))
+
+(after! ediff
+  (my/soften-ediff-faces-h)
+  (add-hook 'doom-load-theme-hook #'my/soften-ediff-faces-h)
+  (add-hook 'ediff-startup-hook #'my/ediff-set-source-modes-h))
+
 (defvar-local my/wst-magit-refresh-timer nil)
 (defvar-local my/wst-magit-refresh-state nil)
 (defvar my/wst-stream-refresh-timer nil)
