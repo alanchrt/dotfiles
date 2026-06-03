@@ -770,11 +770,7 @@
     (when (file-exists-p out-file) (delete-file out-file))
     (message "Cleared iterate annotations for %s" root)))
 
-(after! magit
-  (define-key magit-diff-mode-map (kbd "C-c r") #'my/wst-iterate-annotate-from-diff))
-
 (map! :leader
       (:prefix ("r" . "review")
        :desc "Annotate line for /iterate" "a" #'annotate-annotate
-       :desc "Export annotations → iterate.md" "i" #'my/wst-export-iterate
-       :desc "Clear iterate annotations"        "x" #'my/wst-clear-iterate-annotations))
+       :desc "Clear iterate annotations"  "x" #'my/wst-clear-iterate-annotations))
