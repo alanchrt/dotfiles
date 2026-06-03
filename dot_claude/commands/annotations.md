@@ -42,10 +42,11 @@ except FileNotFoundError:
 root = os.getcwd()
 
 # Annotations store absolute host paths. Remap to container root if needed.
-all_paths = [r[0] for r in (data or []) if isinstance(r, list) and r]
+all_paths = [os.path.expanduser(r[0]) for r in (data or []) if isinstance(r, list) and r]
 ann_root = os.path.commonpath(all_paths) if len(all_paths) > 1 else (os.path.dirname(all_paths[0]) if all_paths else root)
 
 def resolve(path):
+    path = os.path.expanduser(path)
     if os.path.exists(path): return path
     remapped = os.path.join(root, os.path.relpath(path, ann_root))
     return remapped if os.path.exists(remapped) else path
