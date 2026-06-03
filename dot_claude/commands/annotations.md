@@ -40,15 +40,26 @@ except FileNotFoundError:
     sys.exit(0)
 
 root = os.getcwd()
+
+# Annotations store absolute host paths. Remap to container root if needed.
+all_paths = [r[0] for r in (data or []) if isinstance(r, list) and r]
+ann_root = os.path.commonpath(all_paths) if len(all_paths) > 1 else (os.path.dirname(all_paths[0]) if all_paths else root)
+
+def resolve(path):
+    if os.path.exists(path): return path
+    remapped = os.path.join(root, os.path.relpath(path, ann_root))
+    return remapped if os.path.exists(remapped) else path
+
 for rec in (data or []):
     if not isinstance(rec, list) or len(rec) < 2: continue
     path, anns = rec[0], rec[1]
     if not isinstance(anns, list): continue
+    resolved = resolve(path)
     for ann in anns:
         if not isinstance(ann, list) or len(ann) < 3: continue
         start, text = ann[0], ann[2]
         if not isinstance(start, int) or not isinstance(text, str): continue
-        print(f'- `{os.path.relpath(path, root)}:{line_at(path, start)}`: {text}')
+        print(f'- `{os.path.relpath(resolved, root)}:{line_at(resolved, start)}`: {text}')
 ```
 
 ## What to do
