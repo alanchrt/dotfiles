@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+# Toggle fzf picker for unattached wst streams in the current tmux project session.
+# Outer mode: toggle open/close. Inner mode (WST_STREAM_PICKER=1): run picker.
+
+set -euo pipefail
+
+PROJECTS_ROOT="${WST_PROJECTS_ROOT:-$HOME/Projects}"
+PIDFILE="${XDG_CACHE_HOME:-$HOME/.cache}/wst/stream-picker.pid"
+
+session_name() { printf '%s' "$1" | sed -r 's/\./_/g'; }
+
+# ── Outer (toggle) mode ──────────────────────────────────────────────────────
+if [[ -z "${WST_STREAM_PICKER:-}" ]]; then
+  if [[ -f "$PIDFILE" ]]; then
+    _pid=$(cat "$PIDFILE" 2>/dev/null || true)
+    if [[ -n "$_pid" ]] && kill -0 "$_pid" 2>/dev/null; then
+      kill "$_pid" 2>/dev/null || true
+      exit 0
+    fi
+    rm -f "$PIDFILE"
+  fi
+  _cur_session=$(tmux display-message -p '#{session_name}')
+  exec tmux display-popup \
+    -E -w 80% -h 55% \
+    "env WST_STREAM_PICKER=1 WST_SESSION=$(printf '%q' "$_cur_session") $HOME/.local/bin/wst-stream-picker"
+fi
+
+# ── Picker mode (inside popup) ───────────────────────────────────────────────
+mkdir -p "$(dirname "$PIDFILE")"
+printf '%d\n' "$$" > "$PIDFILE"
+trap 'rm -f "$PIDFILE"' EXIT
+
+# Resolve project from the session name passed by outer mode
+proj=""
+if [[ -n "${WST_SESSION:-}" ]]; then
+  for _pdir in "$PROJECTS_ROOT"/*/; do
+    [[ -d "$_pdir" ]] || continue
+    _pname=$(basename "$_pdir")
+    if [[ "$(session_name "$_pname")" == "$WST_SESSION" ]]; then
+      proj="$_pname"
+      break
+    fi
+  done
+fi
+
+# Collect streams with no tmux window yet, scoped to $proj (or all if unresolved)
+streams=()
+for pdir in "$PROJECTS_ROOT"/*/; do
+  [[ -d "$pdir" ]] || continue
+  pname=$(basename "$pdir")
+  [[ -z "$proj" || "$pname" == "$proj" ]] || continue
+  session=$(session_name "$pname")
+  for sdir in "$pdir"*/; do
+    [[ -d "$sdir/.git" ]] || continue
+    slug=$(basename "$sdir")
+    [[ "$slug" == "main" ]] && continue
+    if tmux has-session -t "$session" 2>/dev/null \
+       && tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null \
+          | grep -qx "$slug"; then
+      continue
+    fi
+    cstate="down"
+    if [[ -n "$(docker ps -q --filter "label=devcontainer.local_folder=$sdir" 2>/dev/null)" ]]; then
+      cstate="up"
+    fi
+    streams+=("$pname/$slug $cstate")
+  done
+done
+
+if [[ ${#streams[@]} -eq 0 ]]; then
+  printf '\n  \033[38;5;141mNo unattached streams.\033[0m\n\n'
+  printf '  All streams have open windows, or no streams exist.\n\n'
+  printf '  \033[38;5;61mPress any key...\033[0m'
+  read -r -n1
+  exit 0
+fi
+
+# Border label: show project name if scoped, generic otherwise
+if [[ -n "$proj" ]]; then
+  label="$(printf '  %s ' "$proj")"
+else
+  label="$(printf '  streams ')"
+fi
+
+# Build display lines.
+# When scoped, display just the slug (project is shown in label).
+# The full proj/slug key is appended as a trailing hidden field after two spaces.
+lines=()
+for item in "${streams[@]}"; do
+  key="${item%% *}"
+  state="${item##* }"
+  slug="${key#*/}"
+  display="${proj:+$slug}"
+  display="${display:-$key}"
+  if [[ "$state" == "up" ]]; then
+    dot=$'\033[38;5;84m●\033[0m'
+  else
+    dot=$'\033[38;5;61m●\033[0m'
+  fi
+  lines+=("$(printf '%-38s  %b  %-4s  %s' "$display" "$dot" "$state" "$key")")
+done
+
+# fzf: display columns 1-3, key is last field (used by preview + selection)
+selected=$(
+  printf '%s\n' "${lines[@]}" | fzf \
+    --ansi \
+    --layout=reverse \
+    --no-sort \
+    --info=inline \
+    --with-nth=1,2,3,4 \
+    --nth=1 \
+    --border=rounded \
+    --border-label="$label" \
+    --border-label-pos=3 \
+    --prompt=$'   ' \
+    --pointer=$' ' \
+    --header=$'  \033[38;5;244mtype to filter\033[0m  \033[38;5;141mctrl-n/p\033[0m \033[38;5;244m↕\033[0m  \033[38;5;141menter\033[0m \033[38;5;244mattach\033[0m  \033[38;5;141mesc\033[0m \033[38;5;244mcancel\033[0m\n' \
+    --preview='
+      key=$(printf "%s" {-1})
+      p="${key%%/*}"; s="${key#*/}"
+      dir="'"$PROJECTS_ROOT"'/$p/$s"
+      printf "\033[1;38;5;141m  %s\033[0m\n" "$key"
+      printf "  \033[38;5;61m────────────────────────────────────\033[0m\n"
+      git -C "$dir" log --oneline --color=always -10 2>/dev/null \
+        | sed "s/^/  /" || printf "  (no commits)\n"
+      printf "\n  \033[38;5;61m────────────────────────────────────\033[0m\n"
+      changes=$(git -C "$dir" status --short 2>/dev/null | head -15)
+      if [[ -n "$changes" ]]; then
+        printf "%s\n" "$changes" | sed "s/^/  /"
+      else
+        printf "  \033[38;5;244m(working tree clean)\033[0m\n"
+      fi
+    ' \
+    --preview-window='right:45%:border-left' \
+    --bind='ctrl-n:down,ctrl-p:up,ctrl-a:abort' \
+    --color='bg:#282a36,bg+:#44475a,fg:#f8f8f2,fg+:#f8f8f2' \
+    --color='hl:#50fa7b,hl+:#50fa7b,info:#ffb86c' \
+    --color='prompt:#bd93f9,pointer:#ff79c6,marker:#ff79c6' \
+    --color='spinner:#ffb86c,header:#6272a4,border:#6272a4' \
+    --color='label:#bd93f9,preview-bg:#282a36,preview-border:#6272a4' \
+  || true
+)
+
+[[ -z "$selected" ]] && exit 0
+
+# Extract the full proj/slug key from the last field
+key=$(printf '%s' "$selected" | awk '{print $NF}')
+proj="${key%%/*}"
+slug="${key#*/}"
+
+cd "$PROJECTS_ROOT/$proj"
+exec "$HOME/.local/bin/wst" attach "$slug"
