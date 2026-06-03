@@ -183,7 +183,8 @@
 
 ;; Show git state in Treemacs for both files and parent directories. Doom's
 ;; default is `simple', which only decorates file nodes.
-(setq +treemacs-git-mode 'deferred)
+(setq +treemacs-git-mode 'deferred
+      treemacs-missing-project-action 'remove)
 
 (defun my/disable-line-numbers-in-special-buffer-h ()
   "Keep special tool buffers from briefly showing Doom line numbers."
@@ -194,8 +195,7 @@
 
 (after! treemacs
   (setq treemacs-silent-filewatch t
-        treemacs-silent-refresh t
-        treemacs-missing-project-action 'remove)
+        treemacs-silent-refresh t)
   (add-hook 'treemacs-mode-hook #'my/disable-line-numbers-in-special-buffer-h)
   (treemacs-filewatch-mode 1))
 
@@ -215,14 +215,35 @@
       (setq-local auto-revert-avoid-polling nil)
       (auto-revert-mode 1))))
 
+(use-package! magit-delta
+  :after magit
+  :hook ((magit-diff-mode magit-revision-mode magit-stash-mode)
+         . magit-delta-mode)
+  :config
+  (setq magit-delta-default-dark-theme "Dracula"
+        magit-delta-hide-plus-minus-markers nil
+        magit-delta-delta-args
+        '("--syntax-theme" "Dracula"
+          "--true-color" "always"
+          "--color-only"
+          "--plus-style" "syntax #173f46"
+          "--plus-emph-style" "syntax bold #1f5d66"
+          "--minus-style" "syntax #4a2f3a"
+          "--minus-emph-style" "syntax bold #6b3345"
+          "--zero-style" "syntax"
+          "--file-style" "#bd93f9"
+          "--hunk-header-style" "file line-number syntax bold"
+          "--hunk-header-file-style" "#bd93f9"
+          "--hunk-header-line-number-style" "#8be9fd")))
+
 (defun my/soften-ediff-faces-h ()
   "Use muted Dracula-tinted Ediff backgrounds without hiding font-lock colors."
   (dolist (spec '((ediff-current-diff-A . "#4a2f3a")
-                  (ediff-current-diff-B . "#2d4a3a")
+                  (ediff-current-diff-B . "#24424a")
                   (ediff-current-diff-C . "#4a3f30")
                   (ediff-current-diff-Ancestor . "#403650")
                   (ediff-fine-diff-A . "#6b3345")
-                  (ediff-fine-diff-B . "#336b4a")
+                  (ediff-fine-diff-B . "#2f6470")
                   (ediff-fine-diff-C . "#6b5733")
                   (ediff-fine-diff-Ancestor . "#51406b")
                   (ediff-even-diff-A . "#303241")
@@ -233,6 +254,27 @@
                   (ediff-odd-diff-B . "#282a36")
                   (ediff-odd-diff-C . "#282a36")
                   (ediff-odd-diff-Ancestor . "#282a36")))
+    (when (facep (car spec))
+      (set-face-attribute (car spec) nil
+                          :background (cdr spec)
+                          :foreground 'unspecified
+                          :weight 'unspecified
+                          :slant 'unspecified
+                          :inverse-video nil
+                          :extend t))))
+
+(defun my/soften-diff-faces-h ()
+  "Use colorblind-friendlier Dracula-adjacent colors for non-Delta diffs."
+  (my/soften-ediff-faces-h)
+  (dolist (spec '((diff-added . "#173f46")
+                  (diff-refine-added . "#1f5d66")
+                  (diff-removed . "#4a2f3a")
+                  (diff-refine-removed . "#6b3345")
+                  (magit-diff-added . "#173f46")
+                  (magit-diff-added-highlight . "#1f5d66")
+                  (magit-diff-removed . "#4a2f3a")
+                  (magit-diff-removed-highlight . "#6b3345")
+                  (magit-diff-context-highlight . "#303241")))
     (when (facep (car spec))
       (set-face-attribute (car spec) nil
                           :background (cdr spec)
@@ -265,9 +307,13 @@
                         (bound-and-true-p ediff-ancestor-buffer)))
     (my/ediff-set-source-mode buffer)))
 
+(after! magit
+  (my/soften-diff-faces-h)
+  (add-hook 'doom-load-theme-hook #'my/soften-diff-faces-h))
+
 (after! ediff
-  (my/soften-ediff-faces-h)
-  (add-hook 'doom-load-theme-hook #'my/soften-ediff-faces-h)
+  (my/soften-diff-faces-h)
+  (add-hook 'doom-load-theme-hook #'my/soften-diff-faces-h)
   (add-hook 'ediff-startup-hook #'my/ediff-set-source-modes-h))
 
 (defvar-local my/wst-magit-refresh-timer nil)
@@ -529,6 +575,31 @@
                            (file-name-as-directory (expand-file-name dir))))
   (add-hook 'kill-buffer-hook #'my/wst-stop-magit-refresh-h nil t))
 
+(defun my/wst-delete-other-main-windows ()
+  "Reset the WST pane layout even when Treemacs is the selected side window."
+  (when-let ((main-window (seq-find (lambda (window)
+                                      (not (window-parameter window 'window-side)))
+                                    (window-list))))
+    (select-window main-window))
+  (unless (window-parameter (selected-window) 'window-side)
+    (delete-other-windows)))
+
+(defun my/wst-prune-unreadable-treemacs-projects ()
+  "Remove unreadable persisted Treemacs projects before WST opens its tree."
+  (when (and (require 'treemacs nil t)
+             (fboundp 'treemacs-workspaces)
+             (fboundp 'treemacs-workspace->projects)
+             (fboundp 'treemacs-project->path)
+             (fboundp 'treemacs-project->refresh-path-status!)
+             (fboundp 'treemacs-project->is-unreadable?))
+    (dolist (workspace (treemacs-workspaces))
+      (setf (treemacs-workspace->projects workspace)
+            (seq-remove
+             (lambda (project)
+               (treemacs-project->refresh-path-status! project)
+               (treemacs-project->is-unreadable? project))
+             (treemacs-workspace->projects workspace))))))
+
 (defun my/wst-open-stream-pane (dir)
   "Open a stream-scoped Treemacs + Magit layout for DIR."
   (interactive "DStream directory: ")
@@ -536,10 +607,11 @@
   (my/wst-ensure-dirty-tree-tables)
   (let ((dir (file-name-as-directory (expand-file-name dir))))
     (set-frame-parameter nil 'my/wst-stream-pane t)
+    (ignore-errors (my/wst-prune-unreadable-treemacs-projects))
     (my/wst-enable-stream-refresh dir)
     (add-hook 'treemacs-pre-file-insert-predicates
               #'my/wst-treemacs-hide-clean-path-p)
-    (delete-other-windows)
+    (my/wst-delete-other-main-windows)
     (magit-status dir)
     (my/wst-enable-magit-status-refresh dir)
     (let ((magit-buffer (current-buffer)))

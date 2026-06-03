@@ -62,8 +62,7 @@ managed=$(cat <<'MANAGED'
         "matcher": "Bash",
         "hooks": [
           {"type": "command", "command": "~/.claude/hooks/block-prod-writes.sh"},
-          {"type": "command", "command": "~/.claude/hooks/block-sensitive-paths.sh"},
-          {"type": "command", "command": "~/.claude/hooks/enforce-graphite.sh"}
+          {"type": "command", "command": "~/.claude/hooks/block-sensitive-paths.sh"}
         ]
       },
       {

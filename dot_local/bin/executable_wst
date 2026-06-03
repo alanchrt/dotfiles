@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # wst — workstream manager: parallel AI-coding streams via independent clones + devcontainers.
-# See: dot_claude/CLAUDE.md "Workstream Workflow" and dot_local/share/wst/README.md.
+# See: dot_codex/AGENTS.md "Workstream Workflow" and dot_local/share/wst/README.md.
 
 set -euo pipefail
 
@@ -16,6 +16,10 @@ mkdir -p "$STATE_DIR" "$OVERRIDES_DIR"
 die() { printf 'wst: %s\n' "$*" >&2; exit 1; }
 warn() { printf 'wst: %s\n' "$*" >&2; }
 info() { printf '==> %s\n' "$*"; }
+debug() {
+  [[ -n "${WST_DEBUG:-}" ]] || return 0
+  printf 'wst debug: %s\n' "$*" >&2
+}
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
@@ -44,6 +48,13 @@ ui_step() {
   local log="$log_dir/$(slugify "$label").log"
   local interactive=false
   [[ -t 1 && -z "${WST_PLAIN_LOGS:-}" ]] && interactive=true
+
+  if [[ -n "${WST_DEBUG:-}" ]]; then
+    info "$label"
+    debug "command: $*"
+    "$@"
+    return
+  fi
 
   if ! $interactive; then
     info "$label"
@@ -217,11 +228,12 @@ cmd_new() {
     case "$1" in
       --base)    base="$2"; shift 2 ;;
       --project) project="$2"; shift 2 ;;
+      --debug)   WST_DEBUG=1; WST_PLAIN_LOGS=1; shift ;;
       -*)        die "unknown flag: $1" ;;
       *)         [[ -z "$branch" ]] && branch="$1" || die "unexpected arg: $1"; shift ;;
     esac
   done
-  [[ -n "$branch" ]] || die "usage: wst new <branch> [--base <base>] [--project <name>]"
+  [[ -n "$branch" ]] || die "usage: wst new <branch> [--base <base>] [--project <name>] [--debug]"
   local proj; proj=$(resolve_project "$project")
   local canonical; canonical=$(canonical_dir "$proj")
   [[ -d "$canonical/.git" ]] || die "canonical '$canonical' is not a git repo (run: wst migrate)"
@@ -235,9 +247,16 @@ cmd_new() {
     base=$(git -C "$canonical" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||' || true)
     [[ -n "$base" ]] || base=$(git -C "$canonical" branch --show-current)
   fi
+  debug "project=$proj"
+  debug "branch=$branch"
+  debug "slug=$slug"
+  debug "base=$base"
+  debug "canonical=$canonical"
+  debug "target=$target"
 
   local WST_STEP_LOG_DIR
   WST_STEP_LOG_DIR=$(mktemp -d "${TMPDIR:-/tmp}/wst-new.XXXXXX")
+  debug "step_log_dir=$WST_STEP_LOG_DIR"
 
   ui_cyan
   printf 'Creating stream'
@@ -257,6 +276,8 @@ cmd_new() {
   local host_port
   host_port=$(port_allocate "$key")
   [[ ! -t 1 || -n "${WST_PLAIN_LOGS:-}" ]] && info "Allocated host port $host_port for $key"
+  debug "host_port=$host_port"
+  debug "override=$OVERRIDES_DIR/$proj-$slug.json"
 
   ui_step "Start devcontainer on :$host_port" env \
     WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
@@ -346,10 +367,10 @@ cmd_gtinit() {
   done
 }
 
-# Seed .claude/rules/graphite.md as a symlink to the chezmoi-managed rule, and
-# git-ignore the path. The symlink target is an absolute host path; combined
-# with the matching bind-mount in wst-container-up, it resolves on host AND
-# inside the container.
+# Seed agent Graphite rule files as symlinks to the shared AGENTS override
+# rule, and git-ignore the paths. The symlink target is an absolute host path;
+# combined with the matching bind-mount in wst-container-up, it resolves on
+# host AND inside the container.
 _add_to_git_exclude() {
   local clone="$1" rel="$2"
   local exclude_file="$clone/.git/info/exclude"
@@ -363,11 +384,13 @@ _add_to_git_exclude() {
 seed_graphite_rule() {
   local clone="$1"
 
-  # Claude: link the shared rule into .claude/rules/graphite.md
-  local claude_src="$HOME/.local/share/claude-rules/graphite.md"
-  if [[ -f "$claude_src" ]]; then
+  local codex_src="$HOME/.local/share/codex-rules/graphite.md"
+
+  # Claude Code still discovers project-specific rule files under .claude/,
+  # but the maintained content is the same AGENTS override used by Codex.
+  if [[ -f "$codex_src" ]]; then
     mkdir -p "$clone/.claude/rules"
-    ln -sfn "$claude_src" "$clone/.claude/rules/graphite.md"
+    ln -sfn "$codex_src" "$clone/.claude/rules/graphite.md"
     _add_to_git_exclude "$clone" ".claude/rules/graphite.md"
   fi
 
@@ -375,7 +398,6 @@ seed_graphite_rule() {
   # Codex's AGENTS discovery walks cwd up to the git root checking
   # AGENTS.override.md first, then AGENTS.md — using .override.md keeps
   # the project's committed AGENTS.md (if any) untouched.
-  local codex_src="$HOME/.local/share/codex-rules/graphite.md"
   if [[ -f "$codex_src" ]]; then
     ln -sfn "$codex_src" "$clone/AGENTS.override.md"
     _add_to_git_exclude "$clone" "AGENTS.override.md"
@@ -385,36 +407,55 @@ seed_graphite_rule() {
 # ---- subcommand: attach ----
 
 cmd_attach() {
-  local branch="${1:-}"
-  [[ -n "$branch" ]] || die "usage: wst attach <branch>"
+  local branch=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --debug) WST_DEBUG=1; WST_PLAIN_LOGS=1; shift ;;
+      -*)      die "unknown flag: $1" ;;
+      *)       [[ -z "$branch" ]] && branch="$1" || die "unexpected arg: $1"; shift ;;
+    esac
+  done
+  [[ -n "$branch" ]] || die "usage: wst attach <branch> [--debug]"
   local proj; proj=$(resolve_project)
   local slug; slug=$(slugify "$branch")
   local target; target=$(stream_dir "$proj" "$slug")
   [[ -d "$target" ]] || die "stream '$branch' doesn't exist. Create with: wst new $branch"
+  debug "project=$proj"
+  debug "branch=$branch"
+  debug "slug=$slug"
+  debug "target=$target"
 
   local session; session=$(session_name "$proj")
+  debug "tmux_session=$session"
   if ! tmux has-session -t "$session" 2>/dev/null; then
+    debug "creating tmux session $session"
     tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
   fi
 
   # Bring container up if stopped
   local container_id
   container_id=$(docker ps -q --filter "label=devcontainer.local_folder=$target" 2>/dev/null || true)
+  debug "container_id=${container_id:-<none>}"
   if [[ -z "$container_id" ]]; then
     info "Container stopped — bringing it back up..."
     local key="$proj/$slug"
     local host_port; host_port=$(port_get "$key")
     [[ -n "$host_port" ]] || host_port=$(port_allocate "$key")
-    WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
+    debug "host_port=$host_port"
+    ui_step "Start devcontainer on :$host_port" env \
+      WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
       WST_HOST_PORT="$host_port" WST_TARGET="$target" \
       "$HOME/.local/bin/wst-container-up"
   fi
 
   # Window may not exist yet — create on first attach after a container restart
   if ! tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null | grep -qx "$slug"; then
+    debug "tmux window $session:$slug missing; creating"
     local key="$proj/$slug"
     local host_port; host_port=$(port_get "$key")
     tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port"
+  else
+    debug "tmux window $session:$slug exists"
   fi
 
   if [[ -n "${TMUX:-}" ]]; then
@@ -658,7 +699,7 @@ provision_container() {
   provision_script=$(cat <<'SH'
 set -e
 mkdir -p "$HOME/.claude"
-cat > "$HOME/.claude/mcp_servers.json" <<JSON
+cat > "$HOME/.claude/mcp_servers.json" <<'JSON'
 {
   "mcpServers": {
     "playwright": {
@@ -667,6 +708,10 @@ cat > "$HOME/.claude/mcp_servers.json" <<JSON
         "-lc",
         "chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); [ -n \"$chrome\" ] || { echo 'Claude Playwright MCP: Chromium not found under /opt/playwright-browsers' >&2; exit 1; }; exec playwright-mcp --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-/home/vscode/.config/chromium-wst}\""
       ]
+    },
+    "typescript": {
+      "command": "npx",
+      "args": ["-y", "ts-mcp-server"]
     }
   }
 }
@@ -721,16 +766,15 @@ tmux_create_window() {
   fi
   # Pass the command as the new-window argument so the pane's process IS the
   # devcontainer exec — avoids leaving the launch command visible in the
-  # pane's scrollback. Drop straight into Codex (multi-session is via
-  # `/agent` and `/resume` slash commands once inside); when it exits,
+  # pane's scrollback. Drop straight into Claude Code; when it exits,
   # fall back to an interactive login shell so the pane stays usable.
   # Pane splits (wst-tmux-split) still open in zsh, so you can split for
   # shell work.
-  local codex_pane=""
+  local agent_pane=""
   local git_pane=""
   local shell_pane=""
-  codex_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
-    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'codex; exec zsh -l'")
+  agent_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
+    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'claude; exec zsh -l'")
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
   # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
   # the splits and keep the single-pane layout. The default Magit pane
@@ -759,19 +803,20 @@ tmux_create_window() {
         die "unknown WST_GIT_PANE='${WST_GIT_PANE}' (expected: magit, lazygit, shell)"
         ;;
     esac
-    # 2. Focus the top (codex) pane so the next split lands there.
+    # 2. Focus the top agent pane so the next split lands there.
     tmux select-pane -t "$session:$slug.0"
     # 3. Split the top pane horizontally for the spare zsh on the right.
     shell_pane=$(tmux split-window -P -F '#{pane_id}' -h -l 40% -t "$session:$slug" -c "$target" \
       "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l")
-    # 4. Return focus to codex (top-left).
+    # 4. Return focus to the agent (top-left).
     tmux select-pane -t "$session:$slug.0"
   fi
   tmux set-option -w -t "$session:$slug" @wst-project "$proj"
   tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
   tmux set-option -w -t "$session:$slug" @wst-workdir "$target"
   tmux set-option -w -t "$session:$slug" @wst-port    "$host_port"
-  tmux set-option -w -t "$session:$slug" @wst-codex-pane "$codex_pane"
+  tmux set-option -w -t "$session:$slug" @wst-agent-pane "$agent_pane"
+  tmux set-option -w -t "$session:$slug" @wst-codex-pane "$agent_pane"
   tmux set-option -w -t "$session:$slug" @wst-git-pane   "$git_pane"
   tmux set-option -w -t "$session:$slug" @wst-shell-pane "$shell_pane"
 }
@@ -784,8 +829,9 @@ wst — workstream manager
 
 usage:
   wst clone <git-url> [project-name]                    clone repo into ~/Projects/<name>/main/  (alias: wcl)
-  wst new <branch> [--base <base>] [--project <name>]   create stream
-  wst attach <branch>                                   switch to / boot stream window           (alias: wa)
+  wst new <branch> [--base <base>] [--project <name>] [--debug]
+                                                          create stream
+  wst attach <branch> [--debug]                         switch to / boot stream window           (alias: wa)
   wst preview [<branch>]                                open localhost:<port>/                   (alias: wp)
   wst ls [--all]                                        list streams                             (alias: wls)
   wst rm <branch> [--force]                             tear down stream
@@ -795,7 +841,8 @@ usage:
   wst migrate                                           one-shot canonical relocation
 
 env:
-  WST_PANES=1                                           single-pane layout (default: codex + magit + zsh)
+  WST_PANES=1                                           single-pane layout (default: claude + magit + zsh)
+  WST_DEBUG=1                                           print debug output for new/attach
 EOF
 }
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Toggle a tmux popup attached to a persistent side Codex session. Closing the
+# Toggle a tmux popup attached to a persistent side Claude Code session. Closing the
 # popup detaches only the attached client; the side session keeps running.
 
 set -euo pipefail
@@ -38,9 +38,9 @@ stream=$("${tmux_cmd[@]}" show-options -wqv @wst-stream 2>/dev/null || true)
 workdir=$("${tmux_cmd[@]}" show-options -wqv @wst-workdir 2>/dev/null || true)
 
 if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
-  session="wst-codex-popup-$(slugify "$project")-$(slugify "$stream")"
+  session="wst-claude-popup-$(slugify "$project")-$(slugify "$stream")"
 else
-  session="wst-codex-popup-host"
+  session="wst-claude-popup-host"
 fi
 
 popup_dir="${XDG_CACHE_HOME:-$HOME/.cache}/wst/popups"
@@ -51,7 +51,7 @@ popup_tmux=(tmux -S "$popup_socket")
 if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
   if ! "${popup_tmux[@]}" has-session -t "$session" 2>/dev/null; then
     printf -v command '%q %q zsh -l -c %q' \
-      "$HOME/.local/bin/wst-devcontainer-exec" "$workdir" 'codex; exec zsh -l'
+      "$HOME/.local/bin/wst-devcontainer-exec" "$workdir" 'claude; exec zsh -l'
     "${popup_tmux[@]}" new-session -d -s "$session" -c "$workdir" "$command"
   fi
   # Clean up the old same-server popup session from earlier versions, if it
@@ -62,7 +62,7 @@ if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
   fi
 else
   if ! "${popup_tmux[@]}" has-session -t "$session" 2>/dev/null; then
-    "${popup_tmux[@]}" new-session -d -s "$session" 'codex; exec "${SHELL:-zsh}" -l'
+    "${popup_tmux[@]}" new-session -d -s "$session" 'claude; exec "${SHELL:-zsh}" -l'
   fi
   if "${tmux_cmd[@]}" has-session -t "$session" 2>/dev/null \
       && [[ "$("${tmux_cmd[@]}" list-clients -t "$session" 2>/dev/null | wc -l)" -eq 0 ]]; then
@@ -72,5 +72,5 @@ fi
 
 configure_popup_session
 
-exec "${tmux_cmd[@]}" display-popup -E -w 90% -h 85% -T "Codex side quest" \
+exec "${tmux_cmd[@]}" display-popup -E -w 90% -h 85% -T "Claude side quest" \
   "env -u TMUX tmux -S '$popup_socket' attach-session -t '$session'"

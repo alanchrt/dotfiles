@@ -18,32 +18,33 @@ infer_standard_layout() {
   pane_count=$(tmux list-panes | wc -l)
   (( pane_count >= 3 )) || return 1
 
-  codex=$(tmux list-panes -F '#{pane_id} #{pane_top} #{pane_left}' \
+  agent=$(tmux list-panes -F '#{pane_id} #{pane_top} #{pane_left}' \
     | sort -k2,2n -k3,3n | awk 'NR == 1 {print $1}')
   git=$(tmux list-panes -F '#{pane_id} #{pane_top} #{pane_left}' \
     | sort -k2,2nr -k3,3n | awk 'NR == 1 {print $1}')
   shell=$(tmux list-panes -F '#{pane_id} #{pane_top} #{pane_left}' \
     | sort -k2,2n -k3,3nr | awk 'NR == 1 {print $1}')
 
-  [[ -n "$codex" && -n "$git" && -n "$shell" ]] || return 1
-  [[ "$codex" != "$git" && "$codex" != "$shell" && "$git" != "$shell" ]]
+  [[ -n "$agent" && -n "$git" && -n "$shell" ]] || return 1
+  [[ "$agent" != "$git" && "$agent" != "$shell" && "$git" != "$shell" ]]
 }
 
 workdir=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
 [[ -n "$workdir" ]] || default_next
 
 current=$(tmux display-message -p '#{pane_id}')
-codex=$(tmux show-options -wqv @wst-codex-pane 2>/dev/null || true)
+agent=$(tmux show-options -wqv @wst-agent-pane 2>/dev/null || true)
+[[ -n "$agent" ]] || agent=$(tmux show-options -wqv @wst-codex-pane 2>/dev/null || true)
 git=$(tmux show-options -wqv @wst-git-pane 2>/dev/null || true)
 shell=$(tmux show-options -wqv @wst-shell-pane 2>/dev/null || true)
 
-if ! pane_exists "$codex" || ! pane_exists "$git" || ! pane_exists "$shell"; then
+if ! pane_exists "$agent" || ! pane_exists "$git" || ! pane_exists "$shell"; then
   infer_standard_layout || default_next
 fi
 
 case "$current" in
-  "$codex") exec tmux select-pane -t "$git" ;;
+  "$agent") exec tmux select-pane -t "$git" ;;
   "$git")   exec tmux select-pane -t "$shell" ;;
-  "$shell") exec tmux select-pane -t "$codex" ;;
-  *)        exec tmux select-pane -t "$codex" ;;
+  "$shell") exec tmux select-pane -t "$agent" ;;
+  *)        exec tmux select-pane -t "$agent" ;;
 esac
