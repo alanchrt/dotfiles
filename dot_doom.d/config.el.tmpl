@@ -667,6 +667,15 @@
 (advice-add #'delete-frame
             :around #'my/wst-confirm-delete-frame-a)
 
+;; ── vdiff-magit: side-by-side diffs ─────────────────────────────────────────
+(use-package! vdiff-magit
+  :after magit
+  :config
+  (define-key magit-mode-map "e" #'vdiff-magit-dwim)
+  (define-key magit-mode-map "E" #'vdiff-magit-show-unstaged)
+  (transient-append-suffix 'magit-dispatch "!"
+    '("E" "vdiff" vdiff-magit-dispatch)))
+
 ;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
 ;;
 ;; Workflow:

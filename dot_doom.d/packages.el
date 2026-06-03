@@ -54,3 +54,4 @@
 (package! k8s-mode)
 (package! magit-delta)
 (package! annotate)
+(package! vdiff-magit)
