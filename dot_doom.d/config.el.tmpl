@@ -680,8 +680,11 @@
 ;;      annotate.el overlays and the .annotations file for the project.
 
 ;; Per-project storage: <project-root>/.annotations (gitignored globally).
-;; Add the hook unconditionally — annotate lazy-loads on first use.
+;; Add hooks unconditionally — annotate lazy-loads on first use.
 (add-hook 'find-file-hook #'my/wst-set-project-annotate-file-h)
+(add-hook 'find-file-hook (cmd! (when (file-exists-p (my/wst-annotate-project-file))
+                                  (require 'annotate)
+                                  (annotate-mode 1))))
 
 (defun my/wst-annotate-project-file ()
   "Return the .annotations path for the current project."
@@ -772,5 +775,8 @@
 
 (map! :leader
       (:prefix ("r" . "review")
-       :desc "Annotate line for /iterate" "a" (cmd! (require 'annotate) (call-interactively #'annotate-annotate))
-       :desc "Clear iterate annotations"  "x" #'my/wst-clear-iterate-annotations))
+       :desc "Annotate line for /iterate"  "a" (cmd! (require 'annotate) (call-interactively #'annotate-annotate))
+       :desc "Next annotation"             "n" (cmd! (require 'annotate) (call-interactively #'annotate-goto-next-annotation))
+       :desc "Previous annotation"         "p" (cmd! (require 'annotate) (call-interactively #'annotate-goto-previous-annotation))
+       :desc "Annotation summary"          "s" (cmd! (require 'annotate) (call-interactively #'annotate-show-annotation-summary))
+       :desc "Clear iterate annotations"   "x" #'my/wst-clear-iterate-annotations))
