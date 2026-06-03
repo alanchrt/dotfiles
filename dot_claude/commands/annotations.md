@@ -69,7 +69,6 @@ for rec in (data or []):
 
 1. Run the script above to read annotations. If it prints `NO_ANNOTATIONS`, there is nothing to iterate on — say so and stop.
 2. For each annotation, open the file at the given line, read the surrounding code for context, and address the comment.
-3. After addressing everything, delete `.annotations`.
-4. Summarize what changed.
+3. Summarize what changed and ask whether to delete `.annotations`.
 
 Do not commit.
