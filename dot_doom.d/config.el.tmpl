@@ -666,3 +666,118 @@
             :around #'my/wst-confirm-save-buffers-kill-terminal-a)
 (advice-add #'delete-frame
             :around #'my/wst-confirm-delete-frame-a)
+
+;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
+;;
+;; Workflow:
+;;   1. In Magit diff, press C-c r on a line → visits the file at that line,
+;;      prompts for a comment, saves annotation, returns to the diff.
+;;   2. When done reviewing, M-x my/wst-export-iterate (or SPC r i) → writes
+;;      .claude/iterate.md with file:line:comment entries Claude can parse.
+;;   3. In Claude Code, type /iterate → Claude addresses each comment, deletes
+;;      the file, and tells you what it changed.
+;;   4. M-x my/wst-clear-iterate-annotations (or SPC r x) → removes all
+;;      annotate.el overlays and the .annotations file for the project.
+
+(use-package! annotate
+  :config
+  ;; Per-project storage: <project-root>/.annotations (gitignored globally).
+  ;; All files in the same project share one file, which annotate.el merges
+  ;; automatically since it keys each record by absolute file path.
+  (add-hook 'find-file-hook #'my/wst-set-project-annotate-file-h))
+
+(defun my/wst-annotate-project-file ()
+  "Return the .annotations path for the current project."
+  (expand-file-name ".annotations"
+                    (or (and (fboundp 'projectile-project-root)
+                             (ignore-errors (projectile-project-root)))
+                        (ignore-errors (vc-root-dir))
+                        default-directory)))
+
+(defun my/wst-set-project-annotate-file-h ()
+  "Set `annotate-file' buffer-locally to the project .annotations file."
+  (when buffer-file-name
+    (setq-local annotate-file (my/wst-annotate-project-file))))
+
+(defun my/wst-iterate-annotate-from-diff ()
+  "From a Magit diff, visit the file at point, add an annotation, return."
+  (interactive)
+  (let ((file (magit-file-at-point t)))
+    (unless file (user-error "No file at point in diff"))
+    (save-window-excursion
+      (magit-diff-visit-file file)
+      (my/wst-set-project-annotate-file-h)
+      (call-interactively #'annotate-annotate)
+      (annotate-save-annotations))))
+
+(defun my/wst-export-iterate ()
+  "Write .claude/iterate.md from this project's annotate.el annotations."
+  (interactive)
+  (let* ((root     (or (and (fboundp 'projectile-project-root)
+                            (ignore-errors (projectile-project-root)))
+                       (ignore-errors (vc-root-dir))
+                       default-directory))
+         (ann-file (expand-file-name ".annotations" root))
+         (out-file (expand-file-name ".claude/iterate.md" root)))
+    (unless (file-exists-p ann-file)
+      (user-error "No .annotations found in %s" root))
+    (let* ((data    (with-temp-buffer
+                      (insert-file-contents ann-file)
+                      (read (current-buffer))))
+           (entries nil))
+      ;; Each record: (FILENAME ANNOTATION-LIST CHECKSUM)
+      ;; Each annotation: (START END TEXT ANNOTATED-TEXT ...)
+      (dolist (record data)
+        (let* ((file (car record))
+               (anns (cadr record))
+               (rel  (file-relative-name file root)))
+          (dolist (ann anns)
+            (let* ((beg  (nth 0 ann))
+                   (text (nth 2 ann))
+                   (line (with-current-buffer (find-file-noselect file t)
+                           (save-excursion
+                             (goto-char beg)
+                             (line-number-at-pos)))))
+              (push (list rel line text) entries)))))
+      (if (null entries)
+          (user-error "No annotations to export")
+        (setq entries
+              (sort entries
+                    (lambda (a b)
+                      (or (string< (car a) (car b))
+                          (and (string= (car a) (car b))
+                               (< (cadr a) (cadr b)))))))
+        (make-directory (file-name-directory out-file) t)
+        (with-temp-file out-file
+          (insert "# Review annotations\n\n")
+          (dolist (e entries)
+            (insert (format "- `%s:%d`: %s\n" (nth 0 e) (nth 1 e) (nth 2 e)))))
+        (message "Exported %d annotation(s) → %s" (length entries) out-file)))))
+
+(defun my/wst-clear-iterate-annotations ()
+  "Remove all annotate.el overlays and the .annotations file for this project."
+  (interactive)
+  (let* ((root     (or (and (fboundp 'projectile-project-root)
+                            (ignore-errors (projectile-project-root)))
+                       (ignore-errors (vc-root-dir))
+                       default-directory))
+         (ann-file (expand-file-name ".annotations" root))
+         (out-file (expand-file-name ".claude/iterate.md" root)))
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (when (and buffer-file-name
+                   (string-prefix-p (expand-file-name root) buffer-file-name)
+                   (featurep 'annotate))
+          (annotate-clear-annotations))))
+    (when (file-exists-p ann-file) (delete-file ann-file))
+    (when (file-exists-p out-file) (delete-file out-file))
+    (message "Cleared iterate annotations for %s" root)))
+
+(after! magit
+  (define-key magit-diff-mode-map (kbd "C-c r") #'my/wst-iterate-annotate-from-diff))
+
+(map! :leader
+      (:prefix ("r" . "review")
+       :desc "Annotate line for /iterate" "a" #'annotate-annotate
+       :desc "Export annotations → iterate.md" "i" #'my/wst-export-iterate
+       :desc "Clear iterate annotations"        "x" #'my/wst-clear-iterate-annotations))
