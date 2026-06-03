@@ -772,5 +772,5 @@
 
 (map! :leader
       (:prefix ("r" . "review")
-       :desc "Annotate line for /iterate" "a" #'annotate-annotate
+       :desc "Annotate line for /iterate" "a" (cmd! (require 'annotate) (call-interactively #'annotate-annotate))
        :desc "Clear iterate annotations"  "x" #'my/wst-clear-iterate-annotations))
