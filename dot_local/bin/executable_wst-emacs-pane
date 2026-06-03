@@ -158,8 +158,8 @@ if [[ -t 1 ]]; then
   tput cnorm 2>/dev/null || true
 fi
 
-emacsclient -s "$daemon" --eval "(progn
-  (load-file (expand-file-name \"~/.doom.d/config.el\"))
-  (setq my/wst-next-stream-pane-dir $(elisp_string "$target")))" >/dev/null
+emacsclient -s "$daemon" --eval \
+  "(progn (defvar my/wst-next-stream-pane-dir nil) (setq my/wst-next-stream-pane-dir $(elisp_string "$target")))" \
+  >/dev/null
 emacsclient -t -s "$daemon" "$target"
 exec zsh -l
