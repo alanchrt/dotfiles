@@ -773,18 +773,8 @@ tmux_create_window() {
   local agent_pane=""
   local git_pane=""
   local shell_pane=""
-  # Resume the most recent Claude session for this stream if one exists.
-  # Sessions are keyed by path with slashes replaced by hyphens.
-  local _claude_dir _latest _claude_cmd
-  _claude_dir="$HOME/.claude/projects/$(printf '%s' "$target" | sed 's|/|-|g')"
-  _latest=$(ls -t "$_claude_dir"/*.jsonl 2>/dev/null | head -1 || true)
-  if [[ -n "$_latest" ]]; then
-    _claude_cmd="claude --resume '$(basename "$_latest" .jsonl)'"
-  else
-    _claude_cmd="claude"
-  fi
   agent_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
-    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c '$_claude_cmd; exec zsh -l'")
+    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'claude; exec zsh -l'")
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
   # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
   # the splits and keep the single-pane layout. The default Magit pane
