@@ -774,7 +774,7 @@ tmux_create_window() {
   local git_pane=""
   local shell_pane=""
   agent_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
-    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'claude; exec zsh -l'")
+    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'claude --continue; exec zsh -l'")
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
   # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
   # the splits and keep the single-pane layout. The default Magit pane
