@@ -679,12 +679,9 @@
 ;;   4. M-x my/wst-clear-iterate-annotations (or SPC r x) → removes all
 ;;      annotate.el overlays and the .annotations file for the project.
 
-(use-package! annotate
-  :config
-  ;; Per-project storage: <project-root>/.annotations (gitignored globally).
-  ;; All files in the same project share one file, which annotate.el merges
-  ;; automatically since it keys each record by absolute file path.
-  (add-hook 'find-file-hook #'my/wst-set-project-annotate-file-h))
+;; Per-project storage: <project-root>/.annotations (gitignored globally).
+;; Add the hook unconditionally — annotate lazy-loads on first use.
+(add-hook 'find-file-hook #'my/wst-set-project-annotate-file-h)
 
 (defun my/wst-annotate-project-file ()
   "Return the .annotations path for the current project."
