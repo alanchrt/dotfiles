@@ -701,6 +701,9 @@
 (add-hook 'find-file-hook (cmd! (when (file-exists-p (my/wst-annotate-project-file))
                                   (require 'annotate)
                                   (annotate-mode 1))))
+;; Always show annotations on their own line so they're visible in narrow
+;; windows (e.g. vdiff side-by-side panes).
+(setq annotate-annotation-position-policy :new-line)
 
 (defun my/wst-annotate-project-file ()
   "Return the .annotations path for the current project."
