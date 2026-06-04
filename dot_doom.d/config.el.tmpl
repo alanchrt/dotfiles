@@ -693,14 +693,15 @@
         :n "gf" #'my/vdiff-goto-file))
 
 (defun my/vdiff-goto-file ()
-  "Quit vdiff and open the current file full-screen at point."
+  "Open the current file at point in another window, keeping vdiff open.
+Close the new window (C-x 0) to return to vdiff with scroll position intact."
   (interactive)
-  (let ((buf (current-buffer))
-        (pos (point)))
-    (vdiff-quit)
-    (switch-to-buffer buf)
-    (delete-other-windows)
-    (goto-char pos)))
+  (let ((pos  (point))
+        (file (buffer-file-name)))
+    (if file
+        (progn (find-file-other-window file)
+               (goto-char pos))
+      (user-error "No file for this vdiff buffer"))))
 
 (defun my/treemacs-vdiff-at-point ()
   "Open a vdiff working-tree diff for the file at point in Treemacs."
