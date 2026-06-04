@@ -258,11 +258,11 @@
                   ;; (which are too dark against #282a36), and change has NO
                   ;; background at all via diff-changed. Set all explicitly.
                   (vdiff-addition-face . "#1e4d3a")
-                  (vdiff-change-face . "#3a3420")
+                  (vdiff-change-face . "#232850")
                   (vdiff-subtraction-face . "#4d1e2e")
-                  (vdiff-refine-added . "#2d6b50")
-                  (vdiff-refine-changed . "#5c5020")
-                  (vdiff-refine-removed . "#6b1e38")))
+                  (vdiff-refine-added . "#2d7a52")
+                  (vdiff-refine-changed . "#3a4878")
+                  (vdiff-refine-removed . "#7a2040")))
     (when (facep (car spec))
       (set-face-attribute (car spec) nil
                           :background (cdr spec)
@@ -663,18 +663,20 @@
   ;; diff computation on first use by loading the package mid-init.
   (require 'annotate nil t)
   (setq vdiff-magit-stage-is-2way t)
-  ;; vdiff--refresh-overlays guards with (vdiff--buffer-p) which reads the
-  ;; buffer-local vdiff--session. When called from the async diff sentinel,
-  ;; current-buffer is the process buffer where that local is nil, so overlays
-  ;; are silently skipped. Switch to the session's first buffer if needed.
-  (advice-add 'vdiff--refresh-overlays :around
-              (lambda (fn session)
+  ;; vdiff--refresh-overlays and vdiff-refine-all-hunks both guard with
+  ;; (vdiff--buffer-p) which reads the buffer-local vdiff--session. When called
+  ;; from the async diff sentinel, current-buffer is the process buffer where
+  ;; that local is nil, so both are silently skipped. Fix by wrapping the
+  ;; entire vdiff--diff-refresh-finish (which calls both) in the right context.
+  (advice-add 'vdiff--diff-refresh-finish :around
+              (lambda (fn session &rest args)
                 (if (vdiff--buffer-p)
-                    (funcall fn session)
-                  (when-let ((buf (and session (car (vdiff-session-buffers session)))))
+                    (apply fn session args)
+                  (when-let ((buf (car (vdiff-session-buffers session))))
                     (with-current-buffer buf
-                      (funcall fn session)))))
+                      (apply fn session args)))))
               '((name . vdiff-fix-sentinel-context)))
+  (setq vdiff-auto-refine t)
   (define-key magit-mode-map "e" #'my/vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
