@@ -734,6 +734,29 @@ repaints them with this amber emph instead.")
                      (eq (overlay-get ovr 'face) 'vdiff-refine-added))
                 (overlay-put ovr 'face 'my/vdiff-deletion-refine-face)))))))))
   (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-recolor-deletions)
+  ;; annotate.el renders an annotation in two pieces: the highlight under the
+  ;; annotated text is a plain OVERLAY, but the annotation *text* itself is a
+  ;; `display' property installed by a font-lock keyword. vdiff re-initializes
+  ;; font-lock in its panes after find-file-hook already enabled annotate-mode,
+  ;; which drops annotate's keyword from `font-lock-keywords' — so the overlay
+  ;; underline survives but the comment text vanishes. annotate-mode stays
+  ;; nominally on, so the vdiff-mode-hook's (annotate-mode 1) is a no-op and
+  ;; never re-adds it. Re-install the keyword and re-fontify after each refresh.
+  (defun my/vdiff-restore-annotation-text (session &rest _)
+    (when (vdiff-session-p session)
+      (dolist (buf (vdiff-session-buffers session))
+        (when (and (buffer-live-p buf)
+                   (buffer-local-value 'buffer-file-name buf)
+                   (buffer-local-value 'annotate-mode buf))
+          (with-current-buffer buf
+            (let ((kw '((annotate--font-lock-matcher
+                         (2 (annotate--annotation-builder))
+                         (1 (annotate--change-guard))))))
+              (font-lock-remove-keywords nil kw)
+              (font-lock-add-keywords nil kw))
+            (font-lock-flush)
+            (font-lock-ensure))))))
+  (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-restore-annotation-text)
   (define-key magit-mode-map "e" #'my/vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
@@ -746,6 +769,9 @@ repaints them with this amber emph instead.")
             (cmd! (when (and buffer-file-name
                              (file-exists-p (my/wst-annotate-project-file)))
                     (require 'annotate)
+                    ;; set annotate-file before enabling the mode (mode loads
+                    ;; annotations on activation — see my/wst-find-file-annotate-h)
+                    (my/wst-set-project-annotate-file-h)
                     (annotate-mode 1))))
   (map! :map vdiff-mode-map
         :n "q"  #'vdiff-quit
@@ -819,11 +845,22 @@ when all changes are staged."
             '((name . my/annotate-expand-paths)))
 
 ;; Per-project storage: <project-root>/.annotations (gitignored globally).
-;; Add hooks unconditionally — annotate lazy-loads on first use.
-(add-hook 'find-file-hook #'my/wst-set-project-annotate-file-h)
-(add-hook 'find-file-hook (cmd! (when (file-exists-p (my/wst-annotate-project-file))
-                                  (require 'annotate)
-                                  (annotate-mode 1))))
+;; ORDER MATTERS: `annotate-mode' loads annotations from `annotate-file'
+;; immediately on activation, so the buffer-local `annotate-file' MUST be
+;; pointed at the project's .annotations BEFORE the mode is enabled. Two
+;; separate find-file-hook entries don't guarantee this (add-hook prepends,
+;; so the later-added annotate-mode hook would run first) — the load then
+;; reads the global default `annotate-file' and finds nothing, so existing
+;; annotations silently fail to appear on (re)open. Use one ordered hook.
+(defun my/wst-find-file-annotate-h ()
+  "Point `annotate-file' at the project .annotations, then enable
+`annotate-mode' if that file exists."
+  (when buffer-file-name
+    (my/wst-set-project-annotate-file-h)
+    (when (file-exists-p (my/wst-annotate-project-file))
+      (require 'annotate)
+      (annotate-mode 1))))
+(add-hook 'find-file-hook #'my/wst-find-file-annotate-h)
 ;; Always show annotations on their own line so they're visible in narrow
 ;; windows (e.g. vdiff side-by-side panes).
 (setq annotate-annotation-position-policy :new-line)
