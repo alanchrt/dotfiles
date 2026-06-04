@@ -666,7 +666,7 @@
                     (with-current-buffer buf
                       (funcall fn session)))))
               '((name . vdiff-fix-sentinel-context)))
-  (define-key magit-mode-map "e" #'vdiff-magit-dwim)
+  (define-key magit-mode-map "e" #'my/vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
   ;; annotate-mode directly when vdiff activates on a file with annotations
@@ -685,6 +685,20 @@
         :n "zR" #'vdiff-open-all-folds
         :n "zM" #'vdiff-close-all-folds
         :n "gf" nil))
+
+(defun my/vdiff-magit-dwim ()
+  "Open vdiff: always HEAD vs working tree for files, commit diff for commits.
+Using show-working-tree means e works correctly whether changes are staged,
+unstaged, or mixed — vdiff-magit-dwim's show-unstaged gives an empty diff
+when all changes are staged."
+  (interactive)
+  (cond
+   ((magit-commit-at-point)
+    (vdiff-magit-show-commit (magit-commit-at-point)))
+   ((magit-file-at-point t)
+    (let ((default-directory (magit-toplevel)))
+      (vdiff-magit-show-working-tree (magit-file-at-point t))))
+   (t (user-error "Nothing to diff at point"))))
 
 (defun my/treemacs-vdiff-at-point ()
   "Open a vdiff working-tree diff for the file at point in Treemacs."
