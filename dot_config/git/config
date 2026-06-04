@@ -8,6 +8,17 @@
 	navigate = true
 	line-numbers = true
 	syntax-theme = Dracula
+	# Colorblind-safe blue (add) / amber (remove) backgrounds shared with the
+	# Emacs vdiff/magit faces. `syntax` keeps the Dracula syntax-highlighted
+	# foreground; only the background is overridden. emph styles are the
+	# brighter word-level tints.
+	plus-style = syntax "#132932"
+	plus-emph-style = syntax "#1e414e"
+	minus-style = syntax "#30241d"
+	minus-emph-style = syntax "#4d3621"
+	line-numbers-plus-style = "#1e414e"
+	line-numbers-minus-style = "#4d3621"
+	line-numbers-zero-style = "#6272a4"
 
 # Note: side-by-side is not set globally — it wraps in any moderate-width
 # pane (lazygit, splits, etc.). Opt in per invocation when you want it:

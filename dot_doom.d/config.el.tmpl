@@ -242,30 +242,58 @@
                           :inverse-video nil
                           :extend t))))
 
+(defface my/vdiff-deletion-face '((t (:extend t)))
+  "Amber face for deleted lines (old-pane addition overlays) in vdiff.
+vdiff has no deletion face of its own; `my/vdiff-recolor-deletions'
+applies this to addition overlays in the old/left buffer.")
+
+(defface my/vdiff-deletion-refine-face '((t (:extend t)))
+  "Brighter-amber word-level face for refined regions inside deletions.
+vdiff refines addition-type hunks with the green `vdiff-refine-added';
+in the old/left pane those are deletions, so `my/vdiff-recolor-deletions'
+repaints them with this amber emph instead.")
+
 (defun my/soften-diff-faces-h ()
   "Use colorblind-friendlier Dracula-adjacent colors for non-Delta diffs."
   (my/soften-ediff-faces-h)
-  (dolist (spec '((diff-added . "#173f46")
-                  (diff-refine-added . "#1f5d66")
-                  (diff-removed . "#4a2f3a")
-                  (diff-refine-removed . "#6b3345")
-                  (magit-diff-added . "#173f46")
-                  (magit-diff-added-highlight . "#1f5d66")
-                  (magit-diff-removed . "#4a2f3a")
-                  (magit-diff-removed-highlight . "#6b3345")
-                  (magit-diff-context-highlight . "#303241")
-                  ;; vdiff faces — matched to delta colors from the old magit-delta
-                  ;; config. change-face has no delta equivalent so uses Dracula blue.
-                  (vdiff-addition-face    . "#173f46")
-                  (vdiff-change-face      . "#232850")
-                  (vdiff-subtraction-face . "#4a2f3a")
-                  (vdiff-refine-added     . "#1f5d66")
-                  (vdiff-refine-changed   . "#3a4878")
-                  (vdiff-refine-removed   . "#6b3345")))
+  ;; Colorblind-safe green/amber palette. Green = added-or-modified content,
+  ;; amber = deleted content. green↔amber stays distinguishable across common
+  ;; colorblindness types and both live in Dracula. Base tints are deep +
+  ;; low-saturation for comfort; "highlight"/"refine" word-level tints are a
+  ;; step brighter. magit/delta and vdiff share the palette for consistency.
+  ;;
+  ;; vdiff specifics: it uses ONE `vdiff-addition-face' for "content present in
+  ;; this pane but not the other" — so real additions (new pane) AND deletions
+  ;; (old pane) share it. We keep that face green and recolor the old pane's
+  ;; addition overlays to amber in `my/vdiff-recolor-deletions' below. Modified
+  ;; lines (`vdiff-change-face') are also green per request. The fill gap that
+  ;; pads alignment (`vdiff-subtraction-face') is a neutral, slightly-darker
+  ;; shade of the editor background rather than a colored highlight.
+  (dolist (spec '((diff-added . "#132932")
+                  (diff-refine-added . "#1e414e")
+                  (diff-removed . "#30241d")
+                  (diff-refine-removed . "#4d3621")
+                  (magit-diff-added . "#132932")
+                  (magit-diff-added-highlight . "#1e414e")
+                  (magit-diff-removed . "#30241d")
+                  (magit-diff-removed-highlight . "#4d3621")
+                  (magit-diff-context-highlight . "#2a2c39")
+                  (vdiff-addition-face    . "#132932")
+                  (vdiff-change-face      . "#132932")
+                  (vdiff-refine-added     . "#1e414e")
+                  (vdiff-refine-changed   . "#1e414e")
+                  (vdiff-subtraction-face . "#21232d")
+                  (my/vdiff-deletion-face . "#30241d")
+                  (my/vdiff-deletion-refine-face . "#4d3621")))
     (when (facep (car spec))
+      ;; :inherit 'unspecified severs vdiff-change-face / vdiff-refine-changed
+      ;; from diff-changed's purple foreground, which (as an overlay) would
+      ;; otherwise replace font-lock colors on changed lines. Background-only +
+      ;; no inherited foreground lets the underlying syntax highlighting show.
       (set-face-attribute (car spec) nil
                           :background (cdr spec)
                           :foreground 'unspecified
+                          :inherit 'unspecified
                           :weight 'unspecified
                           :slant 'unspecified
                           :inverse-video nil
@@ -676,6 +704,36 @@
                       (apply fn session args)))))
               '((name . vdiff-fix-sentinel-context)))
   (setq vdiff-auto-refine t)
+  ;; Fill missing/deleted-line regions with blank space instead of the default
+  ;; row of dashes — cleaner, GitHub-like empty gutter.
+  (setq vdiff-subtraction-fill-char ?\s)
+  ;; vdiff paints "extra content" (present in one pane, absent in the other)
+  ;; with vdiff-addition-face in BOTH panes, so deletions in the old pane look
+  ;; identical to additions in the new pane. After each refresh, repaint the
+  ;; old pane's addition overlays amber so deletions read as deletions while
+  ;; additions stay green. The old pane is the revision buffer (no live file);
+  ;; fall back to the session's first buffer.
+  (defun my/vdiff-recolor-deletions (session &rest _)
+    (when (vdiff-session-p session)
+      (let* ((bufs (vdiff-session-buffers session))
+             (a (car bufs)) (b (cadr bufs))
+             (old (cond ((and (buffer-live-p a) (not (buffer-file-name a))) a)
+                        ((and (buffer-live-p b) (not (buffer-file-name b))) b)
+                        (t a))))
+        (when (buffer-live-p old)
+          (with-current-buffer old
+            (dolist (ovr (overlays-in (point-min) (point-max)))
+              (cond
+               ;; line-level deletion region
+               ((eq (overlay-get ovr 'vdiff-type) 'addition)
+                (overlay-put ovr 'face 'my/vdiff-deletion-face))
+               ;; word-level refine inside a deletion (vdiff uses the green
+               ;; refine-added face for addition-type hunks) → amber emph.
+               ;; refine-changed (modifications) stays green, so skip it.
+               ((and (overlay-get ovr 'vdiff-refinement)
+                     (eq (overlay-get ovr 'face) 'vdiff-refine-added))
+                (overlay-put ovr 'face 'my/vdiff-deletion-refine-face)))))))))
+  (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-recolor-deletions)
   (define-key magit-mode-map "e" #'my/vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
