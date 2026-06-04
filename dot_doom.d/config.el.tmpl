@@ -215,27 +215,6 @@
       (setq-local auto-revert-avoid-polling nil)
       (auto-revert-mode 1))))
 
-(use-package! magit-delta
-  :after magit
-  :hook ((magit-diff-mode magit-revision-mode magit-stash-mode)
-         . magit-delta-mode)
-  :config
-  (setq magit-delta-default-dark-theme "Dracula"
-        magit-delta-hide-plus-minus-markers nil
-        magit-delta-delta-args
-        '("--syntax-theme" "Dracula"
-          "--true-color" "always"
-          "--color-only"
-          "--plus-style" "syntax #173f46"
-          "--plus-emph-style" "syntax bold #1f5d66"
-          "--minus-style" "syntax #4a2f3a"
-          "--minus-emph-style" "syntax bold #6b3345"
-          "--zero-style" "syntax"
-          "--file-style" "#bd93f9"
-          "--hunk-header-style" "file line-number syntax bold"
-          "--hunk-header-file-style" "#bd93f9"
-          "--hunk-header-line-number-style" "#8be9fd")))
-
 (defun my/soften-ediff-faces-h ()
   "Use muted Dracula-tinted Ediff backgrounds without hiding font-lock colors."
   (dolist (spec '((ediff-current-diff-A . "#4a2f3a")
