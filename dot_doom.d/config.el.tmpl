@@ -693,19 +693,27 @@
         :n "gf" #'my/vdiff-goto-file))
 
 (defun my/vdiff-goto-file ()
-  "Show the current vdiff buffer full-screen at point, keeping vdiff alive.
-Press q to fully close vdiff when done, or e from Magit to reopen the split."
+  "Quit vdiff and open the current file full-screen at point."
   (interactive)
-  (delete-other-windows))
+  (let ((buf (current-buffer))
+        (pos (point)))
+    (vdiff-quit)
+    (switch-to-buffer buf)
+    (delete-other-windows)
+    (goto-char pos)))
 
 (defun my/treemacs-vdiff-at-point ()
   "Open a vdiff working-tree diff for the file at point in Treemacs."
   (interactive)
-  (when-let* ((btn   (treemacs-current-button))
-              (path  (treemacs-button-get btn :path)))
+  (when-let* ((btn  (treemacs-current-button))
+              (path (treemacs-button-get btn :path)))
     (when (file-regular-p path)
       (let* ((top (magit-toplevel (file-name-directory path)))
-             (default-directory (or top (file-name-directory path))))
+             (default-directory (or top (file-name-directory path)))
+             ;; vdiff window management fails from a side window; pick a main window first
+             (main-win (cl-find-if-not (lambda (w) (window-parameter w 'window-side))
+                                       (window-list))))
+        (when main-win (select-window main-win))
         (if top
             (vdiff-magit-show-working-tree (file-relative-name path top))
           (find-file path))))))
