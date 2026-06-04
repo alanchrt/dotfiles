@@ -675,7 +675,13 @@
   (define-key magit-mode-map "e" #'vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   ;; q records macros in evil; override it to quit vdiff in vdiff buffers
-  (map! :map vdiff-mode-map :n "q" #'vdiff-quit))
+  (map! :map vdiff-mode-map :n "q" #'vdiff-quit)
+  ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
+  ;; annotate-mode directly when vdiff activates on a file with annotations
+  (add-hook 'vdiff-mode-hook
+            (cmd! (when (file-exists-p (my/wst-annotate-project-file))
+                    (require 'annotate)
+                    (annotate-mode 1)))))
 
 ;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
 ;;
