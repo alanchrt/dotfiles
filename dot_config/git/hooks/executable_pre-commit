@@ -1,0 +1,31 @@
+#!/bin/bash
+set -euo pipefail
+
+# Global pre-commit hook:
+#  1) chain to a repo-local pre-commit (core.hooksPath shadows per-repo hooks),
+#  2) block commits that still contain review markers (see /annotations).
+
+# Chain to repo-local hook if it exists. Skip if we were already called FROM a
+# local hook (template chaining) to avoid loops.
+if [[ -z "${_CHAINED_FROM_LOCAL:-}" ]]; then
+    local_hook="$(git rev-parse --git-dir)/hooks/pre-commit"
+    if [[ -x "$local_hook" ]]; then
+        export _CHAINED_FROM_GLOBAL=1
+        "$local_hook" "$@"
+    fi
+fi
+
+# Block staged review markers. The marker is assembled from two string literals
+# so this script never matches itself; *.md is excluded so the /annotations doc
+# (which documents the literal marker) stays committable in the dotfiles repo.
+marker="@agents"":"
+hits=$(git diff --cached --no-color -U0 --diff-filter=AM \
+         -- ':(exclude)*.md' ':(exclude)*.mdx' ':(exclude)*.markdown' \
+       | grep -nE "^\+[^+].*${marker}" || true)
+if [[ -n "$hits" ]]; then
+    echo "✗ commit blocked: unresolved ${marker} review markers are staged:" >&2
+    echo "$hits" >&2
+    echo "Resolve them with /annotations (or remove them); bypass with --no-verify." >&2
+    exit 1
+fi
+exit 0

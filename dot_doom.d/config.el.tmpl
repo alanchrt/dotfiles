@@ -687,9 +687,6 @@ repaints them with this amber emph instead.")
 (use-package! vdiff-magit
   :after magit
   :config
-  ;; Pre-load annotate so the vdiff-mode-hook below doesn't block vdiff's
-  ;; diff computation on first use by loading the package mid-init.
-  (require 'annotate nil t)
   (setq vdiff-magit-stage-is-2way t)
   ;; vdiff--refresh-overlays and vdiff-refine-all-hunks both guard with
   ;; (vdiff--buffer-p) which reads the buffer-local vdiff--session. When called
@@ -740,45 +737,8 @@ repaints them with this amber emph instead.")
                            '(vdiff-refine-added vdiff-refine-changed)))
                 (overlay-put ovr 'face 'my/vdiff-deletion-refine-face)))))))))
   (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-recolor-deletions)
-  ;; annotate.el renders an annotation in two pieces: the highlight under the
-  ;; annotated text is a plain OVERLAY, but the annotation *text* itself is a
-  ;; `display' property installed by a font-lock keyword. vdiff re-initializes
-  ;; font-lock in its panes after find-file-hook already enabled annotate-mode,
-  ;; which drops annotate's keyword from `font-lock-keywords' — so the overlay
-  ;; underline survives but the comment text vanishes. annotate-mode stays
-  ;; nominally on, so the vdiff-mode-hook's (annotate-mode 1) is a no-op and
-  ;; never re-adds it. Re-install the keyword and re-fontify after each refresh.
-  (defun my/vdiff-restore-annotation-text (session &rest _)
-    (when (vdiff-session-p session)
-      (dolist (buf (vdiff-session-buffers session))
-        (when (and (buffer-live-p buf)
-                   (buffer-local-value 'buffer-file-name buf)
-                   (buffer-local-value 'annotate-mode buf))
-          (with-current-buffer buf
-            (let ((kw '((annotate--font-lock-matcher
-                         (2 (annotate--annotation-builder))
-                         (1 (annotate--change-guard))))))
-              (font-lock-remove-keywords nil kw)
-              (font-lock-add-keywords nil kw))
-            (font-lock-flush)
-            (font-lock-ensure))))))
-  (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-restore-annotation-text)
   (define-key magit-mode-map "e" #'my/vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
-  ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
-  ;; annotate-mode directly when vdiff activates on a file with annotations
-  ;; Only enable annotate-mode on real file buffers, not vdiff's temp index/
-  ;; commit versions (e.g. file.tsx.~{index}~). Those have no buffer-file-name
-  ;; and when vdiff-quit kills them, annotate-save-annotations fires with empty
-  ;; data and prompts to delete the annotations file.
-  (add-hook 'vdiff-mode-hook
-            (cmd! (when (and buffer-file-name
-                             (file-exists-p (my/wst-annotate-project-file)))
-                    (require 'annotate)
-                    ;; set annotate-file before enabling the mode (mode loads
-                    ;; annotations on activation — see my/wst-find-file-annotate-h)
-                    (my/wst-set-project-annotate-file-h)
-                    (annotate-mode 1))))
   (map! :map vdiff-mode-map
         :n "q"  #'vdiff-quit
         :n "za" #'vdiff-toggle-fold
@@ -834,146 +794,183 @@ conflate staged and unstaged changes when a file has both."
   (evil-define-key 'treemacs treemacs-mode-map
     (kbd "e") #'my/treemacs-vdiff-at-point))
 
-;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
+;; ── Review markers: inline @agents comments addressed by /annotations ───────
 ;;
-;; Workflow:
-;;   1. In Magit diff, press C-c r on a line → visits the file at that line,
-;;      prompts for a comment, saves annotation, returns to the diff.
-;;   2. When done reviewing, M-x my/wst-export-iterate (or SPC r i) → writes
-;;      .claude/iterate.md with file:line:comment entries Claude can parse.
-;;   3. In Claude Code, type /iterate → Claude addresses each comment, deletes
-;;      the file, and tells you what it changed.
-;;   4. M-x my/wst-clear-iterate-annotations (or SPC r x) → removes all
-;;      annotate.el overlays and the .annotations file for the project.
+;; Workflow: `SPC r a' drops a `@agents <note>' comment on a line; review with
+;; `SPC r n/p/s'; run /annotations in Claude Code to address each marker and
+;; delete it as it goes; `SPC r x' clears any leftovers. A global pre-commit
+;; hook blocks commits that still contain markers. The marker is built by
+;; concatenation so the literal never appears in this committed file (the same
+;; trick the pre-commit hook uses to avoid matching itself).
+(defconst my/review-marker (concat "@agents" ":")
+  "Inline review-marker prefix addressed by the /annotations command.")
 
-;; annotate stores paths with ~ (abbreviate-file-name) but comparisons can fail
-;; when the home dir encoding differs. Normalize all stored paths to absolute
-;; at load time so assoc-string always finds the right entry.
-(advice-add 'annotate-load-annotations :around
-            (lambda (fn &rest args)
-              (cl-letf* ((orig-load (symbol-function 'annotate-load-annotation-data))
-                         ((symbol-function 'annotate-load-annotation-data)
-                          (lambda (&rest a)
-                            (mapcar (lambda (rec)
-                                      (if (and (consp rec) (stringp (car rec)))
-                                          (cons (expand-file-name (car rec)) (cdr rec))
-                                        rec))
-                                    (or (apply orig-load a) nil)))))
-                (apply fn args)))
-            '((name . my/annotate-expand-paths)))
+(defun my/review--marker-line-p ()
+  "Non-nil if the line at point contains the review marker."
+  (save-excursion
+    (beginning-of-line)
+    (let ((case-fold-search nil))
+      (search-forward my/review-marker (line-end-position) t))))
 
-;; Per-project storage: <project-root>/.annotations (gitignored globally).
-;; ORDER MATTERS: `annotate-mode' loads annotations from `annotate-file'
-;; immediately on activation, so the buffer-local `annotate-file' MUST be
-;; pointed at the project's .annotations BEFORE the mode is enabled. Two
-;; separate find-file-hook entries don't guarantee this (add-hook prepends,
-;; so the later-added annotate-mode hook would run first) — the load then
-;; reads the global default `annotate-file' and finds nothing, so existing
-;; annotations silently fail to appear on (re)open. Use one ordered hook.
-(defun my/wst-find-file-annotate-h ()
-  "Point `annotate-file' at the project .annotations, then enable
-`annotate-mode' if that file exists."
-  (when buffer-file-name
-    (my/wst-set-project-annotate-file-h)
-    (when (file-exists-p (my/wst-annotate-project-file))
-      (require 'annotate)
-      (annotate-mode 1))))
-(add-hook 'find-file-hook #'my/wst-find-file-annotate-h)
-;; Always show annotations on their own line so they're visible in narrow
-;; windows (e.g. vdiff side-by-side panes).
-(setq annotate-annotation-position-policy :new-line)
+(defun my/review--marker-text ()
+  "Return the note text of the marker on the current line, else nil."
+  (save-excursion
+    (beginning-of-line)
+    (let ((case-fold-search nil))
+      (when (search-forward my/review-marker (line-end-position) t)
+        (let* ((raw (buffer-substring-no-properties (point) (line-end-position)))
+               (ce  (string-trim (or comment-end "")))
+               (s   (string-trim raw)))
+          (when (and (> (length ce) 0) (string-suffix-p ce s))
+            (setq s (string-trim (substring s 0 (- (length s) (length ce))))))
+          s)))))
 
-(defun my/wst-annotate-project-file ()
-  "Return the .annotations path for the current project."
-  (expand-file-name ".annotations"
-                    (or (and (fboundp 'projectile-project-root)
-                             (ignore-errors (projectile-project-root)))
-                        (ignore-errors (vc-root-dir))
-                        default-directory)))
+(defun my/review--insert-marker (indent text)
+  "Insert a marker comment line for TEXT at point (point at line start)."
+  (let* ((cs      (string-trim-right (or comment-start "#")))
+         (ce      (string-trim (or comment-end "")))
+         (comment (concat cs " " my/review-marker " " text
+                          (unless (string-empty-p ce) (concat " " ce)))))
+    (insert (make-string indent ?\s) comment "\n")))
 
-(defun my/wst-set-project-annotate-file-h ()
-  "Set `annotate-file' buffer-locally to the project .annotations file."
-  (when buffer-file-name
-    (setq-local annotate-file (my/wst-annotate-project-file))))
-
-(defun my/wst-iterate-annotate-from-diff ()
-  "From a Magit diff, visit the file at point, add an annotation, return."
+(defun my/review-annotate-line ()
+  "Add or edit a `@agents' review marker for the line at point.
+If the current line or the line directly above already holds a marker, edit it
+(the prompt is prefilled with its note; blank input deletes it). Otherwise
+insert a new marker comment on a line above point."
   (interactive)
-  (let ((file (magit-file-at-point t)))
-    (unless file (user-error "No file at point in diff"))
-    (save-window-excursion
-      (magit-diff-visit-file file)
-      (my/wst-set-project-annotate-file-h)
-      (call-interactively #'annotate-annotate)
-      (annotate-save-annotations))))
+  (comment-normalize-vars)
+  (let ((marker-bol
+         (cond ((my/review--marker-line-p) (line-beginning-position))
+               ((save-excursion (forward-line -1) (my/review--marker-line-p))
+                (line-beginning-position 0)))))
+    (if marker-bol
+        (let* ((existing (save-excursion (goto-char marker-bol)
+                                         (my/review--marker-text)))
+               (indent   (save-excursion (goto-char marker-bol)
+                                         (current-indentation)))
+               (text     (read-string (concat my/review-marker " ") existing)))
+          (save-excursion
+            (goto-char marker-bol)
+            (delete-region (line-beginning-position)
+                           (min (point-max) (1+ (line-end-position))))
+            (unless (string-blank-p text)
+              (my/review--insert-marker indent text))))
+      (let ((text   (read-string (concat my/review-marker " ")))
+            (indent (current-indentation)))
+        (unless (string-blank-p text)
+          (save-excursion
+            (beginning-of-line)
+            (my/review--insert-marker indent text)))))))
 
-(defun my/wst-export-iterate ()
-  "Write .claude/iterate.md from this project's annotate.el annotations."
+(defun my/review-next-annotation ()
+  "Move to the next `@agents' marker in the buffer (wraps)."
   (interactive)
-  (let* ((root     (or (and (fboundp 'projectile-project-root)
-                            (ignore-errors (projectile-project-root)))
-                       (ignore-errors (vc-root-dir))
-                       default-directory))
-         (ann-file (expand-file-name ".annotations" root))
-         (out-file (expand-file-name ".claude/iterate.md" root)))
-    (unless (file-exists-p ann-file)
-      (user-error "No .annotations found in %s" root))
-    (let* ((data    (with-temp-buffer
-                      (insert-file-contents ann-file)
-                      (read (current-buffer))))
-           (entries nil))
-      ;; Each record: (FILENAME ANNOTATION-LIST CHECKSUM)
-      ;; Each annotation: (START END TEXT ANNOTATED-TEXT ...)
-      (dolist (record data)
-        (let* ((file (car record))
-               (anns (cadr record))
-               (rel  (file-relative-name file root)))
-          (dolist (ann anns)
-            (let* ((beg  (nth 0 ann))
-                   (text (nth 2 ann))
-                   (line (with-current-buffer (find-file-noselect file t)
-                           (save-excursion
-                             (goto-char beg)
-                             (line-number-at-pos)))))
-              (push (list rel line text) entries)))))
-      (if (null entries)
-          (user-error "No annotations to export")
-        (setq entries
-              (sort entries
-                    (lambda (a b)
-                      (or (string< (car a) (car b))
-                          (and (string= (car a) (car b))
-                               (< (cadr a) (cadr b)))))))
-        (make-directory (file-name-directory out-file) t)
-        (with-temp-file out-file
-          (insert "# Review annotations\n\n")
-          (dolist (e entries)
-            (insert (format "- `%s:%d`: %s\n" (nth 0 e) (nth 1 e) (nth 2 e)))))
-        (message "Exported %d annotation(s) → %s" (length entries) out-file)))))
+  (let ((case-fold-search nil) (start (point)))
+    (end-of-line)
+    (if (or (re-search-forward (regexp-quote my/review-marker) nil t)
+            (progn (goto-char (point-min))
+                   (re-search-forward (regexp-quote my/review-marker) nil t)))
+        (goto-char (match-beginning 0))
+      (goto-char start)
+      (user-error "No %s markers" my/review-marker))))
 
-(defun my/wst-clear-iterate-annotations ()
-  "Remove all annotate.el overlays and the .annotations file for this project."
+(defun my/review-previous-annotation ()
+  "Move to the previous `@agents' marker in the buffer (wraps)."
   (interactive)
-  (let* ((root     (or (and (fboundp 'projectile-project-root)
-                            (ignore-errors (projectile-project-root)))
-                       (ignore-errors (vc-root-dir))
-                       default-directory))
-         (ann-file (expand-file-name ".annotations" root))
-         (out-file (expand-file-name ".claude/iterate.md" root)))
-    (dolist (buf (buffer-list))
-      (with-current-buffer buf
-        (when (and buffer-file-name
-                   (string-prefix-p (expand-file-name root) buffer-file-name)
-                   (featurep 'annotate))
-          (annotate-clear-annotations))))
-    (when (file-exists-p ann-file) (delete-file ann-file))
-    (when (file-exists-p out-file) (delete-file out-file))
-    (message "Cleared iterate annotations for %s" root)))
+  (let ((case-fold-search nil) (start (point)))
+    (beginning-of-line)
+    (if (or (re-search-backward (regexp-quote my/review-marker) nil t)
+            (progn (goto-char (point-max))
+                   (re-search-backward (regexp-quote my/review-marker) nil t)))
+        (goto-char (match-beginning 0))
+      (goto-char start)
+      (user-error "No %s markers" my/review-marker))))
+
+(defun my/review-annotation-summary ()
+  "List all `@agents' markers across the project."
+  (interactive)
+  (let ((dir (or (and (fboundp 'projectile-project-root)
+                      (ignore-errors (projectile-project-root)))
+                 (ignore-errors (vc-root-dir))
+                 default-directory)))
+    (if (fboundp 'consult-ripgrep)
+        (consult-ripgrep dir my/review-marker)
+      (occur (regexp-quote my/review-marker)))))
+
+(defun my/review-clear-annotations ()
+  "Delete every line containing a `@agents' marker across the project."
+  (interactive)
+  (let* ((root  (or (and (fboundp 'projectile-project-root)
+                         (ignore-errors (projectile-project-root)))
+                    (ignore-errors (vc-root-dir))
+                    default-directory))
+         (files (ignore-errors
+                  (process-lines "rg" "-l" "--fixed-strings" "--"
+                                 my/review-marker root))))
+    (if (not files)
+        (message "No %s markers found" my/review-marker)
+      (when (yes-or-no-p (format "Remove %s lines from %d file(s)? "
+                                 my/review-marker (length files)))
+        (let ((n 0))
+          (dolist (f files)
+            (with-current-buffer (find-file-noselect f)
+              (save-excursion
+                (goto-char (point-min))
+                (let ((case-fold-search nil))
+                  (while (re-search-forward
+                          (concat "^.*" (regexp-quote my/review-marker) ".*\n?")
+                          nil t)
+                    (replace-match "") (cl-incf n))))
+              (save-buffer)))
+          (message "Removed %d %s line(s) from %d file(s)"
+                   n my/review-marker (length files)))))))
+
+;; Shouty highlight so markers are impossible to miss. A custom font-lock
+;; keyword (not hl-todo — its word-boundary regexp won't match the leading `@')
+;; paints the marker and the rest of its line with a loud background. `prepend'
+;; overrides the dim comment face; `:extend t' runs the bar to the window edge.
+(defface my/review-marker-face '((t :inherit default))
+  "Loud face for inline @agents review markers (colors set via custom-set-faces!).")
+;; Set the colors with `custom-set-faces!' rather than baking them into the
+;; `defface' spec: a plain `defface' is a no-op once the face already exists, so
+;; editing it and running `doom/reload' won't update the live face until a full
+;; restart. `custom-set-faces!' re-applies on every reload and after a theme loads.
+;; Dracula pink background with Dracula's dark base as the text color (~7.4:1).
+(custom-set-faces!
+  '(my/review-marker-face :background "#ff79c6" :foreground "#282a36"
+                          :weight bold :extend t))
+
+(defun my/review-add-font-lock ()
+  "Highlight `@agents' markers in the current buffer."
+  (font-lock-add-keywords
+   nil
+   `((,(concat (regexp-quote my/review-marker) ".*$") 0 'my/review-marker-face prepend))
+   'append)
+  (when font-lock-mode (font-lock-flush)))
+
+(dolist (hook '(prog-mode-hook text-mode-hook conf-mode-hook))
+  (add-hook hook #'my/review-add-font-lock))
+
+;; hl-line (the current-line highlight) is an overlay, so it paints over the
+;; marker's text-property background: when the cursor sits on a marker line, the
+;; pink is replaced by hl-line's dark background, leaving the dark marker text
+;; unreadable. Suppress hl-line on marker lines (return a zero-width range) so the
+;; pink + dark text keep their contrast in both states; other lines highlight as
+;; usual.
+(defun my/review-hl-line-range ()
+  (if (save-excursion
+        (beginning-of-line)
+        (let ((case-fold-search nil))
+          (search-forward my/review-marker (line-end-position) t)))
+      (cons (point) (point))
+    (cons (line-beginning-position) (line-beginning-position 2))))
+(setq hl-line-range-function #'my/review-hl-line-range)
 
 (map! :leader
       (:prefix ("r" . "review")
-       :desc "Annotate line for /iterate"  "a" (cmd! (require 'annotate) (call-interactively #'annotate-annotate))
-       :desc "Next annotation"             "n" (cmd! (require 'annotate) (call-interactively #'annotate-goto-next-annotation))
-       :desc "Previous annotation"         "p" (cmd! (require 'annotate) (call-interactively #'annotate-goto-previous-annotation))
-       :desc "Annotation summary"          "s" (cmd! (require 'annotate) (call-interactively #'annotate-show-annotation-summary))
-       :desc "Clear iterate annotations"   "x" #'my/wst-clear-iterate-annotations))
+       :desc "Annotate line (@agents)" "a" #'my/review-annotate-line
+       :desc "Next annotation"          "n" #'my/review-next-annotation
+       :desc "Previous annotation"      "p" #'my/review-previous-annotation
+       :desc "Annotation summary"       "s" #'my/review-annotation-summary
+       :desc "Clear annotations"        "x" #'my/review-clear-annotations))
