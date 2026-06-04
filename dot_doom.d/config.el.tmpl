@@ -690,19 +690,7 @@
         :n "za" #'vdiff-toggle-fold
         :n "zR" #'vdiff-open-all-folds
         :n "zM" #'vdiff-close-all-folds
-        :n "gf" #'my/vdiff-goto-file))
-
-(defun my/vdiff-goto-file ()
-  "Open the file in a window below vdiff, keeping the diff intact.
-The vdiff panes stay side-by-side above; C-x 0 closes this window to return."
-  (interactive)
-  (unless (buffer-file-name) (user-error "No file for this vdiff buffer"))
-  (let ((buf (current-buffer))
-        (pos (point)))
-    ;; Split the root window below so vdiff stays side-by-side on top
-    (select-window (split-window (frame-root-window) -20 'below))
-    (switch-to-buffer buf)
-    (goto-char pos)))
+        :n "gf" nil))
 
 (defun my/treemacs-vdiff-at-point ()
   "Open a vdiff working-tree diff for the file at point in Treemacs."
