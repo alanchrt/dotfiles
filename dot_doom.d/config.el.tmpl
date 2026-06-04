@@ -650,6 +650,9 @@
 (use-package! vdiff-magit
   :after magit
   :config
+  ;; Pre-load annotate so the vdiff-mode-hook below doesn't block vdiff's
+  ;; diff computation on first use by loading the package mid-init.
+  (require 'annotate nil t)
   (setq vdiff-magit-stage-is-2way t)
   (define-key magit-mode-map "e" #'vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
