@@ -654,6 +654,18 @@
   ;; diff computation on first use by loading the package mid-init.
   (require 'annotate nil t)
   (setq vdiff-magit-stage-is-2way t)
+  ;; vdiff--refresh-overlays guards with (vdiff--buffer-p) which reads the
+  ;; buffer-local vdiff--session. When called from the async diff sentinel,
+  ;; current-buffer is the process buffer where that local is nil, so overlays
+  ;; are silently skipped. Switch to the session's first buffer if needed.
+  (advice-add 'vdiff--refresh-overlays :around
+              (lambda (fn session)
+                (if (vdiff--buffer-p)
+                    (funcall fn session)
+                  (when-let ((buf (and session (car (vdiff-session-buffers session)))))
+                    (with-current-buffer buf
+                      (funcall fn session)))))
+              '((name . vdiff-fix-sentinel-context)))
   (define-key magit-mode-map "e" #'vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
