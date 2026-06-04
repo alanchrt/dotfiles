@@ -671,10 +671,11 @@
 (use-package! vdiff-magit
   :after magit
   :config
+  (setq vdiff-magit-stage-is-2way t)
   (define-key magit-mode-map "e" #'vdiff-magit-dwim)
-  (define-key magit-mode-map "E" #'vdiff-magit-show-unstaged)
-  (transient-append-suffix 'magit-dispatch "!"
-    '("E" "vdiff" vdiff-magit-dispatch)))
+  (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
+  ;; q records macros in evil; override it to quit vdiff in vdiff buffers
+  (map! :map vdiff-mode-map :n "q" #'vdiff-quit))
 
 ;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
 ;;
