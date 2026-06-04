@@ -43,6 +43,10 @@ if [[ -n "${WST_SESSION:-}" ]]; then
   done
 fi
 
+# One docker query for all running devcontainer paths (avoids N serial calls)
+_running_containers=$(docker ps \
+  --format '{{index .Labels "devcontainer.local_folder"}}' 2>/dev/null)
+
 # Collect streams with no tmux window yet, scoped to $proj (or all if unresolved)
 streams=()
 for pdir in "$PROJECTS_ROOT"/*/; do
@@ -60,7 +64,7 @@ for pdir in "$PROJECTS_ROOT"/*/; do
       continue
     fi
     cstate="down"
-    if [[ -n "$(docker ps -q --filter "label=devcontainer.local_folder=$sdir" 2>/dev/null)" ]]; then
+    if printf '%s\n' "$_running_containers" | grep -qxF "${sdir%/}"; then
       cstate="up"
     fi
     streams+=("$pname/$slug $cstate")
