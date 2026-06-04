@@ -693,13 +693,14 @@
         :n "gf" #'my/vdiff-goto-file))
 
 (defun my/vdiff-goto-file ()
-  "Quit vdiff splits and stay in the current file buffer at point."
+  "Quit vdiff and open the current file buffer full-screen at point."
   (interactive)
   (let ((buf (current-buffer))
         (pos (point)))
     (vdiff-quit)
-    (pop-to-buffer buf)
-    (goto-char pos)))
+    (switch-to-buffer buf)
+    (goto-char pos)
+    (delete-other-windows)))
 
 (defun my/treemacs-vdiff-at-point ()
   "Open a vdiff working-tree diff for the file at point in Treemacs."
