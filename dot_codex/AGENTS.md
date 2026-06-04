@@ -9,6 +9,8 @@
 
 # Commit + push flow
 
+**Staging vs committing:** Stage (`git add`) freely and without asking — whenever work is ready to review, stage it immediately. Do NOT commit without explicit user confirmation. Never. Staging is where the user reviews; committing requires their sign-off.
+
 Agents are configured for autonomy with one review gate, at staging. The flow is **one confirmation, then commit and push happen back-to-back with no further prompts**:
 
 1. When a coherent body of work is ready for review — feature complete, bug fixed, or refactor consolidated with its tests/docs — stage the relevant files (`git add ...`).

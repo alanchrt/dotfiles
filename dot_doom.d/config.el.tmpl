@@ -674,14 +674,42 @@
   (setq vdiff-magit-stage-is-2way t)
   (define-key magit-mode-map "e" #'vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
-  ;; q records macros in evil; override it to quit vdiff in vdiff buffers
-  (map! :map vdiff-mode-map :n "q" #'vdiff-quit)
   ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
   ;; annotate-mode directly when vdiff activates on a file with annotations
   (add-hook 'vdiff-mode-hook
             (cmd! (when (file-exists-p (my/wst-annotate-project-file))
                     (require 'annotate)
-                    (annotate-mode 1)))))
+                    (annotate-mode 1))))
+  (map! :map vdiff-mode-map
+        :n "q"  #'vdiff-quit
+        :n "za" #'vdiff-toggle-fold
+        :n "zR" #'vdiff-open-all-folds
+        :n "zM" #'vdiff-close-all-folds
+        :n "gf" #'my/vdiff-goto-file))
+
+(defun my/vdiff-goto-file ()
+  "Quit vdiff splits and stay in the current file buffer at point."
+  (interactive)
+  (let ((buf (current-buffer))
+        (pos (point)))
+    (vdiff-quit)
+    (pop-to-buffer buf)
+    (goto-char pos)))
+
+(defun my/treemacs-vdiff-at-point ()
+  "Open a vdiff working-tree diff for the file at point in Treemacs."
+  (interactive)
+  (when-let* ((btn   (treemacs-current-button))
+              (path  (treemacs-button-get btn :path)))
+    (when (file-regular-p path)
+      (let* ((top (magit-toplevel (file-name-directory path)))
+             (default-directory (or top (file-name-directory path))))
+        (if top
+            (vdiff-magit-show-working-tree (file-relative-name path top))
+          (find-file path))))))
+
+(after! treemacs
+  (define-key treemacs-mode-map (kbd "e") #'my/treemacs-vdiff-at-point))
 
 ;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
 ;;
