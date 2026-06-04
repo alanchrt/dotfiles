@@ -693,14 +693,10 @@
         :n "gf" #'my/vdiff-goto-file))
 
 (defun my/vdiff-goto-file ()
-  "Quit vdiff and open the current file buffer full-screen at point."
+  "Show the current vdiff buffer full-screen at point, keeping vdiff alive.
+Press q to fully close vdiff when done, or e from Magit to reopen the split."
   (interactive)
-  (let ((buf (current-buffer))
-        (pos (point)))
-    (vdiff-quit)
-    (switch-to-buffer buf)
-    (goto-char pos)
-    (delete-other-windows)))
+  (delete-other-windows))
 
 (defun my/treemacs-vdiff-at-point ()
   "Open a vdiff working-tree diff for the file at point in Treemacs."
@@ -715,7 +711,9 @@
           (find-file path))))))
 
 (after! treemacs
-  (map! :map treemacs-mode-map "e" #'my/treemacs-vdiff-at-point))
+  ;; Treemacs uses a custom 'treemacs evil state; evil-define-key is required.
+  (evil-define-key 'treemacs treemacs-mode-map
+    (kbd "e") #'my/treemacs-vdiff-at-point))
 
 ;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
 ;;
