@@ -693,15 +693,16 @@
         :n "gf" #'my/vdiff-goto-file))
 
 (defun my/vdiff-goto-file ()
-  "Open the current file at point in another window, keeping vdiff open.
-Close the new window (C-x 0) to return to vdiff with scroll position intact."
+  "Open the file in a window below vdiff, keeping the diff intact.
+The vdiff panes stay side-by-side above; C-x 0 closes this window to return."
   (interactive)
-  (let ((pos  (point))
-        (file (buffer-file-name)))
-    (if file
-        (progn (find-file-other-window file)
-               (goto-char pos))
-      (user-error "No file for this vdiff buffer"))))
+  (unless (buffer-file-name) (user-error "No file for this vdiff buffer"))
+  (let ((buf (current-buffer))
+        (pos (point)))
+    ;; Split the root window below so vdiff stays side-by-side on top
+    (select-window (split-window (frame-root-window) -20 'below))
+    (switch-to-buffer buf)
+    (goto-char pos)))
 
 (defun my/treemacs-vdiff-at-point ()
   "Open a vdiff working-tree diff for the file at point in Treemacs."
