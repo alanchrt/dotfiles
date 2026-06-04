@@ -265,8 +265,9 @@ repaints them with this amber emph instead.")
   ;; vdiff specifics: it uses ONE `vdiff-addition-face' for "content present in
   ;; this pane but not the other" — so real additions (new pane) AND deletions
   ;; (old pane) share it. We keep that face green and recolor the old pane's
-  ;; addition overlays to amber in `my/vdiff-recolor-deletions' below. Modified
-  ;; lines (`vdiff-change-face') are also green per request. The fill gap that
+  ;; addition overlays to amber in `my/vdiff-recolor-deletions' below, which
+  ;; also amber-izes the old pane's `vdiff-change-face' (modified) regions, so
+  ;; the left/old side is never green — only the new pane is. The fill gap that
   ;; pads alignment (`vdiff-subtraction-face') is a neutral, slightly-darker
   ;; shade of the editor background rather than a colored highlight.
   (dolist (spec '((diff-added . "#132932")
@@ -708,11 +709,13 @@ repaints them with this amber emph instead.")
   ;; row of dashes — cleaner, GitHub-like empty gutter.
   (setq vdiff-subtraction-fill-char ?\s)
   ;; vdiff paints "extra content" (present in one pane, absent in the other)
-  ;; with vdiff-addition-face in BOTH panes, so deletions in the old pane look
-  ;; identical to additions in the new pane. After each refresh, repaint the
-  ;; old pane's addition overlays amber so deletions read as deletions while
-  ;; additions stay green. The old pane is the revision buffer (no live file);
-  ;; fall back to the session's first buffer.
+  ;; with vdiff-addition-face in BOTH panes, and modified lines with
+  ;; vdiff-change-face in both panes — so in the old/left pane, both deletions
+  ;; and the old side of a modification show green, indistinguishable from real
+  ;; additions in the new pane. After each refresh, repaint the old pane's
+  ;; addition AND change overlays amber, so the left/old side is always amber
+  ;; (removed or replaced) and only the new pane shows green. The old pane is the
+  ;; revision buffer (no live file); fall back to the session's first buffer.
   (defun my/vdiff-recolor-deletions (session &rest _)
     (when (vdiff-session-p session)
       (let* ((bufs (vdiff-session-buffers session))
@@ -724,14 +727,17 @@ repaints them with this amber emph instead.")
           (with-current-buffer old
             (dolist (ovr (overlays-in (point-min) (point-max)))
               (cond
-               ;; line-level deletion region
-               ((eq (overlay-get ovr 'vdiff-type) 'addition)
+               ;; Old-pane line region: a pure deletion ('addition type, painted
+               ;; in both panes) OR the old side of a modification ('change).
+               ;; Both are content being removed/replaced → amber, never green.
+               ((memq (overlay-get ovr 'vdiff-type) '(addition change))
                 (overlay-put ovr 'face 'my/vdiff-deletion-face))
-               ;; word-level refine inside a deletion (vdiff uses the green
-               ;; refine-added face for addition-type hunks) → amber emph.
-               ;; refine-changed (modifications) stays green, so skip it.
+               ;; Word-level refine in the old pane: refine-added (inside a
+               ;; deletion) and refine-changed (old side of a modification) are
+               ;; both green by default → amber emph.
                ((and (overlay-get ovr 'vdiff-refinement)
-                     (eq (overlay-get ovr 'face) 'vdiff-refine-added))
+                     (memq (overlay-get ovr 'face)
+                           '(vdiff-refine-added vdiff-refine-changed)))
                 (overlay-put ovr 'face 'my/vdiff-deletion-refine-face)))))))))
   (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-recolor-deletions)
   ;; annotate.el renders an annotation in two pieces: the highlight under the
