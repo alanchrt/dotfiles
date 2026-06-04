@@ -4,16 +4,22 @@
   dnf:
     name: nodejs
 
-- name: Increase file watchers limit
+- name: Increase inotify limits for file watchers
   become: yes
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/sysctl.conf
-    line: fs.inotify.max_user_watches=524288
+    regexp: "^{{ item.key | regex_escape }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    # max_user_instances guards against Metro/Expo's fs.watch fallback (one
+    # inotify instance per dir) exhausting the default 128 cap -> EMFILE.
+    - { key: fs.inotify.max_user_watches, value: 524288 }
+    - { key: fs.inotify.max_user_instances, value: 1024 }
   register: file_watchers
 
 - name: Apply sysctl config
   become: yes
-  shell: sysctl --system
+  ansible.builtin.shell: sysctl --system
   when: file_watchers.changed
 
 - name: Install fnm
@@ -28,6 +34,42 @@
   ansible.builtin.shell: curl -fsSL https://bun.sh/install | bash
   args:
     creates: "{{ ansible_env.HOME }}/.bun/bin/bun"
+
+# Watchman lets Metro/Expo avoid the inefficient fs.watch fallback entirely
+# (one shared watch instead of one inotify instance per node_modules dir).
+- name: Download watchman release
+  become: yes
+  ansible.builtin.unarchive:
+    src: "https://github.com/facebook/watchman/releases/download/{{ watchman_version }}/watchman-{{ watchman_version }}-linux.zip"
+    dest: /opt
+    remote_src: yes
+    creates: "/opt/watchman-{{ watchman_version }}-linux"
+
+- name: Install watchman binaries
+  become: yes
+  ansible.builtin.copy:
+    src: "/opt/watchman-{{ watchman_version }}-linux/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: "0755"
+    remote_src: yes
+  loop:
+    - watchman
+    - watchmanctl
+
+- name: Install watchman bundled libraries
+  become: yes
+  ansible.builtin.copy:
+    # The binary hardcodes absolute NEEDED paths to /usr/local/lib for these.
+    src: "/opt/watchman-{{ watchman_version }}-linux/lib/"
+    dest: /usr/local/lib/
+    mode: "0644"
+    remote_src: yes
+  register: watchman_libs
+
+- name: Refresh linker cache for watchman libraries
+  become: yes
+  ansible.builtin.command: ldconfig
+  when: watchman_libs.changed
 
 - name: Install common node tools
   become: yes

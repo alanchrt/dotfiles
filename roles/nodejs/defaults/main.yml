@@ -1,0 +1,6 @@
+---
+# Pin to the latest watchman release that ships a self-contained linux *zip*.
+# Newer releases switched to fc42-only RPMs whose sonames (ICU 76, boost 1.83,
+# libdwarf) don't exist on current Fedora; the zip statically links those and
+# only bundles libglog/libgflags/libsnappy, so it runs on any recent Fedora.
+watchman_version: v2026.05.11.00
