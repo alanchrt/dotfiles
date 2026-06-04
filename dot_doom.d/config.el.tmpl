@@ -253,7 +253,16 @@
                   (magit-diff-added-highlight . "#1f5d66")
                   (magit-diff-removed . "#4a2f3a")
                   (magit-diff-removed-highlight . "#6b3345")
-                  (magit-diff-context-highlight . "#303241")))
+                  (magit-diff-context-highlight . "#303241")
+                  ;; vdiff faces: addition/subtraction inherit diff-added/removed
+                  ;; (which are too dark against #282a36), and change has NO
+                  ;; background at all via diff-changed. Set all explicitly.
+                  (vdiff-addition-face . "#1e4d3a")
+                  (vdiff-change-face . "#3a3420")
+                  (vdiff-subtraction-face . "#4d1e2e")
+                  (vdiff-refine-added . "#2d6b50")
+                  (vdiff-refine-changed . "#5c5020")
+                  (vdiff-refine-removed . "#6b1e38")))
     (when (facep (car spec))
       (set-face-attribute (car spec) nil
                           :background (cdr spec)
