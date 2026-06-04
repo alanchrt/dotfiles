@@ -62,7 +62,7 @@ if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
   fi
 else
   if ! "${popup_tmux[@]}" has-session -t "$session" 2>/dev/null; then
-    "${popup_tmux[@]}" new-session -d -s "$session" 'claude; exec "${SHELL:-zsh}" -l'
+    "${popup_tmux[@]}" new-session -d -s "$session" 'zsh -l -c "claude; exec zsh -l"'
   fi
   if "${tmux_cmd[@]}" has-session -t "$session" 2>/dev/null \
       && [[ "$("${tmux_cmd[@]}" list-clients -t "$session" 2>/dev/null | wc -l)" -eq 0 ]]; then
