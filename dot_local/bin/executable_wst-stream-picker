@@ -45,7 +45,7 @@ fi
 
 # One docker query for all running devcontainer paths (avoids N serial calls)
 _running_containers=$(docker ps \
-  --format '{{index .Labels "devcontainer.local_folder"}}' 2>/dev/null)
+  --format '{{index .Labels "devcontainer.local_folder"}}' 2>/dev/null || true)
 
 # Collect streams with no tmux window yet, scoped to $proj (or all if unresolved)
 streams=()
