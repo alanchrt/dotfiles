@@ -193,11 +193,38 @@
   (when (bound-and-true-p display-line-numbers-mode)
     (display-line-numbers-mode -1)))
 
+(defun +treemacs/expand-all-projects ()
+  "Fully expand every directory in the current Treemacs workspace.
+Counterpart to `treemacs-collapse-all-projects'. Walks the buffer
+opening every closed root/dir node until a pass changes nothing, so it
+converges from any partial state and is idempotent. Built on
+`treemacs-toggle-node' rather than `treemacs--expand-root-node', which
+is not idempotent when called on an already-open root."
+  (interactive)
+  (treemacs-save-position
+   (let ((changed t))
+     (while changed
+       (setq changed nil)
+       (goto-char (point-min))
+       (while (not (eobp))
+         (let* ((btn (treemacs-current-button))
+                (state (and btn (treemacs-button-get btn :state))))
+           (when (memq state '(root-node-closed dir-node-closed))
+             (treemacs-toggle-node)
+             (setq changed t)))
+         (forward-line 1))))))
+
 (after! treemacs
   (setq treemacs-silent-filewatch t
         treemacs-silent-refresh t)
   (add-hook 'treemacs-mode-hook #'my/disable-line-numbers-in-special-buffer-h)
-  (treemacs-filewatch-mode 1))
+  (treemacs-filewatch-mode 1)
+  ;; Evil fold mnemonics: zR expands the whole tree, zM collapses it.
+  ;; `C-u TAB' can't supply a prefix arg here because Doom's evil binds
+  ;; C-u to `evil-scroll-up'. S-TAB still collapses via `treemacs-mode-map'.
+  (map! :map evil-treemacs-state-map
+        "zR" #'+treemacs/expand-all-projects
+        "zM" #'treemacs-collapse-all-projects))
 
 ;; Keep Magit status useful as a passive worktree monitor. File buffers use
 ;; notifications above; only Magit status buffers opt back into timer checks.
