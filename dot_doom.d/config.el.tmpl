@@ -676,8 +676,13 @@
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   ;; vdiff reuses open buffers so find-file-hook doesn't re-run; enable
   ;; annotate-mode directly when vdiff activates on a file with annotations
+  ;; Only enable annotate-mode on real file buffers, not vdiff's temp index/
+  ;; commit versions (e.g. file.tsx.~{index}~). Those have no buffer-file-name
+  ;; and when vdiff-quit kills them, annotate-save-annotations fires with empty
+  ;; data and prompts to delete the annotations file.
   (add-hook 'vdiff-mode-hook
-            (cmd! (when (file-exists-p (my/wst-annotate-project-file))
+            (cmd! (when (and buffer-file-name
+                             (file-exists-p (my/wst-annotate-project-file)))
                     (require 'annotate)
                     (annotate-mode 1))))
   (map! :map vdiff-mode-map
