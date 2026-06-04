@@ -764,6 +764,29 @@ repaints them with this amber emph instead.")
                            '(vdiff-refine-added vdiff-refine-changed)))
                 (overlay-put ovr 'face 'my/vdiff-deletion-refine-face)))))))))
   (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-recolor-deletions)
+  ;; @agents review markers get their pink from a font-lock keyword (a text
+  ;; property), but vdiff paints hunks with overlays — and overlays draw over
+  ;; text properties regardless of priority — so a marker on a changed line is
+  ;; hidden under vdiff-addition/refine faces. Re-assert the same pink as a
+  ;; high-priority overlay (vdiff's hunk overlays use priority nil) on every
+  ;; marker line in both panes, so markers pop in diffs just like in editing.
+  (defun my/vdiff-highlight-markers (session &rest _)
+    (when (vdiff-session-p session)
+      (dolist (buf (vdiff-session-buffers session))
+        (when (buffer-live-p buf)
+          (with-current-buffer buf
+            (remove-overlays (point-min) (point-max) 'my/review-marker t)
+            (save-excursion
+              (goto-char (point-min))
+              (let ((case-fold-search nil))
+                (while (re-search-forward
+                        (concat (regexp-quote my/review-marker) ".*$") nil t)
+                  (let ((ov (make-overlay (match-beginning 0)
+                                          (min (point-max) (1+ (line-end-position))))))
+                    (overlay-put ov 'my/review-marker t)
+                    (overlay-put ov 'face 'my/review-marker-face)
+                    (overlay-put ov 'priority 100))))))))))
+  (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-highlight-markers)
   (define-key magit-mode-map "e" #'my/vdiff-magit-dwim)
   (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
   (map! :map vdiff-mode-map
