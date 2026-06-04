@@ -715,7 +715,7 @@
           (find-file path))))))
 
 (after! treemacs
-  (define-key treemacs-mode-map (kbd "e") #'my/treemacs-vdiff-at-point))
+  (map! :map treemacs-mode-map "e" #'my/treemacs-vdiff-at-point))
 
 ;; ── Iterate: annotate.el + /iterate skill integration ────────────────────────
 ;;
