@@ -7,11 +7,13 @@
 
 - name: Install docker
   become: yes
-  dnf:
+  ansible.builtin.dnf:
     name:
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
 
 - name: Add user to docker group
   become: yes
@@ -22,7 +24,28 @@
 
 - name: Enable docker service
   become: yes
-  systemd:
+  ansible.builtin.systemd:
     name: docker
     enabled: yes
     state: started
+
+# docker-ce-cli 29.5.0 installs CLI plugins to /usr/libexec/docker/cli-plugins
+# but only *dispatches* them from ~/.docker/cli-plugins: it lists the system
+# dir in `docker info`, yet `docker buildx`/`docker compose` report "unknown
+# command" and `docker build --load` falls back to the legacy builder
+# ("unknown flag: --load"). Symlinking into the user plugin dir restores
+# dispatch (this is what makes Wrangler container builds work).
+- name: Ensure docker user cli-plugins dir exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.docker/cli-plugins"
+    state: directory
+    mode: "0755"
+
+- name: Link docker cli-plugins into the user dispatch dir
+  ansible.builtin.file:
+    src: "/usr/libexec/docker/cli-plugins/docker-{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.docker/cli-plugins/docker-{{ item }}"
+    state: link
+  loop:
+    - buildx
+    - compose
