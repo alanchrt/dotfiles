@@ -254,15 +254,14 @@
                   (magit-diff-removed . "#4a2f3a")
                   (magit-diff-removed-highlight . "#6b3345")
                   (magit-diff-context-highlight . "#303241")
-                  ;; vdiff faces: addition/subtraction inherit diff-added/removed
-                  ;; (which are too dark against #282a36), and change has NO
-                  ;; background at all via diff-changed. Set all explicitly.
-                  (vdiff-addition-face . "#1e4d3a")
-                  (vdiff-change-face . "#232850")
-                  (vdiff-subtraction-face . "#4d1e2e")
-                  (vdiff-refine-added . "#2d7a52")
-                  (vdiff-refine-changed . "#3a4878")
-                  (vdiff-refine-removed . "#7a2040")))
+                  ;; vdiff faces — matched to delta colors from the old magit-delta
+                  ;; config. change-face has no delta equivalent so uses Dracula blue.
+                  (vdiff-addition-face    . "#173f46")
+                  (vdiff-change-face      . "#232850")
+                  (vdiff-subtraction-face . "#4a2f3a")
+                  (vdiff-refine-added     . "#1f5d66")
+                  (vdiff-refine-changed   . "#3a4878")
+                  (vdiff-refine-removed   . "#6b3345")))
     (when (facep (car spec))
       (set-face-attribute (car spec) nil
                           :background (cdr spec)
@@ -695,6 +694,7 @@
         :n "za" #'vdiff-toggle-fold
         :n "zR" #'vdiff-open-all-folds
         :n "zM" #'vdiff-close-all-folds
+        :n "R"  #'vdiff-refine-all-hunks
         :n "gf" nil))
 
 (defun my/vdiff-magit-dwim ()
