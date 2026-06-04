@@ -56,15 +56,38 @@
     - watchman
     - watchmanctl
 
+- name: Find watchman bundled libraries
+  become: yes
+  ansible.builtin.find:
+    paths: "/opt/watchman-{{ watchman_version }}-linux/lib"
+    file_type: file
+  register: watchman_lib_files
+
 - name: Install watchman bundled libraries
   become: yes
+  # Copy each library individually so `dest` is a file path. Copying the whole
+  # directory with `mode` also applies that mode to /usr/local/lib itself,
+  # dropping its execute bit (0644) and making it non-traversable — which
+  # silently breaks everything else under it (e.g. the devcontainer CLI).
+  # The watchman binary hardcodes absolute NEEDED paths to /usr/local/lib.
   ansible.builtin.copy:
-    # The binary hardcodes absolute NEEDED paths to /usr/local/lib for these.
-    src: "/opt/watchman-{{ watchman_version }}-linux/lib/"
-    dest: /usr/local/lib/
+    src: "{{ item.path }}"
+    dest: "/usr/local/lib/{{ item.path | basename }}"
     mode: "0644"
     remote_src: yes
+  loop: "{{ watchman_lib_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
   register: watchman_libs
+
+- name: Ensure /usr/local/lib stays traversable
+  # Self-heals systems whose /usr/local/lib was clobbered to 0644 by the old
+  # directory-copy task above.
+  become: yes
+  ansible.builtin.file:
+    path: /usr/local/lib
+    state: directory
+    mode: "0755"
 
 - name: Refresh linker cache for watchman libraries
   become: yes
