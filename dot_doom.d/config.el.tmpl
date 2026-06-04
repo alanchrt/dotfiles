@@ -782,17 +782,29 @@ repaints them with this amber emph instead.")
         :n "gf" nil))
 
 (defun my/vdiff-magit-dwim ()
-  "Open vdiff: always HEAD vs working tree for files, commit diff for commits.
-Using show-working-tree means e works correctly whether changes are staged,
-unstaged, or mixed — vdiff-magit-dwim's show-unstaged gives an empty diff
-when all changes are staged."
+  "Open vdiff matching the diff Magit shows at point.
+
+Mirrors Magit's own sections, so `e' shows the same hunks the cursor is on:
+- Unstaged hunk/file -> index vs working tree (just the unstaged changes)
+- Staged hunk/file   -> HEAD vs index (just the staged changes)
+- Untracked file     -> HEAD vs working tree (the whole new file)
+- Commit at point    -> that commit's diff
+
+Unlike `vdiff-magit-show-working-tree' (HEAD vs working tree), this does not
+conflate staged and unstaged changes when a file has both."
   (interactive)
   (cond
    ((magit-commit-at-point)
     (vdiff-magit-show-commit (magit-commit-at-point)))
    ((magit-file-at-point t)
-    (let ((default-directory (magit-toplevel)))
-      (vdiff-magit-show-working-tree (magit-file-at-point t))))
+    (let ((default-directory (magit-toplevel))
+          (file (magit-file-at-point)))
+      (pcase (magit-diff-type)
+        ('unstaged (vdiff-magit-show-unstaged file))
+        ('staged   (vdiff-magit-show-staged file))
+        ;; untracked / undefined / committed-file fall back to the whole-file
+        ;; diff (this is the prior behavior, so no regression on those paths).
+        (_         (vdiff-magit-show-working-tree file)))))
    (t (user-error "Nothing to diff at point"))))
 
 (defun my/treemacs-vdiff-at-point ()
