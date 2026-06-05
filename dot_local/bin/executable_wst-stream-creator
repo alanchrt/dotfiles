@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# Toggle popup with a single text field to create a new wst stream.
+# Outer mode: toggle open/close. Inner mode (WST_STREAM_CREATOR=1): run prompt.
+
+set -euo pipefail
+
+PROJECTS_ROOT="${WST_PROJECTS_ROOT:-$HOME/Projects}"
+PIDFILE="${XDG_CACHE_HOME:-$HOME/.cache}/wst/stream-creator.pid"
+
+session_name() { printf '%s' "$1" | sed -r 's/\./_/g'; }
+slugify()      { printf '%s' "$1" | tr '/' '-' | tr -c 'A-Za-z0-9._-' '-'; }
+
+# ── Outer (toggle) mode ──────────────────────────────────────────────────────
+if [[ -z "${WST_STREAM_CREATOR:-}" ]]; then
+  if [[ -f "$PIDFILE" ]]; then
+    _pid=$(cat "$PIDFILE" 2>/dev/null || true)
+    if [[ -n "$_pid" ]] && kill -0 "$_pid" 2>/dev/null; then
+      kill "$_pid" 2>/dev/null || true
+      exit 0
+    fi
+    rm -f "$PIDFILE"
+  fi
+  _cur_session=$(tmux display-message -p '#{session_name}')
+  exec tmux display-popup \
+    -E -w 60% -h 30% \
+    "env WST_STREAM_CREATOR=1 WST_SESSION=$(printf '%q' "$_cur_session") $HOME/.local/bin/wst-stream-creator"
+fi
+
+# ── Prompt mode (inside popup) ───────────────────────────────────────────────
+mkdir -p "$(dirname "$PIDFILE")"
+printf '%d\n' "$$" > "$PIDFILE"
+trap 'rm -f "$PIDFILE"' EXIT
+
+# Resolve project from the session name passed by outer mode
+proj=""
+if [[ -n "${WST_SESSION:-}" ]]; then
+  for _pdir in "$PROJECTS_ROOT"/*/; do
+    [[ -d "$_pdir" ]] || continue
+    _pname=$(basename "$_pdir")
+    if [[ "$(session_name "$_pname")" == "$WST_SESSION" ]]; then
+      proj="$_pname"
+      break
+    fi
+  done
+fi
+
+if [[ -z "$proj" ]]; then
+  printf '\n  \033[38;5;141mNot in a project session.\033[0m\n\n'
+  printf '  Open this from a tmux session named after a project under %s.\n\n' "$PROJECTS_ROOT"
+  printf '  \033[38;5;61mPress any key...\033[0m'
+  read -r -n1
+  exit 0
+fi
+
+# Prompt for the stream name. fzf with --print-query over empty input acts as a
+# one-line text field: it prints whatever was typed when Enter is pressed
+# (exits non-zero with no candidate, hence `|| true`).
+name=$(
+  printf '' | fzf \
+    --print-query \
+    --layout=reverse \
+    --info=hidden \
+    --border=rounded \
+    --border-label="$(printf '  new stream in %s  ' "$proj")" \
+    --border-label-pos=3 \
+    --prompt=$'   ' \
+    --pointer=$' ' \
+    --header=$'  \033[38;5;244mtype a stream name\033[0m  \033[38;5;141menter\033[0m \033[38;5;244mcreate\033[0m  \033[38;5;141mesc\033[0m \033[38;5;244mcancel\033[0m\n' \
+    --color='bg:#282a36,bg+:#44475a,fg:#f8f8f2,fg+:#f8f8f2' \
+    --color='hl:#50fa7b,hl+:#50fa7b,info:#ffb86c' \
+    --color='prompt:#bd93f9,pointer:#ff79c6,marker:#ff79c6' \
+    --color='spinner:#ffb86c,header:#6272a4,border:#6272a4' \
+    --color='label:#bd93f9' \
+  | head -1 || true
+)
+
+# Trim surrounding whitespace; bail on empty (Esc or blank).
+name="${name#"${name%%[![:space:]]*}"}"
+name="${name%"${name##*[![:space:]]}"}"
+[[ -z "$name" ]] && exit 0
+
+cd "$PROJECTS_ROOT/$proj"
+if "$HOME/.local/bin/wst" new "$name"; then
+  slug=$(slugify "$name")
+  tmux select-window -t "$(session_name "$proj"):$slug"
+else
+  printf '\n  \033[38;5;203mFailed — press any key...\033[0m'
+  read -r -n1
+fi
