@@ -56,8 +56,9 @@ wst doctor                         # diagnostics
 ```
 
 - All commits, PRs, dev server runs, and agent invocations live *inside the container* — that's the pane `wa` drops you into. The host clones exist for filesystem navigation only.
+- **A fresh stream opens on the trunk (`main`/`master`) synced to `origin`, NOT on a feature branch.** Before your first commit, create a branch named after the stream — the name is in `$WST_STREAM` (and `git config wst.branch`): `git switch -c "$WST_STREAM"`, or under Graphite `gt create -m "..."` (which makes the branch with the commit). Never commit on the trunk — a `pre-commit` hook rejects it and reminds you of the branch name.
 - Default to plain `git` + `gh`. If `AGENTS.override.md` or `.claude/rules/graphite.md` exists at the repo root with Graphite verbs, use `gt` inside the container instead — specifically: `gt create -m "..."` (not `git commit`), `gt modify` (not `git commit --amend`), `gt create <name>` (not `git checkout -b`), `gt restack` (not `git rebase`), `gt submit` (not `gh pr create`). To enable Graphite for a project, run `wst gtinit` once — it links the rule files into the canonical and every existing stream, and runs `gt repo init` in each running container. Future `wst new` streams inherit the setup automatically.
-- Push: `git push -u origin HEAD` — the stream branch already has the final name, no prefix mapping.
+- Push: `git push -u origin HEAD` — once you've branched, the stream branch carries the final name (matching the stream), no prefix mapping.
 - After merge: `wst rm <branch>` removes the container, the clone dir, the tmux window, and frees the port.
 
 **Tmux integration:** stream windows split into the same container (`prefix + "` / `prefix + %`). Non-stream windows split normally on the host. The split-pane helper is at `~/.local/bin/wst-tmux-split`.

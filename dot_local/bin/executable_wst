@@ -264,7 +264,7 @@ cmd_new() {
   printf ' %s/%s\n\n' "$proj" "$branch"
 
   ui_step "Clone stream" git clone --local "$canonical" "$target"
-  ui_step "Checkout $branch from $base" cmd_new_checkout "$canonical" "$target" "$base" "$branch"
+  ui_step "Sync $base from origin (agent will branch as $branch)" cmd_new_checkout "$canonical" "$target" "$base" "$branch"
 
   # Propagate Graphite enablement from canonical (rule symlink + git exclude).
   # The matching in-container `gt repo init` runs during provision_container.
@@ -291,20 +291,30 @@ cmd_new() {
 
   cat <<EOF
 
-Stream '$branch' ready.
+Stream '$branch' ready (on '$base', synced to origin).
   Workdir : $target
   Preview : http://localhost:$host_port/
   Attach  : wa $branch
+  Note    : agent creates branch '$branch' on first commit — commits on '$base' are blocked.
 EOF
 }
 
+# The stream opens *on the trunk* (e.g. main) reset to origin/<base>, NOT on a
+# pre-created feature branch. Rationale: a pre-created empty branch makes Graphite
+# gripe, and we want the agent to create the branch when it starts work (the branch
+# is then born with its first commit). The intended branch name is recorded in
+# git config (wst.branch) and a pre-commit guard blocks commits made on the trunk.
 cmd_new_checkout() {
   local canonical="$1" target="$2" base="$3" branch="$4"
   local origin_url
   origin_url=$(git -C "$canonical" remote get-url origin)
   git -C "$target" remote set-url origin "$origin_url"
   git -C "$target" fetch origin
-  git -C "$target" checkout -B "$branch" "origin/$base"
+  git -C "$target" checkout -B "$base" "origin/$base"
+  git -C "$target" branch --set-upstream-to "origin/$base" "$base" 2>/dev/null || true
+  git -C "$target" config wst.branch "$branch"   # branch the agent should create
+  git -C "$target" config wst.trunk  "$base"     # trunk the commit guard protects
+  install_trunk_commit_guard "$target"
 }
 
 # ---- subcommand: gtinit ----
@@ -404,6 +414,34 @@ seed_graphite_rule() {
   fi
 }
 
+# Install a pre-commit hook that refuses commits made while HEAD is the trunk.
+# Streams open on the trunk (see cmd_new_checkout); this enforces that agents
+# branch before committing rather than landing work on main/master. The hook is
+# local to the stream's .git (git clone --local does not copy hooks), so writing
+# it is an idempotent overwrite. `gt create` switches to the new branch before
+# committing, so Graphite passes; `--no-verify` remains an escape hatch.
+install_trunk_commit_guard() {
+  local target="$1"
+  local hook="$target/.git/hooks/pre-commit"
+  mkdir -p "$target/.git/hooks"
+  cat > "$hook" <<'HOOK'
+#!/usr/bin/env bash
+# Managed by wst — blocks commits on the trunk so streams branch first.
+cur=$(git symbolic-ref --short HEAD 2>/dev/null) || exit 0
+trunk=$(git config wst.trunk 2>/dev/null || echo main)
+case "$cur" in
+  "$trunk"|main|master)
+    s=$(git config wst.branch 2>/dev/null); : "${s:=${WST_STREAM:-my-feature}}"
+    echo "wst: refusing to commit on trunk '$cur'." >&2
+    echo "Create a feature branch first:" >&2
+    echo "    git switch -c $s        # or: gt create -m \"...\"  (Graphite)" >&2
+    exit 1 ;;
+esac
+exit 0
+HOOK
+  chmod +x "$hook"
+}
+
 # ---- subcommand: attach ----
 
 cmd_attach() {
@@ -424,6 +462,20 @@ cmd_attach() {
   debug "branch=$branch"
   debug "slug=$slug"
   debug "target=$target"
+
+  # Self-heal: ensure pre-existing streams gain the trunk commit guard. Resolve
+  # the trunk if it was never recorded (older streams), then (re)install the hook.
+  if [[ -d "$target/.git" ]]; then
+    if [[ -z "$(git -C "$target" config wst.trunk 2>/dev/null || true)" ]]; then
+      local trunk
+      trunk=$(git -C "$target" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|^origin/||' || true)
+      [[ -n "$trunk" ]] || trunk=$(git -C "$target" branch --show-current)
+      [[ -n "$trunk" ]] && git -C "$target" config wst.trunk "$trunk"
+    fi
+    [[ -z "$(git -C "$target" config wst.branch 2>/dev/null || true)" ]] && \
+      git -C "$target" config wst.branch "$branch"
+    install_trunk_commit_guard "$target"
+  fi
 
   local session; session=$(session_name "$proj")
   debug "tmux_session=$session"

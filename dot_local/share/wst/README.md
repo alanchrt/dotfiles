@@ -140,6 +140,7 @@ ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev
 | Symptom | Fix |
 |---|---|
 | `wst new` fails: "image not found: wst-dev:latest" | `ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev` |
+| commit rejected: "refusing to commit on trunk" | Streams open on the trunk (`main`) synced to origin; create a feature branch first (`git switch -c "$WST_STREAM"` or `gt create -m "..."`). The `pre-commit` guard is installed per-stream by `wst new`/`wa`. |
 | chezmoi apply errors flood the entrypoint log | Check `~/Projects/dotfiles/master/.chezmoidata.toml` is populated; templates reference its fields |
 | `mise install` skips a tool | First run installs binaries to `~/.local/share/mise/installs/`; check that path is writable and the bind mount is in place |
 | `wst chrome` errors with "cannot connect to wayland" | Verify `WAYLAND_DISPLAY` on the host, check `$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY` is bind-mounted into the container at `/run/user/1000/` |
