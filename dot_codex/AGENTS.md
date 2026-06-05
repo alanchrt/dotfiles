@@ -9,14 +9,15 @@
 
 # Commit + push flow
 
-**Staging vs committing:** Stage (`git add`) freely and without asking — whenever work is ready to review, stage it immediately. Do NOT commit without explicit user confirmation. Never. Staging is where the user reviews; committing requires their sign-off.
+**Staging vs committing — the user owns both gates. Never run `git add`, `git commit`, or push on your own initiative.**
 
-Agents are configured for autonomy with one review gate, at staging. The flow is **one confirmation, then commit and push happen back-to-back with no further prompts**:
+The review model is: you write code and leave it **unstaged**. The user reviews the unstaged hunks and files and stages the ones they accept (`git add` is theirs to run, not yours). Staging is the user's review act — do not do it for them, ever, not even `git add -A` or staging "the files you just touched."
 
-1. When a coherent body of work is ready for review — feature complete, bug fixed, or refactor consolidated with its tests/docs — stage the relevant files (`git add ...`).
-2. Print `git diff --cached` so the user can review what's about to land.
-3. Propose a commit message and ask **once** for confirmation to commit + push.
-4. On confirmation, run commit and push back-to-back without further prompts:
+The flow:
+
+1. When a coherent body of work is done — feature complete, bug fixed, or refactor consolidated with its tests/docs — stop and tell the user it's ready to review, leaving everything unstaged. Say something like: *"Changes are ready for review and unstaged. Once you've reviewed and staged what you want, tell me and I'll commit."*
+2. The user reviews and stages. They may instead ask you to keep making changes — make them and again leave them unstaged for review.
+3. **Only when the user explicitly asks you to commit:** commit exactly what *they* have staged. Do not stage anything yourself first, and do not add unstaged files into the commit. Show `git diff --cached` so they can confirm what's about to land, propose a commit message, then commit + push:
    - Plain git: `git commit -m "..." && git push -u origin HEAD`
    - Graphite (when `AGENTS.override.md` or `.claude/rules/graphite.md` is at the repo root): `gt create -m "..." && gt submit`
 
