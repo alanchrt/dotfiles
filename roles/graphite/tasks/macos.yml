@@ -3,6 +3,11 @@
   community.general.homebrew_tap:
     name: withgraphite/tap
 
+- name: Trust Graphite tap
+  ansible.builtin.command:
+    cmd: brew trust withgraphite/tap
+  changed_when: false
+
 - name: Install Graphite CLI
   community.general.homebrew:
     name: graphite
