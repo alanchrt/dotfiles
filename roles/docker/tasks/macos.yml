@@ -1,0 +1,35 @@
+---
+# macOS has no native Docker daemon. Colima runs a lightweight Linux VM that
+# provides the engine; the docker CLI (+ compose/buildx plugins) talks to it.
+- name: Install docker CLI, Colima, and plugins via Homebrew
+  community.general.homebrew:
+    name:
+      - docker
+      - docker-compose
+      - docker-buildx
+      - colima
+
+# Homebrew installs the compose/buildx plugins under its own prefix, but the
+# docker CLI only dispatches plugins from ~/.docker/cli-plugins. Symlink them
+# in (same approach as the Linux role).
+- name: Ensure docker user cli-plugins dir exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.docker/cli-plugins"
+    state: directory
+    mode: "0755"
+
+- name: Link docker cli-plugins into the user dispatch dir
+  ansible.builtin.file:
+    src: "/opt/homebrew/lib/docker/cli-plugins/docker-{{ item }}"
+    dest: "{{ ansible_env.HOME }}/.docker/cli-plugins/docker-{{ item }}"
+    state: link
+  loop:
+    - buildx
+    - compose
+
+# Register a launchd agent so the Colima VM (the docker daemon) starts now and
+# on every login.
+- name: Start Colima now and on login
+  community.general.homebrew_services:
+    name: colima
+    state: present

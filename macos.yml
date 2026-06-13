@@ -4,6 +4,7 @@
     - { name: terminal, tags: [terminal] }
     - { name: nodejs, tags: [nodejs] }
     - { name: ios, tags: [ios, dev] }
+    - { name: docker, tags: [docker, dev] }
     - { name: fonts, tags: [fonts] }
     - { name: rectangle, tags: [rectangle, wm] }
     - { name: vim, tags: [vim] }

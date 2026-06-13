@@ -1,51 +1,6 @@
 ---
-- name: Add docker repo
-  become: yes
-  shell: dnf-3 config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-  args:
-    creates: /etc/yum.repos.d/docker-ce.repo
+- ansible.builtin.include_tasks: linux.yml
+  when: ansible_os_family == 'RedHat'
 
-- name: Install docker
-  become: yes
-  ansible.builtin.dnf:
-    name:
-      - docker-ce
-      - docker-ce-cli
-      - containerd.io
-      - docker-buildx-plugin
-      - docker-compose-plugin
-
-- name: Add user to docker group
-  become: yes
-  user:
-    name: "{{ ansible_env.USER }}"
-    groups: docker
-    append: yes
-
-- name: Enable docker service
-  become: yes
-  ansible.builtin.systemd:
-    name: docker
-    enabled: yes
-    state: started
-
-# docker-ce-cli 29.5.0 installs CLI plugins to /usr/libexec/docker/cli-plugins
-# but only *dispatches* them from ~/.docker/cli-plugins: it lists the system
-# dir in `docker info`, yet `docker buildx`/`docker compose` report "unknown
-# command" and `docker build --load` falls back to the legacy builder
-# ("unknown flag: --load"). Symlinking into the user plugin dir restores
-# dispatch (this is what makes Wrangler container builds work).
-- name: Ensure docker user cli-plugins dir exists
-  ansible.builtin.file:
-    path: "{{ ansible_env.HOME }}/.docker/cli-plugins"
-    state: directory
-    mode: "0755"
-
-- name: Link docker cli-plugins into the user dispatch dir
-  ansible.builtin.file:
-    src: "/usr/libexec/docker/cli-plugins/docker-{{ item }}"
-    dest: "{{ ansible_env.HOME }}/.docker/cli-plugins/docker-{{ item }}"
-    state: link
-  loop:
-    - buildx
-    - compose
+- ansible.builtin.include_tasks: macos.yml
+  when: ansible_os_family == 'Darwin'
