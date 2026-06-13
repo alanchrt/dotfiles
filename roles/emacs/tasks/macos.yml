@@ -3,6 +3,11 @@
   community.general.homebrew_tap:
     name: d12frosted/emacs-plus
 
+- name: Trust emacs-plus tap
+  ansible.builtin.command:
+    cmd: brew trust d12frosted/emacs-plus
+  changed_when: false
+
 - name: Install emacs-plus
   community.general.homebrew:
     name: emacs-plus@30
