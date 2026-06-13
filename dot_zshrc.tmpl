@@ -49,6 +49,11 @@ if command -v fnm &>/dev/null; then
     eval "$(fnm env --use-on-cd --log-level=quiet)"
 fi
 
+# Bun completions. Bun's installer appends this to ~/.zshrc, but chezmoi owns
+# that file and overwrites it on apply, so keep the line here to survive. Must
+# come after oh-my-zsh's compinit since _bun calls compdef.
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
 # Set up pyenv
 if command -v pyenv &>/dev/null; then
     eval "$(pyenv init --path)"

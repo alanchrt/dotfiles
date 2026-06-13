@@ -9,6 +9,7 @@
     - { name: emacs, tags: [emacs] }
     - { name: github, tags: [github] }
     - { name: choose, tags: [choose] }
+    - { name: claude-code, tags: [claude-code] }
     - { name: graphite, tags: [graphite] }
 
     # keep completions last since they depend on programs to generate
