@@ -1,0 +1,90 @@
+---
+- name: Install nodejs
+  become: yes
+  ansible.builtin.dnf:
+    name: nodejs
+
+- name: Increase inotify limits for file watchers
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: "^{{ item.key | regex_escape }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    # max_user_instances guards against Metro/Expo's fs.watch fallback (one
+    # inotify instance per dir) exhausting the default 128 cap -> EMFILE.
+    - { key: fs.inotify.max_user_watches, value: 524288 }
+    - { key: fs.inotify.max_user_instances, value: 1024 }
+  register: file_watchers
+
+- name: Apply sysctl config
+  become: yes
+  ansible.builtin.shell: sysctl --system
+  when: file_watchers.changed
+
+- name: Install fnm
+  ansible.builtin.unarchive:
+    src: https://github.com/Schniz/fnm/releases/latest/download/fnm-linux.zip
+    dest: "{{ ansible_env.HOME }}/.local/bin"
+    mode: +x
+    remote_src: yes
+    creates: "{{ ansible_env.HOME }}/.local/bin/fnm"
+
+# Watchman lets Metro/Expo avoid the inefficient fs.watch fallback entirely
+# (one shared watch instead of one inotify instance per node_modules dir).
+- name: Download watchman release
+  become: yes
+  ansible.builtin.unarchive:
+    src: "https://github.com/facebook/watchman/releases/download/{{ watchman_version }}/watchman-{{ watchman_version }}-linux.zip"
+    dest: /opt
+    remote_src: yes
+    creates: "/opt/watchman-{{ watchman_version }}-linux"
+
+- name: Install watchman binaries
+  become: yes
+  ansible.builtin.copy:
+    src: "/opt/watchman-{{ watchman_version }}-linux/bin/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: "0755"
+    remote_src: yes
+  loop:
+    - watchman
+    - watchmanctl
+
+- name: Find watchman bundled libraries
+  become: yes
+  ansible.builtin.find:
+    paths: "/opt/watchman-{{ watchman_version }}-linux/lib"
+    file_type: file
+  register: watchman_lib_files
+
+- name: Install watchman bundled libraries
+  become: yes
+  # Copy each library individually so `dest` is a file path. Copying the whole
+  # directory with `mode` also applies that mode to /usr/local/lib itself,
+  # dropping its execute bit (0644) and making it non-traversable — which
+  # silently breaks everything else under it (e.g. the devcontainer CLI).
+  # The watchman binary hardcodes absolute NEEDED paths to /usr/local/lib.
+  ansible.builtin.copy:
+    src: "{{ item.path }}"
+    dest: "/usr/local/lib/{{ item.path | basename }}"
+    mode: "0644"
+    remote_src: yes
+  loop: "{{ watchman_lib_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+  register: watchman_libs
+
+- name: Ensure /usr/local/lib stays traversable
+  # Self-heals systems whose /usr/local/lib was clobbered to 0644 by the old
+  # directory-copy task above.
+  become: yes
+  ansible.builtin.file:
+    path: /usr/local/lib
+    state: directory
+    mode: "0755"
+
+- name: Refresh linker cache for watchman libraries
+  become: yes
+  ansible.builtin.command: ldconfig
+  when: watchman_libs.changed

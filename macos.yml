@@ -2,6 +2,7 @@
 - hosts: all
   roles:
     - { name: terminal, tags: [terminal] }
+    - { name: nodejs, tags: [nodejs] }
     - { name: fonts, tags: [fonts] }
     - { name: rectangle, tags: [rectangle, wm] }
     - { name: vim, tags: [vim] }

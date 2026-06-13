@@ -1,0 +1,10 @@
+---
+# node ships npm (used by the shared global-tools task); fnm mirrors the Linux
+# per-project version manager; watchman keeps Metro/Expo off the slow fs.watch
+# fallback. Homebrew's prefix is user-owned, so npm -g needs no sudo here.
+- name: Install node tooling via Homebrew
+  community.general.homebrew:
+    name:
+      - node
+      - fnm
+      - watchman
