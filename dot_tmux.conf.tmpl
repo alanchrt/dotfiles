@@ -10,6 +10,15 @@ set -g @dracula-plugins " "
 set -g default-terminal "tmux-256color"
 set -g focus-events on
 
+{{ if eq .chezmoi.os "darwin" -}}
+# macOS: the tmux server often starts with a bare PATH (/usr/bin:/bin:...)
+# that excludes Homebrew. `run-shell` bindings inherit this PATH, so TPM, the
+# dracula theme, and the wst-* helpers all fail with "tmux: command not found"
+# (the status bar stays unstyled and the split bindings silently do nothing).
+# Set a Homebrew-inclusive PATH on the global environment before TPM runs.
+set-environment -g PATH "/opt/homebrew/bin:/opt/homebrew/sbin:{{ .chezmoi.homeDir }}/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+{{ end -}}
+
 # switch to ctrl+a prefix
 unbind-key C-b
 set-option -g prefix C-a
