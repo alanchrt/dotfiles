@@ -14,6 +14,7 @@
       - fd
       - ripgrep
       - difftastic
+      - git-delta
       - diceware
       - doggo
       - lf
