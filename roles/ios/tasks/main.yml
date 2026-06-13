@@ -1,0 +1,70 @@
+---
+# iOS development toolchain (macOS-only; listed in macos.yml). Gets a machine from
+# a bare Xcode.app install to a working `expo run:ios` / `bun run ios:local`.
+# Xcode.app itself is App-Store / Apple-ID gated and can't run unattended, so we
+# assert it's present and document the manual install in bootstrap.sh.
+
+- name: Check for Xcode.app
+  ansible.builtin.stat:
+    path: /Applications/Xcode.app
+  register: xcode_app
+
+- name: Require Xcode.app to be installed
+  ansible.builtin.assert:
+    that: xcode_app.stat.exists
+    fail_msg: >-
+      Xcode.app was not found at /Applications/Xcode.app. Install Xcode from the
+      App Store (or `xcodes install --latest`), launch it once to finish setup,
+      then re-run this role.
+    success_msg: Xcode.app found.
+
+# xcodebuild/simctl only see the simulators when the active developer dir points
+# at Xcode rather than the bundled CommandLineTools. Order matters: this must
+# run before any xcodebuild task below.
+- name: Get the current developer directory
+  ansible.builtin.command: xcode-select -p
+  register: xcode_dev_dir
+  changed_when: false
+  failed_when: false
+
+- name: Select Xcode as the active developer directory
+  become: true
+  ansible.builtin.command: xcode-select -s /Applications/Xcode.app/Contents/Developer
+  when: xcode_dev_dir.stdout != '/Applications/Xcode.app/Contents/Developer'
+
+- name: Check the Xcode license status
+  ansible.builtin.command: xcodebuild -license check
+  register: xcode_license
+  changed_when: false
+  failed_when: false
+
+- name: Accept the Xcode license
+  become: true
+  ansible.builtin.command: xcodebuild -license accept
+  when: xcode_license.rc != 0
+
+- name: Run Xcode first launch (install additional required components)
+  become: true
+  ansible.builtin.command: xcodebuild -runFirstLaunch
+  register: xcode_first_launch
+  changed_when: "'Installing' in xcode_first_launch.stdout"
+
+- name: List installed simulator runtimes
+  ansible.builtin.command: xcrun simctl list runtimes
+  register: simctl_runtimes
+  changed_when: false
+
+- name: Download the iOS platform and simulator runtime
+  become: true
+  ansible.builtin.command: xcodebuild -downloadPlatform iOS
+  when: "'iOS' not in simctl_runtimes.stdout"
+  changed_when: true
+
+# CocoaPods is required by `expo run:ios` to install native pods; ios-deploy
+# deploys/debugs builds on physical devices. Homebrew's prefix is user-owned,
+# so no sudo here.
+- name: Install iOS build tooling via Homebrew
+  community.general.homebrew:
+    name:
+      - cocoapods
+      - ios-deploy

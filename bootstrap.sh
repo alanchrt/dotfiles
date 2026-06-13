@@ -73,6 +73,8 @@ if [[ "$OS" == "Darwin" ]]; then
     echo "  1. Install Karabiner-Elements: brew install --cask karabiner-elements"
     echo "  2. Open Karabiner-Elements and grant Accessibility/Input Monitoring permissions"
     echo "  3. Open Rectangle and grant Accessibility permissions"
+    echo "  4. Install Xcode from the App Store and launch it once (the ios role"
+    echo "     requires /Applications/Xcode.app and fails fast without it)"
 fi
 
 echo "Please restart this machine to make sure all groups, extensions, and services reload properly."
