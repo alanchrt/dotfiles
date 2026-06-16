@@ -713,12 +713,12 @@ cmd_doctor() {
     if [[ -n "$built" ]]; then
       age=$(( ($(date +%s) - $(date -d "$built" +%s)) / 86400 ))
       printf '  %s (built %s, %d days ago)\n' "$wst_dev" "$built" "$age"
-      (( age > 30 )) && printf '  STALE — refresh: ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev -e wst_dev_force_rebuild=true\n'
+      (( age > 30 )) && printf '  STALE — refresh: ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev -e wst_dev_force_rebuild=true\n'
     else
       printf '  %s exists but metadata unreadable\n' "$wst_dev"
     fi
   else
-    printf '  %s not built — run: ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev\n' "$wst_dev"
+    printf '  %s not built — run: ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev\n' "$wst_dev"
     ok=false
   fi
   if docker volume inspect wst-chromium-profile >/dev/null 2>&1; then

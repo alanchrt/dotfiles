@@ -27,9 +27,9 @@ port forwarding, and `wst-dev-entrypoint`.
 ## Build / refresh
 
 ```bash
-ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev
+ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev
 # Force rebuild (e.g. after a Claude/gh release you want):
-ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev \
+ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev \
   -e wst_dev_force_rebuild=true
 ```
 
@@ -114,7 +114,7 @@ state, want to log out everywhere):
 
 ```bash
 docker volume rm wst-chromium-profile
-ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev
+ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev
 # (the role recreates the empty volume)
 ```
 
@@ -139,7 +139,7 @@ ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev
 
 | Symptom | Fix |
 |---|---|
-| `wst new` fails: "image not found: wst-dev:latest" | `ansible-playbook ~/Projects/dotfiles/master/local.yml --tags wst-dev` |
+| `wst new`/`attach` fails: "base image wst-dev:latest not built" (or stream-picker "returned 1") | `ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev` |
 | commit rejected: "refusing to commit on trunk" | Streams open on the trunk (`main`) synced to origin; create a feature branch first (`git switch -c "$WST_STREAM"` or `gt create -m "..."`). The `pre-commit` guard is installed per-stream by `wst new`/`wa`. |
 | chezmoi apply errors flood the entrypoint log | Check `~/Projects/dotfiles/master/.chezmoidata.toml` is populated; templates reference its fields |
 | `mise install` skips a tool | First run installs binaries to `~/.local/share/mise/installs/`; check that path is writable and the bind mount is in place |

@@ -67,11 +67,13 @@
   loop:
     - "{{ ansible_env.HOME }}/Projects/Shared"
     - "{{ ansible_env.HOME }}/.local/share/wst/mise"
+  tags: [wst-dev]
 
 - name: Ensure shared chromium-profile docker volume exists
   community.docker.docker_volume:
     name: wst-chromium-profile
     state: present
+  tags: [wst-dev]
 
 - name: Build {{ wst_dev_image }}
   community.docker.docker_image:
@@ -84,3 +86,4 @@
       dockerfile: wst-dev.Dockerfile
       pull: yes
       nocache: "{{ wst_dev_force_rebuild }}"
+  tags: [wst-dev]

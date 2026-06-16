@@ -37,6 +37,14 @@ mkdir -p "$OVERRIDES_DIR" "$NOTIFY_QUEUE_DIR"
 
 die() { printf 'wst-container-up: %s\n' "$*" >&2; exit 1; }
 
+# Fail fast with an actionable message if the mega image is missing. Otherwise
+# `devcontainer up` tries to `docker pull wst-dev:latest` (it's local-only, never
+# pushed), retries 5×, and dies with an opaque stack trace — which surfaces as a
+# bare "returned 1" when attach runs inside the stream-picker popup.
+docker image inspect "$WST_DEV_IMAGE" >/dev/null 2>&1 || die \
+  "base image $WST_DEV_IMAGE not built. Build it with:
+    ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev"
+
 # Locate the project's devcontainer.json. If the project does not provide one,
 # use WST's central fallback config so generic repos can still become streams.
 project_dc="$WST_TARGET/.devcontainer/devcontainer.json"
