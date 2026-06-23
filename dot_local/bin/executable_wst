@@ -26,6 +26,10 @@ have() { command -v "$1" >/dev/null 2>&1; }
 ui_color() {
   local code="$1"
   [[ -t 1 && -z "${NO_COLOR:-}" ]] && printf '\033[%sm' "$code"
+  # Always succeed: callers like `ui_cyan` are invoked as bare statements, and a
+  # non-zero return (when stdout isn't a TTY, so the printf is skipped) would
+  # trip `set -e` and abort non-interactive runs (e.g. detached `wst new`).
+  return 0
 }
 
 ui_reset() { ui_color 0; }
@@ -818,7 +822,7 @@ tmux_create_window() {
   fi
   # Pass the command as the new-window argument so the pane's process IS the
   # devcontainer exec — avoids leaving the launch command visible in the
-  # pane's scrollback. Drop straight into Claude Code; when it exits,
+  # pane's scrollback. Drop straight into Codex; when it exits,
   # fall back to an interactive login shell so the pane stays usable.
   # Pane splits (wst-tmux-split) still open in zsh, so you can split for
   # shell work.
@@ -826,7 +830,7 @@ tmux_create_window() {
   local git_pane=""
   local shell_pane=""
   agent_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
-    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'claude; exec zsh -l'")
+    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'codex; exec zsh -l'")
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
   # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
   # the splits and keep the single-pane layout. The default Magit pane
