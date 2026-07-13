@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# adb-start-bridged — start adb listening on 0.0.0.0:5037 so containers can reach it.
+# adb-start-bridged — start adb listening on 0.0.0.0:5037 for opt-in devcontainers.
 # Run via systemd user unit `adb-bridge.service` at login.
 
 set -euo pipefail

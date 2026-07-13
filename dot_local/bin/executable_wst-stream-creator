@@ -29,7 +29,18 @@ fi
 # ── Prompt mode (inside popup) ───────────────────────────────────────────────
 mkdir -p "$(dirname "$PIDFILE")"
 printf '%d\n' "$$" > "$PIDFILE"
-trap 'rm -f "$PIDFILE"' EXIT
+# Cleanup kills only the progress tail (a child of this popup), never the
+# detached `wst new` — so prefix+W can hide the popup while creation continues.
+tailpid=""
+stty_saved=""
+cleanup() {
+  [[ -n "$tailpid" ]] && kill "$tailpid" 2>/dev/null || true
+  [[ -n "$stty_saved" ]] && stty "$stty_saved" 2>/dev/null || true
+  rm -f "$PIDFILE"
+}
+trap cleanup EXIT
+trap 'exit 143' TERM HUP
+trap 'exit 130' INT
 
 # Resolve project from the session name passed by outer mode
 proj=""
@@ -79,11 +90,60 @@ name="${name#"${name%%[![:space:]]*}"}"
 name="${name%"${name##*[![:space:]]}"}"
 [[ -z "$name" ]] && exit 0
 
-cd "$PROJECTS_ROOT/$proj"
-if "$HOME/.local/bin/wst" new "$name"; then
-  slug=$(slugify "$name")
-  tmux select-window -t "$(session_name "$proj"):$slug"
-else
-  printf '\n  \033[38;5;203mFailed — press any key...\033[0m'
-  read -r -n1
+session=$(session_name "$proj")
+slug=$(slugify "$name")
+logdir="${XDG_CACHE_HOME:-$HOME/.cache}/wst/logs"
+mkdir -p "$logdir"
+log="$logdir/$session-$slug.log"
+: > "$log"; rm -f "$log.done"
+
+# Run the creation fully detached (its own session via setsid) so hiding this
+# popup with prefix+W never kills it. We run `wst new` under a PTY (python
+# pty.spawn) so it sees a TTY and emits its pretty, collapsing ui_step output
+# into the log — which we then replay with `tail`. stdin is /dev/null so the
+# detached job is independent of this popup's lifetime. A sentinel signals done.
+setsid bash -c '
+  python3 -c "import pty,sys; sys.exit(pty.spawn(sys.argv[1:]))" \
+    "$HOME/.local/bin/wst" new "$2" --project "$1" </dev/null >"$3" 2>&1
+  rc=$?
+  if [ "$rc" -eq 0 ]; then
+    tmux display-message -t "$4" "wst: stream $2 ready" 2>/dev/null || true
+  else
+    tmux display-message -t "$4" "wst: stream $2 FAILED — see $3" 2>/dev/null || true
+  fi
+  : > "$3.done"
+' _ "$proj" "$name" "$log" "$session" </dev/null >/dev/null 2>&1 &
+disown 2>/dev/null || true
+
+# Show live progress (tail replays the PTY output, spinner and all). The popup
+# is modal, so keystrokes land here, not in tmux: read them raw and treat the
+# prefix sequence (Ctrl-a then W) — or 'q' — as "hide". Hiding just exits this
+# popup; the detached creation keeps running and opens the stream window itself.
+printf '\n  creating stream \033[38;5;141m%s\033[0m in %s\n' "$name" "$proj"
+printf '  \033[38;5;244mprefix+W (or q) hides this — creation keeps running\033[0m\n\n'
+tail -n +1 -F "$log" 2>/dev/null &
+tailpid=$!
+
+stty_saved=$(stty -g 2>/dev/null || true)
+[[ -n "$stty_saved" ]] && stty -echo -icanon min 1 time 0 2>/dev/null || true
+hidden=false
+while [[ ! -f "$log.done" ]]; do
+  if IFS= read -rsn1 -t 0.2 k 2>/dev/null; then
+    case "$k" in
+      $'\x01')  # Ctrl-a (tmux prefix) — consume the next key, hide on W
+        IFS= read -rsn1 -t 0.6 k2 2>/dev/null || true
+        [[ "$k2" == [Ww] ]] && { hidden=true; break; } ;;
+      q|Q) hidden=true; break ;;
+    esac
+  fi
+done
+kill "$tailpid" 2>/dev/null || true
+tailpid=""
+[[ -n "$stty_saved" ]] && stty "$stty_saved" 2>/dev/null || true
+stty_saved=""
+
+if ! $hidden; then
+  sleep 0.3   # let tail flush the final lines
+  printf '\n  \033[38;5;84mdone — closing\033[0m\n'
+  sleep 1
 fi

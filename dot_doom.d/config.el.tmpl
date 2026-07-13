@@ -710,6 +710,38 @@ repaints them with this amber emph instead.")
 (advice-add #'delete-frame
             :around #'my/wst-confirm-delete-frame-a)
 
+;; ── difftastic: AST/structural diffs for review ─────────────────────────────
+;; difft is structural (tree-sitter): it highlights *semantic* changes, not text
+;; lines, so reindents/wraps/moved code stop reading as noise. This is a
+;; display-only REVIEW view — staging still happens in Magit/vdiff (`e').
+;;
+;; difft colors changed TOKENS via foreground SGR codes, so unlike our
+;; background-only magit-diff-* faces (see `my/soften-diff-faces-h') we give
+;; difftastic its own *foreground* vectors. Colors stay on the Dracula palette
+;; and on our colorblind-safe blue(add)↔orange(del) axis (matching vdiff/magit's
+;; teal/amber intent):
+;;   removed  -> Dracula orange  #ffb86c      added    -> Dracula cyan    #8be9fd
+;;   header   -> Dracula yellow  #f1fa8c      literals -> Dracula pink    #ff79c6
+;;   blue     -> Dracula purple  #bd93f9      white    -> Dracula fg      #f8f8f2
+;; difft only emits indices 1/2/3/5 (+bold/faint/default-fg), but we set the
+;; whole vector for both normal and bright so any context is covered. Hex
+;; strings are applied as foreground by `ansi-color'; static Dracula values are
+;; intentional (this config is dark/Dracula-fixed), so no theme hook is needed.
+(use-package! difftastic
+  :after magit
+  :config
+  (let ((dracula-diff-colors
+         ;;  blk      red(del) grn(add) yel(hdr) blu      mag(lit) cyn      wht
+         ["#21222c" "#ffb86c" "#8be9fd" "#f1fa8c" "#bd93f9" "#ff79c6" "#8be9fd" "#f8f8f2"]))
+    (setq difftastic-normal-colors-vector dracula-diff-colors
+          difftastic-bright-colors-vector dracula-diff-colors))
+  ;; Auto-install bindings into Magit's diff/blame transients & Dired. Installs
+  ;; `M-d' (difftastic-magit-diff) and `M-c' (difftastic-magit-show) on the diff
+  ;; transient, `M-RET' in blame, `M-=' in Dired — none collide with our `e'/`E'
+  ;; vdiff keys in magit-mode-map.
+  (require 'difftastic-bindings)
+  (difftastic-bindings-mode))
+
 ;; ── vdiff-magit: side-by-side diffs ─────────────────────────────────────────
 (use-package! vdiff-magit
   :after magit

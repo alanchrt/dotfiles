@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # wst-notify-dispatcher — host-side daemon that watches
 # $HOME/.cache/wst/notify-queue/ for JSON files produced by
-# ~/.claude/hooks/notify-input.sh (running on host or inside a stream's
-# devcontainer) and dispatches each as a desktop notification with a "Focus"
+# ~/.claude/hooks/notify-input.sh (running on host or in an opt-in
+# devcontainer stream) and dispatches each as a desktop notification with a "Focus"
 # action. Click → focus the matching tmux window/pane + raise the Alacritty
 # client. Run as a systemd user service (wst-notify-dispatcher.service).
 
@@ -45,7 +45,7 @@ dispatch_one() {
     [[ -f "$state_file" ]] && prev_id=$(cat "$state_file" 2>/dev/null || true)
   fi
 
-  # Resolve pane_target from wst metadata if the hook couldn't (in-container case)
+  # Resolve pane_target from wst metadata if the hook couldn't.
   if [[ -z "$pane_target" && -n "$wst_project" && -n "$wst_stream" ]] \
        && command -v tmux >/dev/null 2>&1; then
     local session slug win_index

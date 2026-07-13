@@ -33,7 +33,7 @@ bind K run-shell "$HOME/.local/bin/wst-stream-picker"
 bind W run-shell "$HOME/.local/bin/wst-stream-creator"
 
 # stream-aware split bindings: if the current window has @wst-workdir set
-# (created by `wst new`/`wa`), the new pane auto-execs into the devcontainer.
+# (created by `wst new`/`wa`), the new pane opens in the stream runtime.
 unbind '"'
 unbind %
 bind '"' run-shell '~/.local/bin/wst-tmux-split v'

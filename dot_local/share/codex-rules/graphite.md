@@ -21,7 +21,7 @@ A PreToolUse hook denies the left-hand forms in this project. If the hook fires 
 
 ## Where to run gt
 
-Run `gt` inside the stream's devcontainer (the pane you land in after `wa <branch>`). Each stream gets its own gt metadata, so stacks created in one stream don't collide with stacks in another. The host-side canonical at `~/Projects/<project>/main/` is for navigation; don't run gt there during stream work.
+Run `gt` in the stream clone (the pane you land in after `wa <branch>`). Each stream gets its own gt metadata, so stacks created in one stream don't collide with stacks in another. The canonical clone at `~/Projects/<project>/main/` is for navigation; don't run gt there during stream work.
 
 ## Creating changes
 

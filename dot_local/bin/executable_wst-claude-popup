@@ -36,6 +36,9 @@ configure_popup_session() {
 project=$("${tmux_cmd[@]}" show-options -wqv @wst-project 2>/dev/null || true)
 stream=$("${tmux_cmd[@]}" show-options -wqv @wst-stream 2>/dev/null || true)
 workdir=$("${tmux_cmd[@]}" show-options -wqv @wst-workdir 2>/dev/null || true)
+runtime=$("${tmux_cmd[@]}" show-options -wqv @wst-runtime 2>/dev/null || true)
+port=$("${tmux_cmd[@]}" show-options -wqv @wst-port 2>/dev/null || true)
+runtime="${runtime:-host}"
 
 if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
   session="wst-claude-popup-$(slugify "$project")-$(slugify "$stream")"
@@ -50,8 +53,13 @@ popup_tmux=(tmux -S "$popup_socket")
 
 if [[ -n "$project" && -n "$stream" && -n "$workdir" && -d "$workdir" ]]; then
   if ! "${popup_tmux[@]}" has-session -t "$session" 2>/dev/null; then
-    printf -v command '%q %q zsh -l -c %q' \
-      "$HOME/.local/bin/wst-devcontainer-exec" "$workdir" 'claude; exec zsh -l'
+    if [[ "$runtime" == "devcontainer" ]]; then
+      printf -v command '%q %q zsh -l -c %q' \
+        "$HOME/.local/bin/wst-devcontainer-exec" "$workdir" 'claude; exec zsh -l'
+    else
+      printf -v command 'env WST_PROJECT=%q WST_STREAM=%q WST_PORT=%q WST_HOST_PORT=%q WST_BROWSER_PROFILE=%q zsh -l -c %q' \
+        "$project" "$stream" "$port" "$port" "$HOME/.config/chromium-wst" 'claude; exec zsh -l'
+    fi
     "${popup_tmux[@]}" new-session -d -s "$session" -c "$workdir" "$command"
   fi
   # Clean up the old same-server popup session from earlier versions, if it

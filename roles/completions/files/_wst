@@ -70,12 +70,22 @@ _wst() {
   fi
   case "$words[2]" in
     new)
-      if (( CURRENT == 3 )); then
-        branches=("${(@f)$(_wst_branches)}")
-        _describe 'branch' branches
-      fi
+      _arguments \
+        '--base[base branch]:base branch:_wst_branches' \
+        '--project[project name]:project:' \
+        '--devcontainer[run this stream in a devcontainer]' \
+        '--debug[print debug output]' \
+        '1:branch:_wst_branches'
+      return
       ;;
-    attach|preview|rm)
+    attach)
+      _arguments \
+        '--devcontainer[run this stream in a devcontainer]' \
+        '--debug[print debug output]' \
+        '1:stream:_wst_streams'
+      return
+      ;;
+    preview|rm)
       if (( CURRENT == 3 )); then
         streams=("${(@f)$(_wst_streams)}")
         _describe 'stream' streams
@@ -86,8 +96,10 @@ _wst() {
 
 # The short aliases attach to subcommands directly.
 _wa() {
-  local streams=("${(@f)$(_wst_streams)}")
-  _describe 'stream' streams
+  _arguments \
+    '--devcontainer[run this stream in a devcontainer]' \
+    '--debug[print debug output]' \
+    '1:stream:_wst_streams'
 }
 
 _wp() {
@@ -100,8 +112,12 @@ _wls() {
 }
 
 _wn() {
-  local branches=("${(@f)$(_wst_branches)}")
-  _describe 'branch' branches
+  _arguments \
+    '--base[base branch]:base branch:_wst_branches' \
+    '--project[project name]:project:' \
+    '--devcontainer[run this stream in a devcontainer]' \
+    '--debug[print debug output]' \
+    '1:branch:_wst_branches'
 }
 
 case "$service" in

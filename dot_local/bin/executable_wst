@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wst — workstream manager: parallel AI-coding streams via independent clones + devcontainers.
+# wst — workstream manager: parallel AI-coding streams via independent clones + tmux.
 # See: dot_codex/AGENTS.md "Workstream Workflow" and dot_local/share/wst/README.md.
 
 set -euo pipefail
@@ -151,6 +151,40 @@ stream_dir() {
   printf '%s/%s/%s' "$PROJECTS_ROOT" "$1" "$2"
 }
 
+stream_runtime() {
+  local target="$1"
+  git -C "$target" config --get wst.runtime 2>/dev/null || printf 'host'
+}
+
+set_stream_runtime() {
+  local target="$1" runtime="$2"
+  git -C "$target" config wst.runtime "$runtime"
+}
+
+ensure_devcontainer() {
+  local proj="$1" branch="$2" slug="$3" target="$4" host_port="$5"
+  local container_id
+  container_id=$(docker ps -q --filter "label=devcontainer.local_folder=$target" 2>/dev/null || true)
+  debug "container_id=${container_id:-<none>}"
+  if [[ -z "$container_id" ]]; then
+    ui_step "Start devcontainer on :$host_port" env \
+      WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
+      WST_HOST_PORT="$host_port" WST_TARGET="$target" \
+      "$HOME/.local/bin/wst-container-up"
+  fi
+}
+
+stream_command() {
+  local proj="$1" branch="$2" target="$3" host_port="$4" runtime="$5" inner="$6"
+  if [[ "$runtime" == "devcontainer" ]]; then
+    printf '%q %q zsh -l -c %q' \
+      "$HOME/.local/bin/wst-devcontainer-exec" "$target" "$inner"
+  else
+    printf 'env WST_PROJECT=%q WST_STREAM=%q WST_PORT=%q WST_HOST_PORT=%q WST_BROWSER_PROFILE=%q zsh -l -c %q' \
+      "$proj" "$branch" "$host_port" "$host_port" "$HOME/.config/chromium-wst" "$inner"
+  fi
+}
+
 # ---- port allocation ----
 
 ports_init() {
@@ -227,17 +261,18 @@ EOF
 # ---- subcommand: new ----
 
 cmd_new() {
-  local branch="" base="" project=""
+  local branch="" base="" project="" runtime="host"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --base)    base="$2"; shift 2 ;;
       --project) project="$2"; shift 2 ;;
+      --devcontainer) runtime="devcontainer"; shift ;;
       --debug)   WST_DEBUG=1; WST_PLAIN_LOGS=1; shift ;;
       -*)        die "unknown flag: $1" ;;
       *)         [[ -z "$branch" ]] && branch="$1" || die "unexpected arg: $1"; shift ;;
     esac
   done
-  [[ -n "$branch" ]] || die "usage: wst new <branch> [--base <base>] [--project <name>] [--debug]"
+  [[ -n "$branch" ]] || die "usage: wst new <branch> [--base <base>] [--project <name>] [--devcontainer] [--debug]"
   local proj; proj=$(resolve_project "$project")
   local canonical; canonical=$(canonical_dir "$proj")
   [[ -d "$canonical/.git" ]] || die "canonical '$canonical' is not a git repo (run: wst migrate)"
@@ -255,6 +290,7 @@ cmd_new() {
   debug "branch=$branch"
   debug "slug=$slug"
   debug "base=$base"
+  debug "runtime=$runtime"
   debug "canonical=$canonical"
   debug "target=$target"
 
@@ -269,9 +305,10 @@ cmd_new() {
 
   ui_step "Clone stream" git clone --local "$canonical" "$target"
   ui_step "Sync $base from origin (agent will branch as $branch)" cmd_new_checkout "$canonical" "$target" "$base" "$branch"
+  set_stream_runtime "$target" "$runtime"
 
   # Propagate Graphite enablement from canonical (rule symlink + git exclude).
-  # The matching in-container `gt repo init` runs during provision_container.
+  # The matching `gt repo init` runs during provision_agent_tooling.
   if [[ -L "$canonical/.claude/rules/graphite.md" ]]; then
     seed_graphite_rule "$target"
   fi
@@ -283,20 +320,20 @@ cmd_new() {
   debug "host_port=$host_port"
   debug "override=$OVERRIDES_DIR/$proj-$slug.json"
 
-  ui_step "Start devcontainer on :$host_port" env \
-    WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
-    WST_HOST_PORT="$host_port" WST_TARGET="$target" \
-    "$HOME/.local/bin/wst-container-up"
+  if [[ "$runtime" == "devcontainer" ]]; then
+    ensure_devcontainer "$proj" "$branch" "$slug" "$target" "$host_port"
+  fi
 
-  ui_step "Provision agent tooling" provision_container "$target"
+  ui_step "Provision agent tooling" provision_agent_tooling "$target" "$runtime"
 
-  ui_step "Open tmux workspace" tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port"
+  ui_step "Open tmux workspace" tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port" "$runtime"
   rm -rf "$WST_STEP_LOG_DIR"
 
   cat <<EOF
 
 Stream '$branch' ready (on '$base', synced to origin).
   Workdir : $target
+  Runtime : $runtime
   Preview : http://localhost:$host_port/
   Attach  : wa $branch
   Note    : agent creates branch '$branch' on first commit — commits on '$base' are blocked.
@@ -325,9 +362,9 @@ cmd_new_checkout() {
 
 # Mark a project as Graphite-enabled: symlink the shared graphite.md rule into
 # the canonical and every existing stream's .claude/rules/, ignore the path via
-# .git/info/exclude, and run `gt repo init` inside each running stream's
-# container. Idempotent. Future streams pick up the rule automatically via
-# cmd_new + provision_container.
+# .git/info/exclude, and run `gt repo init` in each stream runtime.
+# Idempotent. Future streams pick up the rule automatically via cmd_new +
+# provision_agent_tooling.
 cmd_gtinit() {
   local project=""
   while [[ $# -gt 0 ]]; do
@@ -368,23 +405,34 @@ cmd_gtinit() {
     local slug; slug=$(basename "$sdir")
     [[ "$slug" == "main" ]] && continue
     local sdir_clean="${sdir%/}"
-    local cid
-    cid=$(docker ps -q --filter "label=devcontainer.local_folder=$sdir_clean" 2>/dev/null || true)
-    if [[ -z "$cid" ]]; then
-      warn "skipping gt init in $slug — container not running (boot with: wa $slug)"
-      continue
+    local runtime
+    runtime=$(stream_runtime "$sdir_clean")
+    if [[ "$runtime" == "devcontainer" ]]; then
+      local cid
+      cid=$(docker ps -q --filter "label=devcontainer.local_folder=$sdir_clean" 2>/dev/null || true)
+      if [[ -z "$cid" ]]; then
+        warn "skipping gt init in $slug — devcontainer not running (boot with: wa $slug --devcontainer)"
+        continue
+      fi
+      info "Running gt repo init in $slug devcontainer (trunk: $trunk)"
+      "$HOME/.local/bin/wst-devcontainer-exec" "$sdir_clean" bash -lc \
+        "command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1; gt repo init --trunk $trunk" \
+        || warn "gt repo init reported errors for $slug (continuing)"
+    else
+      info "Running gt repo init in $slug on host (trunk: $trunk)"
+      (
+        cd "$sdir_clean"
+        command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1
+        gt repo init --trunk "$trunk"
+      ) || warn "gt repo init reported errors for $slug (continuing)"
     fi
-    info "Running gt repo init in $slug (trunk: $trunk)"
-    "$HOME/.local/bin/wst-devcontainer-exec" "$sdir_clean" bash -lc \
-      "command -v gt >/dev/null 2>&1 || npm install -g @withgraphite/graphite-cli >/dev/null 2>&1; gt repo init --trunk $trunk" \
-      || warn "gt repo init reported errors for $slug (continuing)"
   done
 }
 
 # Seed agent Graphite rule files as symlinks to the shared AGENTS override
 # rule, and git-ignore the paths. The symlink target is an absolute host path;
-# combined with the matching bind-mount in wst-container-up, it resolves on
-# host AND inside the container.
+# The symlink target is an absolute host path. Devcontainer streams bind-mount
+# the same path so the link resolves there too.
 _add_to_git_exclude() {
   local clone="$1" rel="$2"
   local exclude_file="$clone/.git/info/exclude"
@@ -449,15 +497,16 @@ HOOK
 # ---- subcommand: attach ----
 
 cmd_attach() {
-  local branch=""
+  local branch="" force_runtime=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --devcontainer) force_runtime="devcontainer"; shift ;;
       --debug) WST_DEBUG=1; WST_PLAIN_LOGS=1; shift ;;
       -*)      die "unknown flag: $1" ;;
       *)       [[ -z "$branch" ]] && branch="$1" || die "unexpected arg: $1"; shift ;;
     esac
   done
-  [[ -n "$branch" ]] || die "usage: wst attach <branch> [--debug]"
+  [[ -n "$branch" ]] || die "usage: wst attach <branch> [--devcontainer] [--debug]"
   local proj; proj=$(resolve_project)
   local slug; slug=$(slugify "$branch")
   local target; target=$(stream_dir "$proj" "$slug")
@@ -466,6 +515,11 @@ cmd_attach() {
   debug "branch=$branch"
   debug "slug=$slug"
   debug "target=$target"
+  if [[ -n "$force_runtime" ]]; then
+    set_stream_runtime "$target" "$force_runtime"
+  fi
+  local runtime; runtime=$(stream_runtime "$target")
+  debug "runtime=$runtime"
 
   # Self-heal: ensure pre-existing streams gain the trunk commit guard. Resolve
   # the trunk if it was never recorded (older streams), then (re)install the hook.
@@ -488,30 +542,36 @@ cmd_attach() {
     tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
   fi
 
-  # Bring container up if stopped
-  local container_id
-  container_id=$(docker ps -q --filter "label=devcontainer.local_folder=$target" 2>/dev/null || true)
-  debug "container_id=${container_id:-<none>}"
-  if [[ -z "$container_id" ]]; then
-    info "Container stopped — bringing it back up..."
+  if [[ "$runtime" == "devcontainer" ]]; then
+    info "Ensuring devcontainer is running..."
     local key="$proj/$slug"
     local host_port; host_port=$(port_get "$key")
     [[ -n "$host_port" ]] || host_port=$(port_allocate "$key")
     debug "host_port=$host_port"
-    ui_step "Start devcontainer on :$host_port" env \
-      WST_PROJECT="$proj" WST_BRANCH="$branch" WST_SLUG="$slug" \
-      WST_HOST_PORT="$host_port" WST_TARGET="$target" \
-      "$HOME/.local/bin/wst-container-up"
+    ensure_devcontainer "$proj" "$branch" "$slug" "$target" "$host_port"
   fi
 
-  # Window may not exist yet — create on first attach after a container restart
+  if [[ -n "$force_runtime" ]] \
+       && tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null | grep -qx "$slug"; then
+    local current_runtime
+    current_runtime=$(tmux show-options -wqv -t "$session:$slug" @wst-runtime 2>/dev/null || true)
+    current_runtime="${current_runtime:-host}"
+    if [[ "$current_runtime" != "$runtime" ]]; then
+      debug "recreating tmux window $session:$slug for runtime $runtime"
+      tmux kill-window -t "$session:$slug"
+    fi
+  fi
+
+  # Window may not exist yet — create on first attach after a stream is closed.
   if ! tmux list-windows -t "$session" -F '#{window_name}' 2>/dev/null | grep -qx "$slug"; then
     debug "tmux window $session:$slug missing; creating"
     local key="$proj/$slug"
     local host_port; host_port=$(port_get "$key")
-    tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port"
+    [[ -n "$host_port" ]] || host_port=$(port_allocate "$key")
+    tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port" "$runtime"
   else
     debug "tmux window $session:$slug exists"
+    tmux set-option -w -t "$session:$slug" @wst-runtime "$runtime"
   fi
 
   if [[ -n "${TMUX:-}" ]]; then
@@ -567,11 +627,15 @@ _ls_project() {
     [[ "$slug" == "main" ]] && continue
     local key="$proj/$slug"
     local port; port=$(port_get "$key")
-    local container_state="down"
-    if [[ -n $(docker ps -q --filter "label=devcontainer.local_folder=$sdir" 2>/dev/null || true) ]]; then
-      container_state="up"
+    local runtime; runtime=$(stream_runtime "${sdir%/}")
+    local state="$runtime"
+    if [[ "$runtime" == "devcontainer" ]]; then
+      state="devcontainer:down"
+      if [[ -n $(docker ps -q --filter "label=devcontainer.local_folder=${sdir%/}" 2>/dev/null || true) ]]; then
+        state="devcontainer:up"
+      fi
     fi
-    printf '%s/%s\t%s\tport:%s\n' "$proj" "$slug" "$container_state" "${port:-?}"
+    printf '%s/%s\t%s\tport:%s\n' "$proj" "$slug" "$state" "${port:-?}"
     any=true
   done
   $any || printf '(no streams in %s)\n' "$proj"
@@ -666,12 +730,21 @@ cmd_rm_state() {
 cmd_doctor() {
   local ok=true
   printf 'Host prerequisites:\n'
-  for t in docker devcontainer jq tmux git gh; do
+  for t in jq tmux git gh; do
     if have "$t"; then
       printf '  %-15s ok\n' "$t"
     else
       printf '  %-15s MISSING\n' "$t"
       ok=false
+    fi
+  done
+
+  printf '\nDevcontainer prerequisites (only needed for wst --devcontainer):\n'
+  for t in docker devcontainer; do
+    if have "$t"; then
+      printf '  %-15s ok\n' "$t"
+    else
+      printf '  %-15s optional missing\n' "$t"
     fi
   done
 
@@ -681,7 +754,7 @@ cmd_doctor() {
     local listening
     listening=$(ss -ltn 2>/dev/null | awk '$4 ~ /:5037$/ {print $4}' | head -1 || true)
     if [[ "$listening" == "0.0.0.0:5037" || "$listening" == "*:5037" ]]; then
-      printf '  listening on all interfaces (containers can reach it)\n'
+      printf '  listening on all interfaces (devcontainers can reach it)\n'
     else
       printf '  WARNING: adb may be bound to loopback only — start with: adb-start-bridged\n'
     fi
@@ -705,30 +778,31 @@ cmd_doctor() {
   ports_init
   jq -r '.assignments | to_entries[] | "  " + .key + " → " + (.value|tostring)' "$PORTS_FILE"
 
-  printf '\nOrphaned chrome volumes (wst-chrome-*):\n'
-  docker volume ls --filter 'name=wst-chrome-' --format '  {{.Name}}' 2>/dev/null || true
+  if have docker; then
+    printf '\nOrphaned chrome volumes (wst-chrome-*):\n'
+    docker volume ls --filter 'name=wst-chrome-' --format '  {{.Name}}' 2>/dev/null || true
 
-  printf '\nwst-dev mega image:\n'
-  local wst_dev="${WST_DEV_IMAGE:-wst-dev:latest}"
-  if docker image inspect "$wst_dev" >/dev/null 2>&1; then
-    local meta built age
-    meta=$(docker run --rm --entrypoint cat "$wst_dev" /etc/wst/wst-dev.json 2>/dev/null || true)
-    built=$(printf '%s' "$meta" | sed -n 's/.*"built_at": *"\([^"]*\)".*/\1/p')
-    if [[ -n "$built" ]]; then
-      age=$(( ($(date +%s) - $(date -d "$built" +%s)) / 86400 ))
-      printf '  %s (built %s, %d days ago)\n' "$wst_dev" "$built" "$age"
-      (( age > 30 )) && printf '  STALE — refresh: ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev -e wst_dev_force_rebuild=true\n'
+    printf '\nwst-dev mega image (only needed for --devcontainer):\n'
+    local wst_dev="${WST_DEV_IMAGE:-wst-dev:latest}"
+    if docker image inspect "$wst_dev" >/dev/null 2>&1; then
+      local meta built age
+      meta=$(docker run --rm --entrypoint cat "$wst_dev" /etc/wst/wst-dev.json 2>/dev/null || true)
+      built=$(printf '%s' "$meta" | sed -n 's/.*"built_at": *"\([^"]*\)".*/\1/p')
+      if [[ -n "$built" ]]; then
+        age=$(( ($(date +%s) - $(date -d "$built" +%s)) / 86400 ))
+        printf '  %s (built %s, %d days ago)\n' "$wst_dev" "$built" "$age"
+        (( age > 30 )) && printf '  STALE — refresh: ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev -e wst_dev_force_rebuild=true\n'
+      else
+        printf '  %s exists but metadata unreadable\n' "$wst_dev"
+      fi
     else
-      printf '  %s exists but metadata unreadable\n' "$wst_dev"
+      printf '  %s not built — run only if you use --devcontainer: ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev\n' "$wst_dev"
     fi
-  else
-    printf '  %s not built — run: ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev\n' "$wst_dev"
-    ok=false
-  fi
-  if docker volume inspect wst-chromium-profile >/dev/null 2>&1; then
-    printf '  shared chromium profile volume: present\n'
-  else
-    printf '  shared chromium profile volume: missing (will be created on next ansible run)\n'
+    if docker volume inspect wst-chromium-profile >/dev/null 2>&1; then
+      printf '  shared chromium profile volume: present\n'
+    else
+      printf '  shared chromium profile volume: missing (will be created on next ansible run)\n'
+    fi
   fi
 
   $ok || exit 1
@@ -742,27 +816,35 @@ cmd_migrate() {
 
 # ---- helpers ----
 
-provision_container() {
-  # wst-dev-entrypoint runs chezmoi apply, gh auth, mise install, gt repo
-  # init, and ADB smoke test on container start. All that remains is
-  # registering the Playwright MCP server with the user-level Claude
-  # config — pointed at the persistent Chromium profile shared across
-  # streams (see WST_BROWSER_PROFILE). Because ~/.claude/ is bind-mounted
-  # from the host, this also "leaks" the config back to the host —
-  # intentional: any wst-dev container reads the same mcp_servers.json.
+provision_agent_tooling() {
+  local target="$1" runtime="$2"
+  if [[ "$runtime" == "devcontainer" ]]; then
+    provision_container "$target"
+  else
+    provision_host "$target"
+  fi
+}
+
+provision_host() {
   local target="$1"
-  local provision_script
-  provision_script=$(cat <<'SH'
-set -e
-mkdir -p "$HOME/.claude"
-cat > "$HOME/.claude/mcp_servers.json" <<'JSON'
+  mkdir -p "$HOME/.config/chromium-wst"
+  write_claude_mcp_config "$HOME"
+  if command -v zsh >/dev/null 2>&1; then
+    (cd "$target" && timeout 90 zsh -lic 'true' >/dev/null 2>&1) || true
+  fi
+}
+
+write_claude_mcp_config() {
+  local home_dir="$1"
+  mkdir -p "$home_dir/.claude"
+  cat > "$home_dir/.claude/mcp_servers.json" <<'JSON'
 {
   "mcpServers": {
     "playwright": {
       "command": "bash",
       "args": [
         "-lc",
-        "chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); [ -n \"$chrome\" ] || { echo 'Claude Playwright MCP: Chromium not found under /opt/playwright-browsers' >&2; exit 1; }; exec playwright-mcp --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-/home/vscode/.config/chromium-wst}\""
+        "runner=$(command -v playwright-mcp || true); [ -n \"$runner\" ] || runner='npx -y @playwright/mcp'; chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); if [ -n \"$chrome\" ]; then exec $runner --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\"; fi; exec $runner --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\""
       ]
     },
     "typescript": {
@@ -772,6 +854,17 @@ cat > "$HOME/.claude/mcp_servers.json" <<'JSON'
   }
 }
 JSON
+}
+
+provision_container() {
+  # wst-dev-entrypoint runs chezmoi apply, gh auth, mise install, gt repo
+  # init, and ADB smoke test on container start. WST writes the user-level
+  # Claude MCP config on the host before entering the devcontainer; ~/.claude/
+  # is bind-mounted so devcontainer streams read the same config.
+  local target="$1"
+  local provision_script
+  provision_script=$(cat <<'SH'
+set -e
 # Prime the prompt helper during provisioning so fresh terminal panes don't
 # show powerlevel10k's first-run gitstatusd download message.
 if command -v zsh >/dev/null 2>&1; then
@@ -779,13 +872,14 @@ if command -v zsh >/dev/null 2>&1; then
 fi
 SH
 )
+  write_claude_mcp_config "$HOME"
   "$HOME/.local/bin/wst-devcontainer-exec" "$target" bash -c "$provision_script" \
     || warn "post-up MCP registration had non-fatal errors (continuing)"
 }
 
 cmd_chrome() {
-  # Open headed Chromium inside the current stream's container against the
-  # shared persistent profile. Use this when Claude is driving the browser
+  # Open headed Chromium for the current stream against the shared persistent
+  # profile. Use this when Claude is driving the browser
   # via @playwright/mcp and asks you to complete SSO / MFA / a captcha —
   # see ~/.local/share/wst/README.md (Browser handoff workflow).
   #
@@ -800,43 +894,60 @@ cmd_chrome() {
   if [[ -z "${WAYLAND_DISPLAY:-}" ]]; then
     warn "WAYLAND_DISPLAY is empty on the host — headed Chromium will fail to connect"
   fi
-  info "opening headed Chromium for stream $proj/$branch"
-  # The Playwright-bundled chromium ships at a versioned path; resolve at
-  # runtime so we don't pin a version here.
-  "$HOME/.local/bin/wst-devcontainer-exec" "$target" bash -lc '
-    chrome=$(find /opt/playwright-browsers -path "*/chromium-*/chrome-linux*/chrome" -type f -executable 2>/dev/null | head -1)
-    [ -n "$chrome" ] || { echo "wst chrome: no chromium binary found under /opt/playwright-browsers" >&2; exit 1; }
+  local runtime; runtime=$(stream_runtime "$target")
+  info "opening headed Chromium for stream $proj/$branch ($runtime)"
+  if [[ "$runtime" == "devcontainer" ]]; then
+    # The Playwright-bundled chromium ships at a versioned path; resolve at
+    # runtime so we don't pin a version here.
+    "$HOME/.local/bin/wst-devcontainer-exec" "$target" bash -lc '
+      chrome=$(find /opt/playwright-browsers -path "*/chromium-*/chrome-linux*/chrome" -type f -executable 2>/dev/null | head -1)
+      [ -n "$chrome" ] || { echo "wst chrome: no chromium binary found under /opt/playwright-browsers" >&2; exit 1; }
+      exec "$chrome" \
+        --ozone-platform=wayland --enable-features=UseOzonePlatform \
+        --user-data-dir="$WST_BROWSER_PROFILE" \
+        --no-first-run --no-default-browser-check \
+        "$@"
+    ' bash "$@"
+  else
+    local chrome=""
+    for candidate in chromium chromium-browser google-chrome google-chrome-stable; do
+      if command -v "$candidate" >/dev/null 2>&1; then
+        chrome=$(command -v "$candidate")
+        break
+      fi
+    done
+    [[ -n "$chrome" ]] || die "no host Chromium/Chrome binary found on PATH"
     exec "$chrome" \
-      --ozone-platform=wayland --enable-features=UseOzonePlatform \
-      --user-data-dir="$WST_BROWSER_PROFILE" \
+      --user-data-dir="$HOME/.config/chromium-wst" \
       --no-first-run --no-default-browser-check \
       "$@"
-  ' bash "$@"
+  fi
 }
 
 tmux_create_window() {
-  local proj="$1" branch="$2" slug="$3" target="$4" host_port="$5"
+  local proj="$1" branch="$2" slug="$3" target="$4" host_port="$5" runtime="${6:-host}"
   local session; session=$(session_name "$proj")
   if ! tmux has-session -t "$session" 2>/dev/null; then
     tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
   fi
   # Pass the command as the new-window argument so the pane's process IS the
-  # devcontainer exec — avoids leaving the launch command visible in the
-  # pane's scrollback. Drop straight into Codex; when it exits,
-  # fall back to an interactive login shell so the pane stays usable.
-  # Pane splits (wst-tmux-split) still open in zsh, so you can split for
-  # shell work.
+  # stream command — avoids leaving the launch command visible in scrollback.
+  # Drop straight into Codex; when it exits, fall back to an interactive login
+  # shell so the pane stays usable. Pane splits (wst-tmux-split) still open in
+  # zsh, so you can split for shell work.
   local agent_pane=""
   local git_pane=""
   local shell_pane=""
+  local agent_command
+  agent_command=$(stream_command "$proj" "$branch" "$target" "$host_port" "$runtime" 'codex; exec zsh -l')
   agent_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
-    "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'codex; exec zsh -l'")
+    "$agent_command")
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
   # git UI (bottom, full width, ~33% height). Set WST_PANES=1 to skip
   # the splits and keep the single-pane layout. The default Magit pane
   # runs on the host in a stream-specific Emacs daemon, so it edits host
   # paths without sharing buffers with other streams. Set
-  # WST_GIT_PANE=lazygit to use lazygit in the devcontainer instead.
+  # WST_GIT_PANE=lazygit to use lazygit in the active stream runtime instead.
   if [[ "${WST_PANES:-}" != 1 ]]; then
     case "${WST_GIT_PANE:-magit}" in
       magit|emacs)
@@ -848,12 +959,16 @@ tmux_create_window() {
           "$emacs_command")
         ;;
       lazygit)
+        local lazygit_command
+        lazygit_command=$(stream_command "$proj" "$branch" "$target" "$host_port" "$runtime" 'lazygit; exec zsh -l')
         git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
-          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l -c 'lazygit; exec zsh -l'")
+          "$lazygit_command")
         ;;
       shell|zsh)
+        local git_shell_command
+        git_shell_command=$(stream_command "$proj" "$branch" "$target" "$host_port" "$runtime" 'exec zsh -l')
         git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
-          "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l")
+          "$git_shell_command")
         ;;
       *)
         die "unknown WST_GIT_PANE='${WST_GIT_PANE}' (expected: magit, lazygit, shell)"
@@ -862,8 +977,10 @@ tmux_create_window() {
     # 2. Focus the top agent pane so the next split lands there.
     tmux select-pane -t "$session:$slug.0"
     # 3. Split the top pane horizontally for the spare zsh on the right.
+    local shell_command
+    shell_command=$(stream_command "$proj" "$branch" "$target" "$host_port" "$runtime" 'exec zsh -l')
     shell_pane=$(tmux split-window -P -F '#{pane_id}' -h -l 40% -t "$session:$slug" -c "$target" \
-      "$HOME/.local/bin/wst-devcontainer-exec '$target' zsh -l")
+      "$shell_command")
     # 4. Return focus to the agent (top-left).
     tmux select-pane -t "$session:$slug.0"
   fi
@@ -871,6 +988,7 @@ tmux_create_window() {
   tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
   tmux set-option -w -t "$session:$slug" @wst-workdir "$target"
   tmux set-option -w -t "$session:$slug" @wst-port    "$host_port"
+  tmux set-option -w -t "$session:$slug" @wst-runtime "$runtime"
   tmux set-option -w -t "$session:$slug" @wst-agent-pane "$agent_pane"
   tmux set-option -w -t "$session:$slug" @wst-codex-pane "$agent_pane"
   tmux set-option -w -t "$session:$slug" @wst-git-pane   "$git_pane"
@@ -885,9 +1003,9 @@ wst — workstream manager
 
 usage:
   wst clone <git-url> [project-name]                    clone repo into ~/Projects/<name>/main/  (alias: wcl)
-  wst new <branch> [--base <base>] [--project <name>] [--debug]
+  wst new <branch> [--base <base>] [--project <name>] [--devcontainer] [--debug]
                                                           create stream
-  wst attach <branch> [--debug]                         switch to / boot stream window           (alias: wa)
+  wst attach <branch> [--devcontainer] [--debug]        switch to stream window                  (alias: wa)
   wst preview [<branch>]                                open localhost:<port>/                   (alias: wp)
   wst ls [--all]                                        list streams                             (alias: wls)
   wst rm <branch> [--force]                             tear down stream
@@ -897,7 +1015,7 @@ usage:
   wst migrate                                           one-shot canonical relocation
 
 env:
-  WST_PANES=1                                           single-pane layout (default: claude + magit + zsh)
+  WST_PANES=1                                           single-pane layout (default: codex + magit + zsh)
   WST_DEBUG=1                                           print debug output for new/attach
 EOF
 }

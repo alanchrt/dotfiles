@@ -49,11 +49,9 @@ sys.stdout.write(text + "\n" if text else "")
   cat <<'MANAGED'
 # Autonomous-first stance: codex doesn't have a Claude-style command-pattern
 # allowlist (no equivalent of permissions.ask = ["Bash(git push*)"]). So
-# instead of mixing sandbox + on-request prompts (which fires on every
-# read-only command when the in-container sandbox can't initialize), drop
-# codex's own sandboxing and never-prompt. The commit/push review gate
-# lives in AGENTS.md as a prose instruction. Container isolation (Docker)
-# and host filesystem layout are the real security boundary.
+# instead of mixing sandbox + on-request prompts, drop codex's own sandboxing
+# and never-prompt. The commit/push review gate lives in AGENTS.md as a prose
+# instruction, and stream isolation comes from separate git clones/workspaces.
 sandbox_mode = "danger-full-access"
 approval_policy = "never"
 MANAGED
@@ -70,20 +68,20 @@ MANAGED
 [features]
 fast_mode = {{ dig "fast_mode" false . }}
 
-# Playwright MCP — model-agnostic browser automation. The wst-dev image
-# installs @playwright/mcp globally so `npx` resolves it quickly. Same
-# server, same Chromium ($WST_BROWSER_PROFILE) you used from Claude.
+# Playwright MCP — model-agnostic browser automation. In normal host streams,
+# use the host browser profile; devcontainer streams override WST_BROWSER_PROFILE
+# and provide the Playwright-managed Chromium path.
 [mcp_servers.playwright]
 command = "bash"
 args = [
   "-lc",
-  "chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); [ -n \"$chrome\" ] || { echo 'Codex Playwright MCP: Chromium not found under /opt/playwright-browsers' >&2; exit 1; }; exec playwright-mcp --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-/home/vscode/.config/chromium-wst}\""
+  "runner=$(command -v playwright-mcp || true); [ -n \"$runner\" ] || runner='npx -y @playwright/mcp'; chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); if [ -n \"$chrome\" ]; then exec $runner --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\"; fi; exec $runner --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\""
 ]
 startup_timeout_sec = 120
 
 # TypeScript MCP — tsserver-backed code intelligence and refactoring. Run via
-# npx inside the active container/session so it sees the same workspace,
-# tsconfig, node_modules, and generated files as Codex.
+# npx inside the active stream session so it sees the same workspace, tsconfig,
+# node_modules, and generated files as Codex.
 [mcp_servers.typescript]
 command = "npx"
 args = ["-y", "ts-mcp-server"]

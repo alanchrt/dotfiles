@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# wst-tmux-split — split-pane helper that auto-execs into the stream's devcontainer.
+# wst-tmux-split — split-pane helper that opens in the current stream runtime.
 # Bound from dot_tmux.conf.tmpl to `bind '"'` and `bind '%'`.
 # Argument: h (horizontal) | v (vertical)
 
@@ -9,9 +9,21 @@ flag="-v"
 [[ "${1:-}" = h ]] && flag="-h"
 
 dir=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
+project=$(tmux show-options -wqv @wst-project 2>/dev/null || true)
+stream=$(tmux show-options -wqv @wst-stream 2>/dev/null || true)
+port=$(tmux show-options -wqv @wst-port 2>/dev/null || true)
+runtime=$(tmux show-options -wqv @wst-runtime 2>/dev/null || true)
+runtime="${runtime:-host}"
 
 if [[ -n "$dir" && -d "$dir" ]]; then
-  tmux split-window "$flag" -c "$dir" "$HOME/.local/bin/wst-devcontainer-exec '$dir' zsh"
+  if [[ "$runtime" == "devcontainer" ]]; then
+    tmux split-window "$flag" -c "$dir" "$HOME/.local/bin/wst-devcontainer-exec '$dir' zsh"
+  else
+    printf -v command 'env WST_PROJECT=%q WST_STREAM=%q WST_PORT=%q WST_HOST_PORT=%q WST_BROWSER_PROFILE=%q zsh -l' \
+      "$project" "$stream" "$port" "$port" "$HOME/.config/chromium-wst"
+    tmux split-window "$flag" -c "$dir" \
+      "$command"
+  fi
 else
   tmux split-window "$flag"
 fi

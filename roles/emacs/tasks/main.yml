@@ -36,7 +36,7 @@
     creates: "{{ ansible_env.HOME }}/.config/emacs/.local"
 
 - name: Sync doom packages
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom sync"
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.config/emacs/bin/doom sync --force"
   when: doom_clone.changed
   changed_when: false
 
