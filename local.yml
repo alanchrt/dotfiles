@@ -43,6 +43,8 @@
       tags: [heroku, dev]
     - name: azure
       tags: [azure, dev]
+    - name: aws
+      tags: [aws, dev]
     - name: mcp
       tags: [mcp, dev]
     - name: claude-code

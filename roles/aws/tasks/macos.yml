@@ -1,0 +1,4 @@
+---
+- name: Install AWS CLI
+  community.general.homebrew:
+    name: awscli

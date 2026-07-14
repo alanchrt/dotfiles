@@ -1,0 +1,37 @@
+---
+- name: Choose AWS CLI architecture
+  ansible.builtin.set_fact:
+    aws_cli_arch: "{{ 'aarch64' if ansible_architecture in ['aarch64', 'arm64'] else 'x86_64' }}"
+
+- name: Check for aws CLI
+  ansible.builtin.command: /usr/local/bin/aws --version
+  register: aws_cli_version
+  changed_when: false
+  failed_when: false
+
+- name: Install AWS CLI v2
+  when: aws_cli_version.rc != 0
+  block:
+    - name: Create AWS CLI installer temp dir
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: awscli
+      register: aws_cli_tmp
+
+    - name: Unpack AWS CLI installer
+      ansible.builtin.unarchive:
+        src: "https://awscli.amazonaws.com/awscli-exe-linux-{{ aws_cli_arch }}.zip"
+        dest: "{{ aws_cli_tmp.path }}"
+        remote_src: true
+
+    - name: Run AWS CLI installer
+      become: yes
+      ansible.builtin.command:
+        cmd: "{{ aws_cli_tmp.path }}/aws/install --install-dir /usr/local/aws-cli --bin-dir /usr/local/bin"
+
+  always:
+    - name: Remove AWS CLI installer temp dir
+      ansible.builtin.file:
+        path: "{{ aws_cli_tmp.path | default('') }}"
+        state: absent
+      when: aws_cli_tmp is defined and aws_cli_tmp.path is defined

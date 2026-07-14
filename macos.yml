@@ -10,6 +10,7 @@
     - { name: vim, tags: [vim] }
     - { name: emacs, tags: [emacs] }
     - { name: github, tags: [github] }
+    - { name: aws, tags: [aws, dev] }
     - { name: choose, tags: [choose] }
     - { name: claude-code, tags: [claude-code] }
     - { name: graphite, tags: [graphite] }
