@@ -10,11 +10,11 @@ current=$(cat)
 
 # Preserve everything in the current file EXCEPT our managed top-level
 # keys (only valid before the first section header) and our managed
-# sections ([features], [mcp_servers.playwright], [mcp_servers.typescript]).
+# sections ([features], [mcp_servers.chrome-devtools], [mcp_servers.typescript]).
 preserved=$(printf '%s' "$current" | python3 -c '
 import re, sys
 managed_keys = {"sandbox_mode", "approval_policy", "service_tier"}
-managed_sections = {"features", "mcp_servers.playwright", "mcp_servers.typescript"}
+managed_sections = {"features", "mcp_servers.playwright", "mcp_servers.chrome-devtools", "mcp_servers.typescript"}
 out = []
 in_drop = False
 in_any_section = False
@@ -68,16 +68,17 @@ MANAGED
 [features]
 fast_mode = {{ dig "fast_mode" false . }}
 
-# Playwright MCP — model-agnostic browser automation. In normal host streams,
-# use the host browser profile; devcontainer streams override WST_BROWSER_PROFILE
-# and provide the Playwright-managed Chromium path.
-[mcp_servers.playwright]
+# Chrome DevTools MCP — browser inspection and automation against the stream's
+# Chrome instance. Launch it with `wst chrome`; WST exports WST_CDP_PORT in
+# stream panes so Codex connects to the right browser.
+[mcp_servers.chrome-devtools]
 command = "bash"
 args = [
   "-lc",
-  "runner=$(command -v playwright-mcp || true); [ -n \"$runner\" ] || runner='npx -y @playwright/mcp'; chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); if [ -n \"$chrome\" ]; then exec $runner --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\"; fi; exec $runner --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\""
+  "exec npx -y chrome-devtools-mcp@latest --browser-url \"http://127.0.0.1:${WST_CDP_PORT:-9222}\" --no-usage-statistics"
 ]
 startup_timeout_sec = 120
+tool_timeout_sec = 120
 
 # TypeScript MCP — tsserver-backed code intelligence and refactoring. Run via
 # npx inside the active stream session so it sees the same workspace, tsconfig,

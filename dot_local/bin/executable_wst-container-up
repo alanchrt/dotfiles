@@ -71,6 +71,7 @@ if [[ -z "$container_port" ]]; then
     | jq -r '.forwardPorts? // [] | .[0] // empty' 2>/dev/null || true)
 fi
 container_port="${container_port:-$DEFAULT_CONTAINER_PORT}"
+cdp_port="${WST_CDP_PORT:-$((WST_HOST_PORT + 10000))}"
 
 chrome_volume="wst-chrome-$WST_PROJECT"
 override="$OVERRIDES_DIR/$WST_PROJECT-$WST_SLUG.json"
@@ -187,6 +188,7 @@ wst_mounts_json=$(printf '%s\n' "${wst_mounts[@]}" | jq -R . | jq -s .)
 # relative build paths resolved to absolute (override lives in ~/.cache/).
 printf '%s' "$project_json" | jq \
   --arg host_port "$WST_HOST_PORT" \
+  --arg cdp_port "$cdp_port" \
   --arg cport "$container_port" \
   --arg dc_dir "$project_dc_dir" \
   --arg github_token "${GITHUB_TOKEN:-}" \
@@ -230,6 +232,7 @@ printf '%s' "$project_json" | jq \
       COLORTERM: "truecolor",
       WST_PORT: $cport,
       WST_HOST_PORT: $host_port,
+      WST_CDP_PORT: $cdp_port,
       WST_PROJECT: $project,
       WST_STREAM: $branch,
       WST_DOTFILES_SRC: "/home/vscode/Projects/dotfiles/master",

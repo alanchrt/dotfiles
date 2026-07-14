@@ -65,7 +65,7 @@ wst doctor                         # diagnostics
 
 **Android emulator:** the emulator runs on host (KVM access). Host streams can use normal host `adb`. Devcontainer streams reach it through `ADB_SERVER_SOCKET=tcp:host.docker.internal:5037` (set automatically by `wst-container-up`). Host adb listens on all interfaces via the `adb-bridge` systemd user service.
 
-**Chromium / Playwright MCP handoff:** `wst chrome` opens headed Chromium against the stream's persistent browser profile. When driving the browser via `@playwright/mcp` and hit an SSO / MFA / captcha / consent flow you can't complete on your own, **stop and ask the user to run `wst chrome` in a sibling tmux pane**. Tell them the exact URL and what they need to do. After they confirm, retry the navigation. See `~/.local/share/wst/README.md` for the full workflow.
+**Chromium / Chrome DevTools MCP:** `wst chrome` opens headed Chromium against the stream's persistent browser profile with remote debugging enabled on `$WST_CDP_PORT`. Before using the `chrome-devtools` MCP server in a WST stream, launch Chrome with `wst chrome >/tmp/wst-chrome.log 2>&1 &` from a stream pane. If the browser reaches SSO / MFA / captcha / consent that you can't complete on your own, tell the user the exact URL and what they need to do in that window. After they confirm, retry the browser action. See `~/.local/share/wst/README.md` for the workflow.
 
 # Production Safety
 

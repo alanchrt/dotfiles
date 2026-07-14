@@ -4,7 +4,7 @@
 `~/Projects/<project>/<stream>/` and opens each stream in its own tmux window.
 The default runtime is the host: panes run directly in the stream clone with
 `WST_PROJECT`, `WST_STREAM`, `WST_PORT`, `WST_HOST_PORT`, and
-`WST_BROWSER_PROFILE` exported.
+`WST_CDP_PORT`, and `WST_BROWSER_PROFILE` exported.
 
 ## Commands
 
@@ -36,18 +36,22 @@ Set `WST_PANES=1` for a single pane. Set `WST_GIT_PANE=lazygit` or
 `WST_GIT_PANE=shell` to replace the Magit pane. Stream-aware tmux splits
 (`prefix + "` and `prefix + %`) open in the current stream runtime.
 
-## Browser Handoff
+## Chrome DevTools MCP
 
-When an agent driving `@playwright/mcp` hits SSO, MFA, a captcha, or a consent
-screen, run this in a sibling stream pane:
+When Codex needs browser access through Chrome DevTools MCP, run this in a
+sibling stream pane first:
 
 ```bash
-wst chrome
+wst chrome >/tmp/wst-chrome.log 2>&1 &
 ```
 
 Host streams use `~/.config/chromium-wst`. Devcontainer streams use the
-devcontainer profile configured by `wst-container-up`. Complete the interactive
-flow, close the browser window, then tell the agent to retry.
+devcontainer profile configured by `wst-container-up`. Both launch Chrome with
+remote debugging enabled on `$WST_CDP_PORT` so Codex's `chrome-devtools` MCP
+server can attach to it.
+
+For SSO, MFA, captchas, or consent screens, complete the interactive flow in
+that Chrome window, then tell the agent to retry.
 
 ## Devcontainer Opt-In
 

@@ -156,6 +156,15 @@ stream_runtime() {
   git -C "$target" config --get wst.runtime 2>/dev/null || printf 'host'
 }
 
+cdp_port_for_host_port() {
+  local host_port="$1"
+  if [[ "$host_port" =~ ^[0-9]+$ ]]; then
+    printf '%s' "$((host_port + 10000))"
+  else
+    printf '9222'
+  fi
+}
+
 set_stream_runtime() {
   local target="$1" runtime="$2"
   git -C "$target" config wst.runtime "$runtime"
@@ -176,12 +185,13 @@ ensure_devcontainer() {
 
 stream_command() {
   local proj="$1" branch="$2" target="$3" host_port="$4" runtime="$5" inner="$6"
+  local cdp_port; cdp_port=$(cdp_port_for_host_port "$host_port")
   if [[ "$runtime" == "devcontainer" ]]; then
     printf '%q %q zsh -l -c %q' \
       "$HOME/.local/bin/wst-devcontainer-exec" "$target" "$inner"
   else
-    printf 'env WST_PROJECT=%q WST_STREAM=%q WST_PORT=%q WST_HOST_PORT=%q WST_BROWSER_PROFILE=%q zsh -l -c %q' \
-      "$proj" "$branch" "$host_port" "$host_port" "$HOME/.config/chromium-wst" "$inner"
+    printf 'env WST_PROJECT=%q WST_STREAM=%q WST_PORT=%q WST_HOST_PORT=%q WST_CDP_PORT=%q WST_BROWSER_PROFILE=%q zsh -l -c %q' \
+      "$proj" "$branch" "$host_port" "$host_port" "$cdp_port" "$HOME/.config/chromium-wst" "$inner"
   fi
 }
 
@@ -571,7 +581,12 @@ cmd_attach() {
     tmux_create_window "$proj" "$branch" "$slug" "$target" "$host_port" "$runtime"
   else
     debug "tmux window $session:$slug exists"
+    local key="$proj/$slug"
+    local host_port; host_port=$(port_get "$key")
+    [[ -n "$host_port" ]] || host_port=$(port_allocate "$key")
     tmux set-option -w -t "$session:$slug" @wst-runtime "$runtime"
+    tmux set-option -w -t "$session:$slug" @wst-port "$host_port"
+    tmux set-option -w -t "$session:$slug" @wst-cdp-port "$(cdp_port_for_host_port "$host_port")"
   fi
 
   if [[ -n "${TMUX:-}" ]]; then
@@ -840,11 +855,11 @@ write_claude_mcp_config() {
   cat > "$home_dir/.claude/mcp_servers.json" <<'JSON'
 {
   "mcpServers": {
-    "playwright": {
+    "chrome-devtools": {
       "command": "bash",
       "args": [
         "-lc",
-        "runner=$(command -v playwright-mcp || true); [ -n \"$runner\" ] || runner='npx -y @playwright/mcp'; chrome=$(find /opt/playwright-browsers -path '*/chromium-*/chrome-linux*/chrome' -type f -executable 2>/dev/null | head -1); if [ -n \"$chrome\" ]; then exec $runner --executable-path \"$chrome\" --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\"; fi; exec $runner --user-data-dir \"${WST_BROWSER_PROFILE:-$HOME/.config/chromium-wst}\""
+        "exec npx -y chrome-devtools-mcp@latest --browser-url \"http://127.0.0.1:${WST_CDP_PORT:-9222}\" --no-usage-statistics"
       ]
     },
     "typescript": {
@@ -879,8 +894,8 @@ SH
 
 cmd_chrome() {
   # Open headed Chromium for the current stream against the shared persistent
-  # profile. Use this when Claude is driving the browser
-  # via @playwright/mcp and asks you to complete SSO / MFA / a captcha —
+  # profile. Use this when Codex/Claude needs a Chrome DevTools MCP target or
+  # asks you to complete SSO / MFA / a captcha —
   # see ~/.local/share/wst/README.md (Browser handoff workflow).
   #
   # Detect the stream via the tmux window option set by tmux_create_window.
@@ -895,15 +910,20 @@ cmd_chrome() {
     warn "WAYLAND_DISPLAY is empty on the host — headed Chromium will fail to connect"
   fi
   local runtime; runtime=$(stream_runtime "$target")
-  info "opening headed Chromium for stream $proj/$branch ($runtime)"
+  local port cdp_port
+  port=$(tmux show-options -wqv @wst-port 2>/dev/null || true)
+  cdp_port=$(tmux show-options -wqv @wst-cdp-port 2>/dev/null || true)
+  cdp_port="${cdp_port:-$(cdp_port_for_host_port "$port")}"
+  info "opening headed Chromium for stream $proj/$branch ($runtime, CDP :$cdp_port)"
   if [[ "$runtime" == "devcontainer" ]]; then
-    # The Playwright-bundled chromium ships at a versioned path; resolve at
+    # Chromium is installed under the Playwright browser cache path; resolve at
     # runtime so we don't pin a version here.
     "$HOME/.local/bin/wst-devcontainer-exec" "$target" bash -lc '
       chrome=$(find /opt/playwright-browsers -path "*/chromium-*/chrome-linux*/chrome" -type f -executable 2>/dev/null | head -1)
       [ -n "$chrome" ] || { echo "wst chrome: no chromium binary found under /opt/playwright-browsers" >&2; exit 1; }
       exec "$chrome" \
         --ozone-platform=wayland --enable-features=UseOzonePlatform \
+        --remote-debugging-port="${WST_CDP_PORT:-9222}" \
         --user-data-dir="$WST_BROWSER_PROFILE" \
         --no-first-run --no-default-browser-check \
         "$@"
@@ -918,6 +938,7 @@ cmd_chrome() {
     done
     [[ -n "$chrome" ]] || die "no host Chromium/Chrome binary found on PATH"
     exec "$chrome" \
+      --remote-debugging-port="$cdp_port" \
       --user-data-dir="$HOME/.config/chromium-wst" \
       --no-first-run --no-default-browser-check \
       "$@"
@@ -926,6 +947,7 @@ cmd_chrome() {
 
 tmux_create_window() {
   local proj="$1" branch="$2" slug="$3" target="$4" host_port="$5" runtime="${6:-host}"
+  local cdp_port; cdp_port=$(cdp_port_for_host_port "$host_port")
   local session; session=$(session_name "$proj")
   if ! tmux has-session -t "$session" 2>/dev/null; then
     tmux new-session -d -s "$session" -c "$PROJECTS_ROOT/$proj"
@@ -988,6 +1010,7 @@ tmux_create_window() {
   tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
   tmux set-option -w -t "$session:$slug" @wst-workdir "$target"
   tmux set-option -w -t "$session:$slug" @wst-port    "$host_port"
+  tmux set-option -w -t "$session:$slug" @wst-cdp-port "$cdp_port"
   tmux set-option -w -t "$session:$slug" @wst-runtime "$runtime"
   tmux set-option -w -t "$session:$slug" @wst-agent-pane "$agent_pane"
   tmux set-option -w -t "$session:$slug" @wst-codex-pane "$agent_pane"
@@ -1010,7 +1033,7 @@ usage:
   wst ls [--all]                                        list streams                             (alias: wls)
   wst rm <branch> [--force]                             tear down stream
   wst gtinit [--project <name>]                         enable Graphite in canonical + all streams
-  wst chrome [-- <url> ...]                             open headed Chromium for SSO/MFA handoff
+  wst chrome [-- <url> ...]                             open headed Chromium for Chrome DevTools MCP
   wst doctor                                            diagnostics
   wst migrate                                           one-shot canonical relocation
 

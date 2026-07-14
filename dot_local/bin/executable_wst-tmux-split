@@ -12,15 +12,20 @@ dir=$(tmux show-options -wqv @wst-workdir 2>/dev/null || true)
 project=$(tmux show-options -wqv @wst-project 2>/dev/null || true)
 stream=$(tmux show-options -wqv @wst-stream 2>/dev/null || true)
 port=$(tmux show-options -wqv @wst-port 2>/dev/null || true)
+cdp_port=$(tmux show-options -wqv @wst-cdp-port 2>/dev/null || true)
 runtime=$(tmux show-options -wqv @wst-runtime 2>/dev/null || true)
 runtime="${runtime:-host}"
+if [[ -z "$cdp_port" && "$port" =~ ^[0-9]+$ ]]; then
+  cdp_port="$((port + 10000))"
+fi
+cdp_port="${cdp_port:-9222}"
 
 if [[ -n "$dir" && -d "$dir" ]]; then
   if [[ "$runtime" == "devcontainer" ]]; then
     tmux split-window "$flag" -c "$dir" "$HOME/.local/bin/wst-devcontainer-exec '$dir' zsh"
   else
-    printf -v command 'env WST_PROJECT=%q WST_STREAM=%q WST_PORT=%q WST_HOST_PORT=%q WST_BROWSER_PROFILE=%q zsh -l' \
-      "$project" "$stream" "$port" "$port" "$HOME/.config/chromium-wst"
+    printf -v command 'env WST_PROJECT=%q WST_STREAM=%q WST_PORT=%q WST_HOST_PORT=%q WST_CDP_PORT=%q WST_BROWSER_PROFILE=%q zsh -l' \
+      "$project" "$stream" "$port" "$port" "$cdp_port" "$HOME/.config/chromium-wst"
     tmux split-window "$flag" -c "$dir" \
       "$command"
   fi

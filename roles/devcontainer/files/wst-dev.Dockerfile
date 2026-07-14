@@ -1,7 +1,7 @@
 # wst-dev — one mega image for all wst stream containers.
 #
 # Bakes in the user's full toolchain (gh, claude, gt, mise, chezmoi, bun,
-# node, jdk, Android SDK), Playwright + Chromium, and the union of system
+# node, jdk, Android SDK), Chromium, Chrome DevTools MCP, and the union of system
 # deps the user's projects need. wst-container-up swaps project devcontainer
 # `image`/`build`/`features` for this image while preserving mounts, ports,
 # env, runArgs, and postCreateCommand.
@@ -139,11 +139,11 @@ RUN set -eux; \
 # in the release SHA256SUMS; the npm package works cleanly).
 RUN npm install -g --no-fund --no-audit \
       @withgraphite/graphite-cli \
-      @playwright/mcp \
+      chrome-devtools-mcp \
       @devcontainers/cli \
       @openai/codex
 
-# 7. Playwright Chromium (system-wide; readable by any container user)
+# 7. Chromium for Chrome DevTools MCP targets (system-wide; readable by any container user)
 ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright-browsers
 RUN set -eux; \
     npx -y playwright install chromium; \
