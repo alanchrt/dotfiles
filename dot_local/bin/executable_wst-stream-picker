@@ -43,14 +43,6 @@ if [[ -n "${WST_SESSION:-}" ]]; then
   done
 fi
 
-# One docker query for all running devcontainer paths (only used for streams
-# explicitly marked devcontainer).
-_running_containers=""
-if command -v docker >/dev/null 2>&1; then
-  _running_containers=$(docker ps \
-    --format '{{.Label "devcontainer.local_folder"}}' 2>/dev/null || true)
-fi
-
 # Collect streams with no tmux window yet, scoped to $proj (or all if unresolved)
 streams=()
 for pdir in "$PROJECTS_ROOT"/*/; do
@@ -67,15 +59,7 @@ for pdir in "$PROJECTS_ROOT"/*/; do
           | grep -qx "$slug"; then
       continue
     fi
-    runtime=$(git -C "${sdir%/}" config --get wst.runtime 2>/dev/null || printf 'host')
-    cstate="$runtime"
-    if [[ "$runtime" == "devcontainer" ]]; then
-      cstate="dev:down"
-      if printf '%s\n' "$_running_containers" | grep -qxF "${sdir%/}"; then
-        cstate="dev:up"
-      fi
-    fi
-    streams+=("$pname/$slug $cstate")
+    streams+=("$pname/$slug host")
   done
 done
 

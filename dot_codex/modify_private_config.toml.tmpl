@@ -13,7 +13,7 @@ current=$(cat)
 # sections ([features], [mcp_servers.chrome-devtools], [mcp_servers.typescript]).
 preserved=$(printf '%s' "$current" | python3 -c '
 import re, sys
-managed_keys = {"sandbox_mode", "approval_policy", "service_tier"}
+managed_keys = {"model", "model_reasoning_effort", "sandbox_mode", "approval_policy", "service_tier"}
 managed_sections = {"features", "mcp_servers.playwright", "mcp_servers.chrome-devtools", "mcp_servers.typescript"}
 out = []
 in_drop = False
@@ -22,7 +22,9 @@ for line in sys.stdin.read().splitlines(keepends=True):
     stripped = line.strip()
     if stripped.startswith("[") and stripped.endswith("]") and not stripped.startswith("[["):
         section = stripped[1:-1].strip()
-        in_drop = section in managed_sections
+        in_drop = section in managed_sections or any(
+            section.startswith(managed + ".") for managed in managed_sections
+        )
         in_any_section = True
         if not in_drop:
             out.append(line)
@@ -54,6 +56,8 @@ sys.stdout.write(text + "\n" if text else "")
 # instruction, and stream isolation comes from separate git clones/workspaces.
 sandbox_mode = "danger-full-access"
 approval_policy = "never"
+model = "gpt-5.6-luna"
+model_reasoning_effort = "xhigh"
 MANAGED
 
 {{ if dig "fast_mode" false . -}}
@@ -87,6 +91,11 @@ tool_timeout_sec = 120
 command = "npx"
 args = ["-y", "ts-mcp-server"]
 startup_timeout_sec = 120
+
+# Bound each long-lived tsserver spawned by the TypeScript MCP. Without this,
+# inactive WST streams can retain multi-gigabyte heaps indefinitely.
+[mcp_servers.typescript.env]
+NODE_OPTIONS = "--max-old-space-size=2560"
 MANAGED
 
   if [ -n "$preserved" ]; then

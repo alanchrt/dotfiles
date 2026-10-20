@@ -60,7 +60,11 @@ _wst() {
     'attach:attach to existing stream'
     'preview:open stream URL in browser'
     'ls:list streams'
+    'resources:show or apply active pane resource limits'
+    'park:stop a workspace but preserve its clone and state'
     'rm:tear down stream'
+    'purpose:view or set persistent Codex purpose'
+    'codex:start Codex with the stream purpose'
     'doctor:diagnostics'
     'migrate:relocate canonicals to <project>/main/'
   )
@@ -73,19 +77,30 @@ _wst() {
       _arguments \
         '--base[base branch]:base branch:_wst_branches' \
         '--project[project name]:project:' \
-        '--devcontainer[run this stream in a devcontainer]' \
+        '--purpose[persistent Codex purpose]:purpose:' \
         '--debug[print debug output]' \
         '1:branch:_wst_branches'
       return
       ;;
+    purpose)
+      _arguments \
+        '--set[set persistent Codex purpose]:purpose:' \
+        '--clear[clear explicit purpose]'
+      return
+      ;;
     attach)
       _arguments \
-        '--devcontainer[run this stream in a devcontainer]' \
         '--debug[print debug output]' \
         '1:stream:_wst_streams'
       return
       ;;
-    preview|rm)
+    resources)
+      _arguments \
+        '--apply[apply limits to matching active panes]' \
+        '1:stream:_wst_streams'
+      return
+      ;;
+    preview|park|rm)
       if (( CURRENT == 3 )); then
         streams=("${(@f)$(_wst_streams)}")
         _describe 'stream' streams
@@ -97,7 +112,6 @@ _wst() {
 # The short aliases attach to subcommands directly.
 _wa() {
   _arguments \
-    '--devcontainer[run this stream in a devcontainer]' \
     '--debug[print debug output]' \
     '1:stream:_wst_streams'
 }
@@ -115,7 +129,6 @@ _wn() {
   _arguments \
     '--base[base branch]:base branch:_wst_branches' \
     '--project[project name]:project:' \
-    '--devcontainer[run this stream in a devcontainer]' \
     '--debug[print debug output]' \
     '1:branch:_wst_branches'
 }

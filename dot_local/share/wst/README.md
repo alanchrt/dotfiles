@@ -2,7 +2,7 @@
 
 `wst` creates isolated workstreams as separate git clones under
 `~/Projects/<project>/<stream>/` and opens each stream in its own tmux window.
-The default runtime is the host: panes run directly in the stream clone with
+Panes run directly on the host in the stream clone with
 `WST_PROJECT`, `WST_STREAM`, `WST_PORT`, `WST_HOST_PORT`, and
 `WST_CDP_PORT`, and `WST_BROWSER_PROFILE` exported.
 
@@ -10,23 +10,48 @@ The default runtime is the host: panes run directly in the stream clone with
 
 ```bash
 wst clone <git-url> [name]                         # clone into ~/Projects/<name>/main/
-wst new <branch> [--base <base>] [--devcontainer]  # create stream + tmux window
-wst attach <branch> [--devcontainer]               # switch to stream window
+wst new <branch> [--base <base>] [--purpose <text>]
+                                                    # create stream + tmux window
+wst attach <branch>                                # switch to stream window
 wst preview [<branch>]                             # open http://localhost:<port>/
 wst ls [--all]                                     # list streams
+wst resources [--apply] [<branch>]                 # inspect/apply pane limits
+wst park <branch>                                  # stop panes; preserve clone/state
 wst rm <branch> [--force]                          # remove stream clone/window/state
 wst gtinit [--project <name>]                      # enable Graphite rules
+wst purpose [--set <text> | --clear]               # manage the persistent Codex purpose
+wst codex [codex options...]                       # start Codex with the stream purpose
 wst chrome [-- <url> ...]                          # browser handoff profile
 wst doctor                                         # diagnostics
 ```
 
-Use `--devcontainer` only when a stream needs container isolation or a project
-runtime that is not installed on the host. The choice is persisted in the stream
-git config as `wst.runtime`.
+## Persistent Codex Purpose
+
+Each stream can store a durable purpose in its clone-local Git config. This
+value is not committed. WST injects it as a Codex developer instruction each
+time it starts Codex.
+
+```bash
+wst purpose --set "Fix product defects and add focused regression tests."
+wst purpose
+wst codex
+```
+
+You can also set the purpose when you create a stream:
+
+```bash
+wst new bugs --purpose "Fix product defects and add focused regression tests."
+```
+
+After you change a purpose, exit the current Codex CLI once and start it with
+`wst codex`. Then use `/new <task>` or `/clear <task>` between unrelated tasks.
+The new chat drops the old task context, but it keeps the stream purpose from
+the WST launch configuration. If no explicit purpose exists, WST uses the
+stream name as the purpose.
 
 ## Tmux Layout
 
-`wst new` opens the same workspace layout for host and devcontainer streams:
+`wst new` opens this workspace layout:
 
 - top-left: Codex
 - top-right: spare shell
@@ -34,7 +59,33 @@ git config as `wst.runtime`.
 
 Set `WST_PANES=1` for a single pane. Set `WST_GIT_PANE=lazygit` or
 `WST_GIT_PANE=shell` to replace the Magit pane. Stream-aware tmux splits
-(`prefix + "` and `prefix + %`) open in the current stream runtime.
+(`prefix + "` and `prefix + %`) open in the current stream.
+
+## Resource Controls
+
+Every WST pane runs in its own systemd scope with a lower CPU/IO scheduling
+weight than desktop applications. Memory pressure starts at 6 GiB for agent
+panes, 3 GiB for editor panes, and 8 GiB for shell/build panes; hard limits are
+10 GiB, 5 GiB, and 12 GiB respectively. These limits keep one runaway stream
+from making Chrome, calls, or the desktop unresponsive.
+
+New panes receive the policy automatically. Apply it to panes that were already
+open when the dotfiles changed, and inspect current/peak usage, with:
+
+```bash
+wst resources --apply
+wst resources                 # all active streams
+wst resources my-stream       # one stream
+```
+
+Park inactive streams instead of leaving their agents and language servers in
+memory. Parking closes the tmux window and its Emacs daemon, but preserves the
+clone, Git changes, port, and stream configuration:
+
+```bash
+wst park my-stream
+wa my-stream                  # recreate the panes later
+```
 
 ## Chrome DevTools MCP
 
@@ -45,39 +96,17 @@ sibling stream pane first:
 wst chrome >/tmp/wst-chrome.log 2>&1 &
 ```
 
-Host streams use `~/.config/chromium-wst`. Devcontainer streams use the
-devcontainer profile configured by `wst-container-up`. Both launch Chrome with
-remote debugging enabled on `$WST_CDP_PORT` so Codex's `chrome-devtools` MCP
-server can attach to it.
+WST uses the persistent `~/.config/chromium-wst` profile and launches Chrome
+with remote debugging enabled on `$WST_CDP_PORT` so Codex's `chrome-devtools`
+MCP server can attach to it.
 
 For SSO, MFA, captchas, or consent screens, complete the interactive flow in
 that Chrome window, then tell the agent to retry.
-
-## Devcontainer Opt-In
-
-Devcontainer streams still use the `wst-dev:latest` mega image and the existing
-`wst-container-up`/`wst-devcontainer-exec` helpers.
-
-Build or refresh the image when needed:
-
-```bash
-ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev
-ansible-playbook -i ~/Projects/dotfiles/master/hosts ~/Projects/dotfiles/master/local.yml --tags wst-dev \
-  -e wst_dev_force_rebuild=true
-```
-
-Create or attach with a devcontainer:
-
-```bash
-wst new my-stream --devcontainer
-wst attach my-stream --devcontainer
-```
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
 | commit rejected: "refusing to commit on trunk" | Streams open on trunk synced to origin; create the feature branch first with `git switch -c "$WST_STREAM"` or `gt create -m "..."`. |
-| `wst chrome` cannot find Chromium | Install host Chromium/Chrome, or use a devcontainer stream with `--devcontainer`. |
-| devcontainer stream fails: "base image wst-dev:latest not built" | Run the Ansible `--tags wst-dev` command above. |
-| `wst ls` shows `devcontainer:down` | Attach with `wa <branch>` to boot the devcontainer, or switch back to host by setting `git config wst.runtime host` in the stream clone. |
+| `wst chrome` cannot find Chromium | Install Chromium or Chrome on the host. |
+| A new Codex chat does not know the stream purpose | Exit the CLI with `/quit`, then run `wst codex` once. Future `/new` and `/clear` chats retain it. |

@@ -6,9 +6,8 @@
 # (wst-notify-dispatcher) watches the queue and dispatches each entry via
 # notify-send + tmux pane focus + wmctrl.
 #
-# The queue indirection lets this hook work from host Claude Code and from
-# opt-in devcontainer streams where direct access to DBus / host tmux / X11
-# isn't plumbed.
+# The queue indirection keeps desktop notification work in a long-running
+# host service instead of blocking Claude Code hooks.
 
 set -euo pipefail
 
@@ -70,9 +69,8 @@ if [[ -n "$SUMMARY" ]]; then
 fi
 BODY="${BODY:-Waiting for your input}"
 
-# --- Tmux pane target. Devcontainer streams cannot walk host tmux pane_pid, so
-#     they skip the walk and let the dispatcher resolve via WST_PROJECT /
-#     WST_STREAM env. ---
+# --- Tmux pane target. WST streams use their project/stream metadata; other
+#     sessions walk the host process tree to find their pane. ---
 PANE_TARGET=""
 if [[ -z "${WST_STREAM:-}" ]] && command -v tmux >/dev/null 2>&1 \
      && tmux list-panes -a >/dev/null 2>&1; then

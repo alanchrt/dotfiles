@@ -4,6 +4,25 @@
     key: "/org/gnome/shell/disable-extension-version-validation"
     value: "true"
 
+- name: Create the GNOME Shell systemd drop-in directory
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user/org.gnome.Shell@user.service.d"
+    state: directory
+    mode: "0755"
+
+- name: Keep application OOM events from taking down GNOME Shell
+  ansible.builtin.copy:
+    src: gnome-shell-oom.conf
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/org.gnome.Shell@user.service.d/oom.conf"
+    mode: "0644"
+  register: gnome_shell_oom_config
+
+- name: Reload user systemd units after changing GNOME Shell OOM policy
+  ansible.builtin.systemd_service:
+    scope: user
+    daemon_reload: yes
+  when: gnome_shell_oom_config.changed
+
 - name: Create backgrounds and themes directories
   file:
     path: "{{ item }}"

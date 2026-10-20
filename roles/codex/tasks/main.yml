@@ -6,5 +6,6 @@
   become: yes
   community.general.npm:
     name: "@openai/codex"
+    version: "{{ codex_npm_version }}"
     global: true
     state: present

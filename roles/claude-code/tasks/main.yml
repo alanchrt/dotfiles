@@ -3,3 +3,53 @@
   shell: "curl -fsSL https://claude.ai/install.sh | bash"
   args:
     creates: "{{ ansible_env.HOME }}/.local/bin/claude"
+
+- name: Install inotify-tools for the Claude notification dispatcher
+  become: yes
+  ansible.builtin.dnf:
+    name: inotify-tools
+
+- name: Ensure the Claude notification queue exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.cache/wst/notify-queue"
+    state: directory
+    mode: "0755"
+
+- name: Ensure systemd user dir exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.config/systemd/user"
+    state: directory
+    mode: "0755"
+
+- name: Install the Claude notification dispatcher service
+  ansible.builtin.copy:
+    dest: "{{ ansible_env.HOME }}/.config/systemd/user/wst-notify-dispatcher.service"
+    content: |
+      [Unit]
+      Description=wst notification queue dispatcher (host-side notify-send + tmux focus)
+      After=default.target
+
+      [Service]
+      Type=simple
+      Restart=on-failure
+      RestartSec=3
+      Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+      ExecStart=%h/.local/bin/wst-notify-dispatcher
+
+      [Install]
+      WantedBy=default.target
+    mode: "0644"
+  register: wst_notify_unit
+
+- name: Reload systemd user units when the dispatcher changes
+  ansible.builtin.systemd:
+    daemon_reload: yes
+    scope: user
+  when: wst_notify_unit.changed
+
+- name: Enable the Claude notification dispatcher
+  ansible.builtin.systemd:
+    name: wst-notify-dispatcher
+    scope: user
+    enabled: yes
+    state: started

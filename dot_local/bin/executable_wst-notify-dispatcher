@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # wst-notify-dispatcher — host-side daemon that watches
 # $HOME/.cache/wst/notify-queue/ for JSON files produced by
-# ~/.claude/hooks/notify-input.sh (running on host or in an opt-in
-# devcontainer stream) and dispatches each as a desktop notification with a "Focus"
+# ~/.claude/hooks/notify-input.sh and dispatches each as a desktop notification with a "Focus"
 # action. Click → focus the matching tmux window/pane + raise the Alacritty
 # client. Run as a systemd user service (wst-notify-dispatcher.service).
 

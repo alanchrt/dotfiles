@@ -30,7 +30,7 @@ The separate "ask before committing to main/master" rule above still applies; th
 When the user refers to "the screenshot", "that file I downloaded", or otherwise points to a file by description without a path, check these locations first:
 
 - `~/Downloads/` — files the user dropped from host browsers/apps.
-- Screenshots: `~/Pictures/Screenshots/` on the host. Devcontainer streams may also expose them at `~/Screenshots/`.
+- Screenshots: `~/Pictures/Screenshots/`.
 
 Treat these as read-only reference locations — read freely, but don't try to modify files there in place.
 
@@ -40,13 +40,13 @@ When working in TypeScript or JavaScript, use the TypeScript MCP server for type
 
 # Workstream Workflow
 
-Streams are isolated parallel development environments — each one is its own git clone with its own port and tmux workspace. By default, stream panes run directly on the host in the stream clone. A stream can opt into a devcontainer with `--devcontainer`. Stream layout: `~/Projects/<project>/main/` is the canonical, `~/Projects/<project>/<branch>/` are streams. The user manages stream lifecycle manually; don't propose creating or tearing down streams unsolicited.
+Streams are isolated parallel development environments — each one is its own git clone with its own port and tmux workspace. Stream panes run directly on the host in the stream clone. Stream layout: `~/Projects/<project>/main/` is the canonical, `~/Projects/<project>/<branch>/` are streams. The user manages stream lifecycle manually; don't propose creating or tearing down streams unsolicited.
 
 **Commands** (the host `wst` script — see `~/.local/bin/wst`; chezmoi source: `dot_local/bin/executable_wst`):
 
 ```bash
 wcl <git-url> [name]               # clone repo into ~/Projects/<name>/main/
-wst new <branch> [--base <base>] [--devcontainer]  # clone + tmux window
+wst new <branch> [--base <base>]   # clone + tmux window
 wa <branch>                        # attach — switches tmux window
 wp [<branch>]                      # preview: open localhost:<port>/ in host browser
 wls                                # list streams in current project
@@ -59,11 +59,11 @@ wst doctor                         # diagnostics
 - **A fresh stream opens on the trunk (`main`/`master`) synced to `origin`, NOT on a feature branch.** Before your first commit, create a branch named after the stream — the name is in `$WST_STREAM` (and `git config wst.branch`): `git switch -c "$WST_STREAM"`, or under Graphite `gt create -m "..."` (which makes the branch with the commit). Never commit on the trunk — a `pre-commit` hook rejects it and reminds you of the branch name.
 - Default to plain `git` + `gh`. If `AGENTS.override.md` or `.claude/rules/graphite.md` exists at the repo root with Graphite verbs, use `gt` in the stream clone instead — specifically: `gt create -m "..."` (not `git commit`), `gt modify` (not `git commit --amend`), `gt create <name>` (not `git checkout -b`), `gt restack` (not `git rebase`), `gt submit` (not `gh pr create`). To enable Graphite for a project, run `wst gtinit` once — it links the rule files into the canonical and every existing stream, and runs `gt repo init` in each stream. Future `wst new` streams inherit the setup automatically.
 - Push: `git push -u origin HEAD` — once you've branched, the stream branch carries the final name (matching the stream), no prefix mapping.
-- After merge: `wst rm <branch>` removes the clone dir, the tmux window, and frees the port. For devcontainer streams, it also removes the devcontainer.
+- After merge: `wst rm <branch>` removes the clone dir, the tmux window, and frees the port.
 
-**Tmux integration:** stream windows split into the same stream runtime (`prefix + "` / `prefix + %`). Host streams open host panes; devcontainer streams open devcontainer panes. Non-stream windows split normally on the host. The split-pane helper is at `~/.local/bin/wst-tmux-split`.
+**Tmux integration:** stream windows split into the same host workspace (`prefix + "` / `prefix + %`). Non-stream windows split normally. The split-pane helper is at `~/.local/bin/wst-tmux-split`.
 
-**Android emulator:** the emulator runs on host (KVM access). Host streams can use normal host `adb`. Devcontainer streams reach it through `ADB_SERVER_SOCKET=tcp:host.docker.internal:5037` (set automatically by `wst-container-up`). Host adb listens on all interfaces via the `adb-bridge` systemd user service.
+**Android emulator:** the emulator and `adb` run on the host with KVM access.
 
 **Chromium / Chrome DevTools MCP:** `wst chrome` opens headed Chromium against the stream's persistent browser profile with remote debugging enabled on `$WST_CDP_PORT`. Before using the `chrome-devtools` MCP server in a WST stream, launch Chrome with `wst chrome >/tmp/wst-chrome.log 2>&1 &` from a stream pane. If the browser reaches SSO / MFA / captcha / consent that you can't complete on your own, tell the user the exact URL and what they need to do in that window. After they confirm, retry the browser action. See `~/.local/share/wst/README.md` for the workflow.
 

@@ -15,6 +15,8 @@
       tags: [terminal, dev]
     - name: nodejs
       tags: [nodejs, dev]
+    - name: playwright
+      tags: [playwright, dev]
     - name: python
       tags: [python, dev]
     - name: go
@@ -29,8 +31,6 @@
       tags: [vim, dev]
     - name: docker
       tags: [docker, dev]
-    - name: devcontainer
-      tags: [devcontainer, dev]
     - name: kubernetes
       tags: [kubernetes, dev]
     - name: terraform

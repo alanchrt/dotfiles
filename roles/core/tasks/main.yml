@@ -56,7 +56,34 @@
       - dbus-devel
       - libxcrypt-compat
       - patch
+      - systemd-oomd-defaults
+      - zram-generator-defaults
     update_cache: yes
+
+- name: Configure a 16 GiB compressed-memory swap device
+  become: yes
+  ansible.builtin.copy:
+    src: zram-generator.conf
+    dest: /etc/systemd/zram-generator.conf
+    owner: root
+    group: root
+    mode: "0644"
+  register: zram_generator_config
+
+- name: Explain when the zram change takes effect
+  ansible.builtin.debug:
+    msg: "zram is configured for up to 16 GiB; reboot after this playbook run to activate the new size."
+  when: zram_generator_config.changed
+
+- name: Enable and start userspace out-of-memory protection
+  become: yes
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - systemd-oomd.socket
+    - systemd-oomd.service
 
 - name: Install ffmpeg from RPM Fusion
   become: yes
@@ -70,4 +97,3 @@
     name: flathub
     state: present
     flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
-

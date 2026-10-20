@@ -1,0 +1,17 @@
+---
+- name: Install Playwright browsers in the shared user cache
+  ansible.builtin.command:
+    argv: >-
+      {{
+        ['npx', '--yes', 'playwright@' ~ item, 'install']
+        + playwright_browsers
+      }}
+  environment:
+    HOME: "{{ ansible_env.HOME }}"
+  loop: "{{ playwright_versions }}"
+  loop_control:
+    label: "Playwright {{ item }}"
+  register: playwright_install
+  changed_when: >-
+    'downloaded to' in playwright_install.stdout
+    or 'downloaded to' in playwright_install.stderr

@@ -1,0 +1,10 @@
+---
+# Browser revisions are tied to the Playwright package version. Keep the
+# versions used by active projects here; Ansible installs them side-by-side in
+# Playwright's shared user cache.
+playwright_versions:
+  - "1.61.1"
+
+# An empty list asks Playwright to install every supported browser. Override
+# this with (for example) [chromium] to keep the download smaller.
+playwright_browsers: []

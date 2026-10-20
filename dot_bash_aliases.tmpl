@@ -8,7 +8,7 @@ function dots {
 {{ else -}}
         ansible-playbook --ask-become-pass -c local $(chezmoi source-path)/local.yml -i $(chezmoi source-path)/hosts $@
 {{ end -}}
-        chezmoi apply --force --verbose
+        chezmoi apply --force --verbose --no-pager
     fi
 }
 
