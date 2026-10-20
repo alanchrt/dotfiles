@@ -1025,34 +1025,32 @@ tmux_create_window() {
         local emacs_command
         printf -v emacs_command '%q %q %q %q' \
           "$HOME/.local/bin/wst-emacs-pane" "$emacs_daemon" "$target" "$proj/$branch"
-        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
+        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$agent_pane" -c "$target" \
           "$emacs_command")
         ;;
       lazygit)
         local lazygit_command
         lazygit_command=$(stream_command "$proj" "$branch" "$host_port" 'lazygit; exec zsh -l')
-        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
+        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$agent_pane" -c "$target" \
           "$lazygit_command")
         ;;
       shell|zsh)
         local git_shell_command
         git_shell_command=$(stream_command "$proj" "$branch" "$host_port" 'exec zsh -l')
-        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$session:$slug" -c "$target" \
+        git_pane=$(tmux split-window -P -F '#{pane_id}' -v -l 33% -t "$agent_pane" -c "$target" \
           "$git_shell_command")
         ;;
       *)
         die "unknown WST_GIT_PANE='${WST_GIT_PANE}' (expected: magit, lazygit, shell)"
         ;;
     esac
-    # 2. Focus the top agent pane so the next split lands there.
-    tmux select-pane -t "$session:$slug.0"
-    # 3. Split the top pane horizontally for the spare zsh on the right.
+    # 2. Split the captured agent pane horizontally for the spare zsh on the
+    # right. Targeting the pane ID keeps placement independent of focus and
+    # tmux's pane-base-index setting.
     local shell_command
     shell_command=$(stream_command "$proj" "$branch" "$host_port" 'exec zsh -l')
-    shell_pane=$(tmux split-window -P -F '#{pane_id}' -h -l 40% -t "$session:$slug" -c "$target" \
+    shell_pane=$(tmux split-window -P -F '#{pane_id}' -h -l 40% -t "$agent_pane" -c "$target" \
       "$shell_command")
-    # 4. Return focus to the agent (top-left).
-    tmux select-pane -t "$session:$slug.0"
   fi
   tmux set-option -w -t "$session:$slug" @wst-project "$proj"
   tmux set-option -w -t "$session:$slug" @wst-stream  "$branch"
@@ -1066,6 +1064,7 @@ tmux_create_window() {
   resource_apply_to_pane "$agent_pane" agent
   resource_apply_to_pane "$git_pane" editor
   resource_apply_to_pane "$shell_pane" shell
+  tmux select-pane -t "$agent_pane"
 }
 
 # ---- dispatch ----
