@@ -259,6 +259,36 @@ stream_command() {
     "$proj" "$branch" "$host_port" "$host_port" "$cdp_port" "$HOME/.config/chromium-wst" "$inner"
 }
 
+agent_stream_command() {
+  local proj="$1" branch="$2" host_port="$3" inner
+  printf -v inner '%q codex; exec zsh -l' "$HOME/.local/bin/wst"
+  stream_command "$proj" "$branch" "$host_port" "$inner"
+}
+
+# Existing tmux windows survive across attaches. If Codex exited during an
+# earlier startup, the agent pane used to remain at a plain shell forever
+# because attach only selected the existing window. Restart only an idle zsh
+# pane: a running Codex (or any other foreground/background child) is left
+# untouched.
+tmux_ensure_agent_pane() {
+  local proj="$1" branch="$2" slug="$3" target="$4" host_port="$5"
+  local session agent_pane pane_pid pane_command agent_command
+  session=$(session_name "$proj")
+  agent_pane=$(tmux show-options -wqv -t "$session:$slug" @wst-agent-pane 2>/dev/null || true)
+  [[ -n "$agent_pane" ]] || return 0
+
+  pane_pid=$(tmux display-message -p -t "$agent_pane" '#{pane_pid}' 2>/dev/null || true)
+  pane_command=$(tmux display-message -p -t "$agent_pane" '#{pane_current_command}' 2>/dev/null || true)
+  [[ -n "$pane_pid" && "$pane_command" == "zsh" ]] || return 0
+  if pgrep -P "$pane_pid" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  debug "restarting Codex in idle agent pane $agent_pane"
+  agent_command=$(agent_stream_command "$proj" "$branch" "$host_port")
+  tmux respawn-pane -k -t "$agent_pane" -c "$target" "$agent_command"
+}
+
 # ---- port allocation ----
 
 ports_init() {
@@ -658,6 +688,7 @@ cmd_attach() {
     [[ -n "$host_port" ]] || host_port=$(port_allocate "$key")
     tmux set-option -w -t "$session:$slug" @wst-port "$host_port"
     tmux set-option -w -t "$session:$slug" @wst-cdp-port "$(cdp_port_for_host_port "$host_port")"
+    tmux_ensure_agent_pane "$proj" "$branch" "$slug" "$target" "$host_port"
   fi
 
   if [[ -n "${TMUX:-}" ]]; then
@@ -1009,7 +1040,7 @@ tmux_create_window() {
   local git_pane=""
   local shell_pane=""
   local agent_command
-  agent_command=$(stream_command "$proj" "$branch" "$host_port" 'wst codex; exec zsh -l')
+  agent_command=$(agent_stream_command "$proj" "$branch" "$host_port")
   agent_pane=$(tmux new-window -P -F '#{pane_id}' -t "$session:" -n "$slug" -c "$target" \
     "$agent_command")
   # 3-pane layout: agent (top-left ~60%), spare zsh (top-right ~40%),
