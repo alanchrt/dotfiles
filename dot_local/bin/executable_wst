@@ -170,10 +170,20 @@ stream_developer_instructions() {
   printf '%s' "You are working in the $proj/$branch WST stream. Its durable purpose is: $purpose Keep work aligned with this purpose unless the user explicitly directs otherwise. The user can start each distinct task with /new or /clear; never depend on earlier chat history to remember the stream purpose."
 }
 
-codex_developer_instructions_override() {
-  local instructions="$1"
+codex_stream_profile() {
+  local proj="$1" branch="$2" instructions="$3"
   require_tool jq core
-  printf 'developer_instructions=%s' "$(printf '%s' "$instructions" | jq -Rs .)"
+  local codex_home="${CODEX_HOME:-$HOME/.codex}"
+  local profile
+  profile="wst-$(slugify "$proj")-$(slugify "$branch")"
+  local profile_file="$codex_home/$profile.config.toml"
+  local tmp
+  mkdir -p "$codex_home"
+  tmp=$(mktemp "$codex_home/.$profile.XXXXXX")
+  printf 'developer_instructions = %s\n' "$(printf '%s' "$instructions" | jq -Rs .)" > "$tmp"
+  chmod 600 "$tmp"
+  mv "$tmp" "$profile_file"
+  printf '%s' "$profile"
 }
 
 cdp_port_for_host_port() {
@@ -489,12 +499,12 @@ cmd_purpose() {
 }
 
 cmd_codex() {
-  local context proj branch target instructions override
+  local context proj branch target instructions profile
   context=$(current_stream_context)
   IFS=$'\t' read -r proj branch target <<<"$context"
   instructions=$(stream_developer_instructions "$proj" "$branch" "$target")
-  override=$(codex_developer_instructions_override "$instructions")
-  exec codex -c "$override" "$@"
+  profile=$(codex_stream_profile "$proj" "$branch" "$instructions")
+  exec codex --profile "$profile" "$@"
 }
 
 # The stream opens *on the trunk* (e.g. main) reset to origin/<base>, NOT on a
