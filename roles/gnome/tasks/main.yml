@@ -143,7 +143,6 @@
   dnf:
     name: papirus-icon-theme
   when: papirus_installed.rc != 0
-  register: papirus_icons
 
 - name: Install papirus-folders script
   become: yes
@@ -153,8 +152,8 @@
     mode: "0755"
 
 - name: Set Papirus folder color to violet (Dracula)
+  become: yes
   command: papirus-folders -C violet --theme Papirus
-  when: papirus_icons.changed
   changed_when: false
 
 - name: Set icon theme
