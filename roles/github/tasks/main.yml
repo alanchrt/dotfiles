@@ -5,3 +5,8 @@
 
 - ansible.builtin.include_tasks: macos.yml
   when: ansible_os_family == 'Darwin'
+
+- name: Install GitHub stacked pull requests extension
+  ansible.builtin.command:
+    cmd: gh extension install github/gh-stack
+    creates: "{{ ansible_env.HOME }}/.local/share/gh/extensions/gh-stack/gh-stack"

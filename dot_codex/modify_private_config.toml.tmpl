@@ -49,9 +49,8 @@ sys.stdout.write(text + "\n" if text else "")
 # then the preserved bits (codex's runtime tables, anything else).
 {
   cat <<'MANAGED'
-# Autonomous-first stance: codex doesn't have a Claude-style command-pattern
-# allowlist (no equivalent of permissions.ask = ["Bash(git push*)"]). So
-# instead of mixing sandbox + on-request prompts, drop codex's own sandboxing
+# Autonomous-first stance: Codex does not have command-pattern approval
+# rules. Instead of mixing sandbox + on-request prompts, drop Codex's sandboxing
 # and never-prompt. The commit/push review gate lives in AGENTS.md as a prose
 # instruction, and stream isolation comes from separate git clones/workspaces.
 sandbox_mode = "danger-full-access"

@@ -1,10 +1,9 @@
 # Workflow
 
-- For any non-trivial implementation, **start in plan mode** (`/plan` in Codex, plan mode in Claude Code) and produce a plan before writing code.
+- For any non-trivial implementation, **start in plan mode** (`/plan` in Codex) and produce a plan before writing code.
 - In plan mode, do not Edit/Write or run state-mutating Bash (no installs, commits, pushes, file moves, network writes). If a real change is needed to validate the plan, ask first.
 - Once you begin implementation, be independent until finished. Do not ask unnecessary questions mid-task.
 - Group work into coherent, reviewable PR-sized changes unless explicitly told to split smaller.
-  - If `AGENTS.override.md` or `.claude/rules/graphite.md` exists at the repo root with Graphite verbs, use `gt create -m "..."` instead of `git commit`. Same swaps: `gt modify` for `git commit --amend`, `gt create <name>` for `git checkout -b <name>`, `gt restack` for `git rebase`, `gt submit` for `gh pr create`. See that rule file for the full verb table.
 - Before committing to the main/master branch, always ask for confirmation first. (This does not apply when working in a worktree on a feature branch.)
 
 # Commit + push flow
@@ -18,12 +17,26 @@ The flow:
 1. When a coherent body of work is done — feature complete, bug fixed, or refactor consolidated with its tests/docs — stop and tell the user it's ready to review, leaving everything unstaged. Say something like: *"Changes are ready for review and unstaged. Once you've reviewed and staged what you want, tell me and I'll commit."*
 2. The user reviews and stages. They may instead ask you to keep making changes — make them and again leave them unstaged for review.
 3. **Only when the user explicitly asks you to commit:** commit exactly what *they* have staged. Do not stage anything yourself first, and do not add unstaged files into the commit. Show `git diff --cached` so they can confirm what's about to land, propose a commit message, then commit + push:
-   - Plain git: `git commit -m "..." && git push -u origin HEAD`
-   - Graphite (when `AGENTS.override.md` or `.claude/rules/graphite.md` is at the repo root): `gt create -m "..." && gt submit`
+   - Single PR: `git commit -m "..." && git push -u origin HEAD`
+   - Native GitHub stack: commit the staged layer with `git commit -m "..."`, then use `gh stack submit` only when the user has explicitly asked to publish the stack.
 
 Prefer one coherent PR over many tiny PRs. Accumulate related edits until the change has a clear review boundary, while avoiding unrelated work in the same PR.
 
 The separate "ask before committing to main/master" rule above still applies; that case is unusual and out-of-band.
+
+# GitHub Stacked Pull Requests
+
+When work naturally needs two or more dependent review units, use GitHub's native stacked pull requests through `gh stack`. Do not emulate a stack by manually opening ordinary pull requests whose base branches point at one another.
+
+- Start the first layer with `gh stack init <branch-name>`.
+- Start each dependent layer with `gh stack add <branch-name>`.
+- Keep each layer reviewable and honor the staging and commit gates above for every layer.
+- Publish or update the whole stack with `gh stack submit` only after explicit user approval for the external write.
+- Rebase a changed lower layer through its dependents with `gh stack rebase`; push the rebased branches with `gh stack push`.
+- After layers merge, use `gh stack sync --prune` to update local stack metadata and remove merged branches.
+- Use `gh stack checkout`, `gh stack down`, and `gh stack top` to navigate a stack.
+
+Use a normal Git branch and PR when the work is a single review unit. GitHub stacks require branches in the same repository; do not use them for fork-based contributions.
 
 # Shared host files
 
@@ -51,13 +64,12 @@ wa <branch>                        # attach — switches tmux window
 wp [<branch>]                      # preview: open localhost:<port>/ in host browser
 wls                                # list streams in current project
 wst rm <branch>                    # tear down: clone dir + tmux window
-wst gtinit [--project <name>]      # mark project as Graphite-enabled (one-time per project)
 wst doctor                         # diagnostics
 ```
 
 - All commits, PRs, dev server runs, and agent invocations happen in the stream clone shown by `wa <branch>`.
-- **A fresh stream opens on the trunk (`main`/`master`) synced to `origin`, NOT on a feature branch.** Before your first commit, create a branch named after the stream — the name is in `$WST_STREAM` (and `git config wst.branch`): `git switch -c "$WST_STREAM"`, or under Graphite `gt create -m "..."` (which makes the branch with the commit). Never commit on the trunk — a `pre-commit` hook rejects it and reminds you of the branch name.
-- Default to plain `git` + `gh`. If `AGENTS.override.md` or `.claude/rules/graphite.md` exists at the repo root with Graphite verbs, use `gt` in the stream clone instead — specifically: `gt create -m "..."` (not `git commit`), `gt modify` (not `git commit --amend`), `gt create <name>` (not `git checkout -b`), `gt restack` (not `git rebase`), `gt submit` (not `gh pr create`). To enable Graphite for a project, run `wst gtinit` once — it links the rule files into the canonical and every existing stream, and runs `gt repo init` in each stream. Future `wst new` streams inherit the setup automatically.
+- **A fresh stream opens on the trunk (`main`/`master`) synced to `origin`, NOT on a feature branch.** Before your first commit, create a branch named after the stream — the name is in `$WST_STREAM` (and `git config wst.branch`). Use `git switch -c "$WST_STREAM"` for a single PR or `gh stack init "$WST_STREAM"` for the first layer of a native GitHub stack. Never commit on the trunk — a `pre-commit` hook rejects it and reminds you of the branch name.
+- Default to plain `git` + `gh` for a single PR. When the work needs dependent PRs, use the native `gh stack` workflow described above.
 - Push: `git push -u origin HEAD` — once you've branched, the stream branch carries the final name (matching the stream), no prefix mapping.
 - After merge: `wst rm <branch>` removes the clone dir, the tmux window, and frees the port.
 

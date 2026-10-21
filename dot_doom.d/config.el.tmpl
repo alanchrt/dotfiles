@@ -172,7 +172,7 @@
 (after! python
   (set-formatter! 'ruff-format "ruff format -" :modes '(python-mode python-ts-mode)))
 
-;; Live-refresh buffers when files change on disk (e.g. Claude Code edits).
+;; Live-refresh buffers when files change on disk (e.g. Codex edits).
 ;; Pair with `:ui vc-gutter` to get live fringe markers without manual revert.
 (setq auto-revert-verbose nil
       auto-revert-use-notify t
@@ -879,7 +879,7 @@ conflate staged and unstaged changes when a file has both."
 ;; ── Review markers: inline @agents comments addressed by /annotations ───────
 ;;
 ;; Workflow: `SPC r a' drops a `@agents <note>' comment on a line; review with
-;; `SPC r n/p/s'; run /annotations in Claude Code to address each marker and
+;; `SPC r n/p/s'; ask Codex to address each marker and
 ;; delete it as it goes; `SPC r x' clears any leftovers. A global pre-commit
 ;; hook blocks commits that still contain markers. The marker is built by
 ;; concatenation so the literal never appears in this committed file (the same

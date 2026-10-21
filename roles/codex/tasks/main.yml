@@ -3,7 +3,7 @@
 # is currently broken on glibc Linux (it resolves a musl variant that isn't in
 # the release SHA256SUMS). The npm package works cleanly.
 - name: Install Codex CLI (npm global)
-  become: yes
+  become: "{{ ansible_os_family == 'RedHat' }}"
   community.general.npm:
     name: "@openai/codex"
     version: "{{ codex_npm_version }}"

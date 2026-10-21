@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Template hook: chains to global hook when core.hooksPath is overridden to .git/hooks
-# (e.g. by Claude Code). Without this, the global hook would be silently skipped.
+# (e.g. by a repository tool). Without this, the global hook would be silently skipped.
 
 GLOBAL_HOOK="$HOME/.config/git/hooks/$(basename "$0")"
 if [[ -x "$GLOBAL_HOOK" && -z "${_CHAINED_FROM_GLOBAL:-}" ]]; then

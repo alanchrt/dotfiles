@@ -18,7 +18,6 @@ wst ls [--all]                                     # list streams
 wst resources [--apply] [<branch>]                 # inspect/apply pane limits
 wst park <branch>                                  # stop panes; preserve clone/state
 wst rm <branch> [--force]                          # remove stream clone/window/state
-wst gtinit [--project <name>]                      # enable Graphite rules
 wst purpose [--set <text> | --clear]               # manage the persistent Codex purpose
 wst codex [codex options...]                       # start Codex with the stream purpose
 wst chrome [-- <url> ...]                          # browser handoff profile
@@ -107,6 +106,6 @@ that Chrome window, then tell the agent to retry.
 
 | Symptom | Fix |
 |---|---|
-| commit rejected: "refusing to commit on trunk" | Streams open on trunk synced to origin; create the feature branch first with `git switch -c "$WST_STREAM"` or `gt create -m "..."`. |
+| commit rejected: "refusing to commit on trunk" | Streams open on trunk synced to origin; use `git switch -c "$WST_STREAM"` for a single PR or `gh stack init "$WST_STREAM"` for a native GitHub stack. |
 | `wst chrome` cannot find Chromium | Install Chromium or Chrome on the host. |
 | A new Codex chat does not know the stream purpose | Exit the CLI with `/quit`, then run `wst codex` once. Future `/new` and `/clear` chats retain it. |

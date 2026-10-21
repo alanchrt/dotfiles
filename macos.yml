@@ -12,8 +12,7 @@
     - { name: github, tags: [github] }
     - { name: aws, tags: [aws, dev] }
     - { name: choose, tags: [choose] }
-    - { name: claude-code, tags: [claude-code] }
-    - { name: graphite, tags: [graphite] }
+    - { name: codex, tags: [codex, dev] }
 
     # keep completions last since they depend on programs to generate
     - { name: completions, tags: [completions] }
