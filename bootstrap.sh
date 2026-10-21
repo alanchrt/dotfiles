@@ -15,9 +15,29 @@ read RBW_EMAIL
 PANEL_COLOR=""
 CHEZMOI_DATA="name = \"$NAME\"\nemail = \"$EMAIL\"\nrbw_email = \"$RBW_EMAIL\""
 
-echo -n "[sudo] password for $USER: "
-read -s PASSWORD
-echo
+BECOME_PASSWORD_FILE=$(mktemp "${TMPDIR:-/tmp}/dotfiles-become.XXXXXX")
+chmod 600 "$BECOME_PASSWORD_FILE"
+cleanup() {
+    rm -f -- "$BECOME_PASSWORD_FILE"
+}
+trap cleanup EXIT
+
+while true; do
+    echo -n "[sudo] password for $USER: "
+    read -r -s PASSWORD
+    echo
+
+    # Force a real credential check now instead of discovering a typo after
+    # chezmoi has applied and Ansible has started running roles.
+    sudo -k
+    if printf '%s\n' "$PASSWORD" | sudo -S -p '' -v; then
+        printf '%s\n' "$PASSWORD" > "$BECOME_PASSWORD_FILE"
+        unset PASSWORD
+        break
+    fi
+    unset PASSWORD
+    echo "Incorrect sudo password; please try again."
+done
 
 if [[ "$OS" == "Linux" ]]; then
     echo -n "Top bar color override (leave blank for Dracula default, e.g. rgba(20, 20, 30, 0.98)): "
@@ -35,7 +55,7 @@ if [[ "$OS" == "Darwin" ]]; then
     fi
     brew install ansible chezmoi
 elif [[ "$OS" == "Linux" ]]; then
-    echo "$PASSWORD" | sudo -S dnf install -y ansible python3-psutil
+    sudo dnf install -y ansible python3-psutil
     mkdir -p "$HOME/.local/bin"
 
     # install chezmoi (latest release; `chezmoi upgrade` can refresh later)
@@ -60,11 +80,11 @@ if [[ "$OS" == "Darwin" ]]; then
     ANSIBLE_FORCE_COLOR=true ansible-playbook -v -c local \
         "$DOTFILES_DIR/macos.yml" \
         -i "$DOTFILES_DIR/hosts" \
-        --extra-vars "ansible_become_password=$PASSWORD"
+        --become-password-file "$BECOME_PASSWORD_FILE"
 elif [[ "$OS" == "Linux" ]]; then
     ANSIBLE_FORCE_COLOR=true ansible-pull -v --checkout master \
         --url https://github.com/alanchrt/dotfiles.git \
-        -i hosts --extra-vars "ansible_become_password=$PASSWORD"
+        -i hosts --become-password-file "$BECOME_PASSWORD_FILE"
 fi
 
 if [[ "$OS" == "Darwin" ]]; then
