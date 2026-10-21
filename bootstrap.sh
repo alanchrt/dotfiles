@@ -77,12 +77,12 @@ chezmoi apply --source "$DOTFILES_DIR"
 
 # run ansible playbook
 if [[ "$OS" == "Darwin" ]]; then
-    ANSIBLE_FORCE_COLOR=true ansible-playbook -v -c local \
+    PYTHONUNBUFFERED=1 ANSIBLE_FORCE_COLOR=true ansible-playbook -v -c local \
         "$DOTFILES_DIR/macos.yml" \
         -i "$DOTFILES_DIR/hosts" \
         --become-password-file "$BECOME_PASSWORD_FILE"
 elif [[ "$OS" == "Linux" ]]; then
-    ANSIBLE_FORCE_COLOR=true ansible-pull -v --checkout master \
+    PYTHONUNBUFFERED=1 ANSIBLE_FORCE_COLOR=true ansible-pull -v --checkout master \
         --url https://github.com/alanchrt/dotfiles.git \
         -i hosts --become-password-file "$BECOME_PASSWORD_FILE"
 fi
