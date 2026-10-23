@@ -8,9 +8,10 @@ set -euo pipefail
 
 current=$(cat)
 
-# Preserve everything in the current file EXCEPT our managed top-level
-# keys (only valid before the first section header) and our managed
-# sections ([features], [mcp_servers.chrome-devtools], [mcp_servers.typescript]).
+# Preserve everything in the current file EXCEPT our managed top-level keys
+# (only valid before the first section header), managed sections ([features],
+# [mcp_servers.chrome-devtools], [mcp_servers.typescript]), and the managed
+# tui.vim_mode_default key. Other Codex-written [tui] state stays intact.
 preserved=$(printf '%s' "$current" | python3 -c '
 import re, sys
 managed_keys = {"model", "model_reasoning_effort", "sandbox_mode", "approval_policy", "service_tier"}
@@ -18,19 +19,29 @@ managed_sections = {"features", "mcp_servers.playwright", "mcp_servers.chrome-de
 out = []
 in_drop = False
 in_any_section = False
+current_section = None
+tui_seen = False
 for line in sys.stdin.read().splitlines(keepends=True):
     stripped = line.strip()
     if stripped.startswith("[") and stripped.endswith("]") and not stripped.startswith("[["):
         section = stripped[1:-1].strip()
+        current_section = section
         in_drop = section in managed_sections or any(
             section.startswith(managed + ".") for managed in managed_sections
         )
         in_any_section = True
         if not in_drop:
             out.append(line)
+            if section == "tui":
+                out.append("vim_mode_default = true\n")
+                tui_seen = True
         continue
     if in_drop:
         continue
+    if current_section == "tui":
+        m = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=", line)
+        if m and m.group(1) == "vim_mode_default":
+            continue
     if not in_any_section:
         # Leading area before any section header is owned by this script —
         # drop managed keys and any blank/comment lines so the output stays
@@ -41,6 +52,10 @@ for line in sys.stdin.read().splitlines(keepends=True):
         if m and m.group(1) in managed_keys:
             continue
     out.append(line)
+if not tui_seen:
+    if out and out[-1].strip():
+        out.append("\n")
+    out.extend(["[tui]\n", "vim_mode_default = true\n"])
 text = "".join(out).rstrip()
 sys.stdout.write(text + "\n" if text else "")
 ')

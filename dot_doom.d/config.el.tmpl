@@ -746,6 +746,25 @@ repaints them with this amber emph instead.")
 (use-package! vdiff-magit
   :after magit
   :config
+  ;; vdiff-magit 0.3.3 still calls two APIs changed by Magit 4.7.  The removed
+  ;; lookup was only an optimization before falling back to
+  ;; `magit-find-file-noselect', so returning nil preserves that behavior.  The
+  ;; deprecated index helper now accepts only FILE, while vdiff-magit still
+  ;; passes the old second argument.  Keep both shims conditional so they
+  ;; disappear harmlessly if upstream compatibility returns.
+  (unless (fboundp 'magit-get-revision-buffer)
+    (defun magit-get-revision-buffer (_rev _file &optional _create)
+      "Compatibility shim for vdiff-magit on Magit 4.7."
+      nil))
+  (defun my/vdiff-magit-index-buffer-compat-a (fn file &rest _legacy-args)
+    "Call Magit's current index-buffer helper with FILE only."
+    (funcall fn file))
+  (advice-remove 'magit-find-file-index-noselect
+                 #'my/vdiff-magit-index-buffer-compat-a)
+  (when (equal (help-function-arglist #'magit-find-file-index-noselect t)
+               '(file))
+    (advice-add 'magit-find-file-index-noselect :around
+                #'my/vdiff-magit-index-buffer-compat-a))
   (setq vdiff-magit-stage-is-2way t)
   ;; vdiff--refresh-overlays and vdiff-refine-all-hunks both guard with
   ;; (vdiff--buffer-p) which reads the buffer-local vdiff--session. When called
@@ -820,7 +839,7 @@ repaints them with this amber emph instead.")
                     (overlay-put ov 'priority 100))))))))))
   (advice-add 'vdiff--diff-refresh-finish :after #'my/vdiff-highlight-markers)
   (define-key magit-mode-map "e" #'my/vdiff-magit-dwim)
-  (define-key magit-mode-map "E" #'vdiff-magit-dispatch)
+  (define-key magit-mode-map "E" #'vdiff-magit)
   (map! :map vdiff-mode-map
         :n "q"  #'vdiff-quit
         :n "za" #'vdiff-toggle-fold

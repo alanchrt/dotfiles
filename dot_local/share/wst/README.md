@@ -28,7 +28,9 @@ wst doctor                                         # diagnostics
 
 Each stream can store a durable purpose in its clone-local Git config. This
 value is not committed. WST injects it as a Codex developer instruction each
-time it starts Codex.
+time it starts Codex through a local, git-excluded `.codex/config.toml`. Using
+project configuration keeps Codex connected to its shared background server;
+WST does not launch Codex with command-line configuration overrides.
 
 ```bash
 wst purpose --set "Fix product defects and add focused regression tests."
