@@ -64,7 +64,7 @@ _wst() {
     'park:stop a workspace but preserve its clone and state'
     'rm:tear down stream'
     'purpose:view or set persistent Codex purpose'
-    'codex:start Codex with the stream purpose'
+    'codex:start isolated Codex with the stream purpose'
     'doctor:diagnostics'
     'migrate:relocate canonicals to <project>/main/'
   )

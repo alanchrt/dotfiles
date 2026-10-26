@@ -2,10 +2,16 @@
 # @openai/codex via npm — the standalone install.sh (chatgpt.com/codex/install.sh)
 # is currently broken on glibc Linux (it resolves a musl variant that isn't in
 # the release SHA256SUMS). The npm package works cleanly.
-- name: Install Codex CLI (npm global)
-  become: "{{ ansible_os_family == 'RedHat' }}"
+- name: Ensure user-owned npm prefix exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/.local"
+    state: directory
+    mode: "0755"
+
+- name: Install latest Codex CLI into the user-owned npm prefix
   community.general.npm:
     name: "@openai/codex"
-    version: "{{ codex_npm_version }}"
     global: true
-    state: present
+    state: latest
+  environment:
+    npm_config_prefix: "{{ ansible_facts['user_dir'] }}/.local"

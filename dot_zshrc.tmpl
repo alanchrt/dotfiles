@@ -43,6 +43,9 @@ if command -v fnm &>/dev/null; then
     eval "$(fnm env --use-on-cd --log-level=quiet)"
 fi
 
+# Keep user-owned global npm tools ahead of fnm's version-specific globals.
+path=("$HOME/.local/bin" ${path:#"$HOME/.local/bin"})
+
 # Bun completions. Bun's installer appends this to ~/.zshrc, but chezmoi owns
 # that file and overwrites it on apply, so keep the line here to survive. Must
 # come after oh-my-zsh's compinit since _bun calls compdef.

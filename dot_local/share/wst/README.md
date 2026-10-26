@@ -19,7 +19,7 @@ wst resources [--apply] [<branch>]                 # inspect/apply pane limits
 wst park <branch>                                  # stop panes; preserve clone/state
 wst rm <branch> [--force]                          # remove stream clone/window/state
 wst purpose [--set <text> | --clear]               # manage the persistent Codex purpose
-wst codex [codex options...]                       # start Codex with the stream purpose
+wst codex [codex options...]                       # start isolated Codex with the stream purpose
 wst chrome [-- <url> ...]                          # browser handoff profile
 wst doctor                                         # diagnostics
 ```
@@ -28,15 +28,23 @@ wst doctor                                         # diagnostics
 
 Each stream can store a durable purpose in its clone-local Git config. This
 value is not committed. WST injects it as a Codex developer instruction each
-time it starts Codex through a local, git-excluded `.codex/config.toml`. Using
-project configuration keeps Codex connected to its shared background server;
-WST does not launch Codex with command-line configuration overrides.
+time it starts Codex through a local, git-excluded `.codex/config.toml`. WST
+launches Codex with `--no-daemon`, so each session's embedded app server and
+child tools remain in that tmux pane's systemd scope instead of sharing a
+background daemon. Project configuration preserves the stream instructions
+without command-line configuration overrides.
 
 ```bash
 wst purpose --set "Fix product defects and add focused regression tests."
 wst purpose
 wst codex
+wst codex resume --last
+wst codex fork --last
 ```
+
+Arguments after `wst codex` are forwarded unchanged. New, resumed, and forked
+sessions therefore all use per-pane embedded mode while retaining Codex
+options such as `--profile`.
 
 You can also set the purpose when you create a stream:
 
@@ -65,9 +73,9 @@ Set `WST_PANES=1` for a single pane. Set `WST_GIT_PANE=lazygit` or
 ## Resource Controls
 
 Every WST pane runs in its own systemd scope with a lower CPU/IO scheduling
-weight than desktop applications. Memory pressure starts at 6 GiB for agent
+weight than desktop applications. Memory pressure starts at 10 GiB for agent
 panes, 3 GiB for editor panes, and 8 GiB for shell/build panes; hard limits are
-10 GiB, 5 GiB, and 12 GiB respectively. These limits keep one runaway stream
+16 GiB, 5 GiB, and 12 GiB respectively. These limits keep one runaway stream
 from making Chrome, calls, or the desktop unresponsive.
 
 New panes receive the policy automatically. Apply it to panes that were already

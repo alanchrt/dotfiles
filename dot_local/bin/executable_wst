@@ -213,7 +213,7 @@ cdp_port_for_host_port() {
 # servers, and builds before they can force a machine-wide OOM.
 resource_policy_for_class() {
   case "$1" in
-    agent)  printf '6G\t10G' ;;
+    agent)  printf '10G\t16G' ;;
     editor) printf '3G\t5G' ;;
     shell)  printf '8G\t12G' ;;
     *)      die "unknown WST resource class '$1'" ;;
@@ -511,7 +511,10 @@ cmd_codex() {
   IFS=$'\t' read -r proj branch target <<<"$context"
   instructions=$(stream_developer_instructions "$proj" "$branch" "$target")
   write_stream_codex_config "$target" "$instructions"
-  exec codex "$@"
+  # Keep the embedded app server and all of its tools inside this tmux pane's
+  # systemd scope. Placing the global option before the untouched caller args
+  # covers new, resume, and fork invocations alike.
+  exec "$HOME/.local/bin/codex" --no-daemon "$@"
 }
 
 # The stream opens *on the trunk* (e.g. main) reset to origin/<base>, NOT on a
@@ -742,7 +745,7 @@ cmd_resources() {
   printf '\nTotal active WST pane memory: %s; swap: %s\n' \
     "$(format_resource_bytes "$total_memory")" "$(format_resource_bytes "$total_swap")"
   if $apply; then
-    printf 'Applied limits: agent 6G/10G, editor 3G/5G, shell 8G/12G high/max; CPU/IO weight 25.\n'
+    printf 'Applied limits: agent 10G/16G, editor 3G/5G, shell 8G/12G high/max; CPU/IO weight 25.\n'
   fi
 }
 
@@ -1015,7 +1018,7 @@ usage:
   wst park <branch>                                     stop a workspace but preserve its clone
   wst rm <branch> [--force]                             tear down stream
   wst purpose [--set <text> | --clear]                  view or set the persistent Codex purpose
-  wst codex [codex options...]                          start Codex with the stream purpose
+  wst codex [codex options...]                          start isolated Codex with the stream purpose
   wst chrome [-- <url> ...]                             open headed Chromium for Chrome DevTools MCP
   wst doctor                                            diagnostics
   wst migrate                                           one-shot canonical relocation
