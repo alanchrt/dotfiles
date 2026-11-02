@@ -58,6 +58,7 @@
       - patch
       - systemd-oomd-defaults
       - zram-generator-defaults
+      - fuse-libs
     update_cache: yes
 
 - name: Configure a 16 GiB compressed-memory swap device

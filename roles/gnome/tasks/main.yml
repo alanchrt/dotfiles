@@ -225,12 +225,36 @@
     path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
     state: directory
 
+- name: Check installed ddterm version
+  ansible.builtin.command:
+    argv:
+      - grep
+      - -q
+      - '"version": 73'
+      - "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/metadata.json"
+  register: ddterm_version
+  changed_when: false
+  failed_when: false
+
+- name: Remove outdated ddterm extension
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
+    state: absent
+  when: ddterm_version.rc != 0
+
+- name: Create ddterm extension directory after version check
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
+    state: directory
+  when: ddterm_version.rc != 0
+
 - name: Install ddterm extension
   unarchive:
-    src: https://extensions.gnome.org/extension-data/ddtermamezin.github.com.v64.shell-extension.zip
+    src: https://extensions.gnome.org/extension-data/ddtermamezin.github.com.v73.shell-extension.zip
     remote_src: yes
     dest: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com"
     creates: "{{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/metadata.json"
+  when: ddterm_version.rc != 0
 
 - name: Compile ddterm GSettings schemas
   command: glib-compile-schemas {{ ansible_env.HOME }}/.local/share/gnome-shell/extensions/ddterm@amezin.github.com/schemas/
